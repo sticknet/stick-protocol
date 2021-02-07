@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Gradle: org.whispersystems:curve25519-java:0.5.0">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.whispersystems/curve25519-java/0.5.0/787dab46ed8e6f8adf9bbbb945145d503b7f181a/curve25519-java-0.5.0.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.whispersystems/curve25519-java/0.5.0/ff555b7404726915d090ded90e9efcc81973db5e/curve25519-java-0.5.0-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.whispersystems/curve25519-java/0.5.0/baeef90f6ad70c50b1a91bec2a83462d64d7c7d0/curve25519-java-0.5.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

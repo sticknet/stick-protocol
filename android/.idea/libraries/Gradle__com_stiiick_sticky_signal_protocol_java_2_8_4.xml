@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Gradle: com.stiiick:sticky-signal-protocol-java:2.8.4">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.stiiick/sticky-signal-protocol-java/2.8.4/de49ff01bb09546c1286acb76c077f62f6ebb60b/sticky-signal-protocol-java-2.8.4.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.stiiick/sticky-signal-protocol-java/2.8.4/6cd5d0f99fa91adec988d44e0666eddadd8d8ed3/sticky-signal-protocol-java-2.8.4-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.stiiick/sticky-signal-protocol-java/2.8.4/ee71ba387f7eee32a1bb36adafe12bbb7afbc9d/sticky-signal-protocol-java-2.8.4-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

@@ -11,7 +11,10 @@ buildscript {
     repositories {
         google()
         jcenter()
-        maven { url "https://jitpack.io" }
+        maven {
+            url "https://jitpack.io"
+            credentials { username authToken }
+        }
     }
     dependencies {
         classpath "com.android.tools.build:gradle:4.1.1"
