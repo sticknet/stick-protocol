@@ -114,37 +114,28 @@ public class StickProtocol {
     public void reInit(JSONObject bundle, String password, String oneTimeId) {
         //  ** Regenerate previous keys  ** //
         try {
-            System.out.println("xxx1");
             IdentityKey publicKey = new IdentityKey(Base64.decode((String) bundle.get("identityPublic")), 0);
             byte[] identityCipher = pbDecrypt((String) bundle.get("identityCipher"), (String) bundle.get("identitySalt"), password);
             ECPrivateKey privateKey = Curve.decodePrivatePoint(identityCipher);
             IdentityKeyPair identityKeyPair = new IdentityKeyPair(publicKey, privateKey);
-            System.out.println("xxx2");
             IdentityKeyUtil.save(context, "pref_identity_public_v3", Base64.encodeBytes(publicKey.serialize()));
             IdentityKeyUtil.save(context, "pref_identity_private_v3", Base64.encodeBytes(privateKey.serialize()));
             SignalProtocolStore store = new MySignalProtocolStore(context);
-            System.out.println("xxx3");
 
             ECPublicKey sigPublicKey = Curve.decodePoint(Base64.decode((String) bundle.get("signedPublic")), 0);
             byte[] signedCipher = pbDecrypt((String) bundle.get("signedCipher"), (String) bundle.get("signedSalt"), password);
-            System.out.println("xxx4");
             ECPrivateKey sigPrivateKey = Curve.decodePrivatePoint(signedCipher);
             ECKeyPair sigKeyPair = new ECKeyPair(sigPublicKey, sigPrivateKey);
             byte[] signature = Curve.calculateSignature(identityKeyPair.getPrivateKey(), identityKeyPair.getPublicKey().serialize());
-            System.out.println("xxx5");
             int signedPreKeId = (int) bundle.get("signedPreKeyId");
-            System.out.println("xxx6");
             SignedPreKeyRecord record = new SignedPreKeyRecord(signedPreKeId, System.currentTimeMillis(), sigKeyPair, signature);
             store.storeSignedPreKey(signedPreKeId, record);
             Preferences.setActiveSignedPreKeyId(context, signedPreKeId);
             JSONArray preKeys = (JSONArray) bundle.get("preKeys");
             JSONArray senderKeys = (JSONArray) bundle.get("senderKeys");
-            System.out.println("xxx7");
             int totalKeys = preKeys.length() + senderKeys.length();
             long now = System.currentTimeMillis();
-            System.out.println("xxx8");
             for (int i = 0; i < preKeys.length(); i++) {
-                System.out.println("xxx9");
                 JSONObject preKeyJson = preKeys.getJSONObject(i);
                 ECPublicKey prePubKey = Curve.decodePoint(Base64.decode(preKeyJson.getString("public")), 0);
                 byte[] cipher = pbDecrypt(preKeyJson.getString("cipher"), preKeyJson.getString("salt"), password);
@@ -162,10 +153,8 @@ public class StickProtocol {
 
             // KEYS FOR SENDING SELF
             SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress((String) bundle.get("userId"), 1);
-            System.out.println("xxx10");
             for (int i = 0; i < senderKeys.length(); i++) {
                 JSONObject senderKeyJson = senderKeys.getJSONObject(i);
-                System.out.println("xxx11 "  + senderKeyJson.toString());
                 reinitSenderKey(senderKeyJson, signalProtocolAddress, (String) bundle.get("userId"));
                 Log.d("PROGRESS", Integer.toString(i + 1));
 //                        WritableMap params = Arguments.createMap();
@@ -175,7 +164,6 @@ public class StickProtocol {
             }
             PreferenceManager.getDefaultSharedPreferences(context).edit().putString("oneTimeId", oneTimeId).apply();
             PreferenceManager.getDefaultSharedPreferences(context).edit().putString("userId", (String) bundle.get("userId")).apply();
-            System.out.println("xxx12");
         } catch (Exception e) {
             e.printStackTrace();
         }
