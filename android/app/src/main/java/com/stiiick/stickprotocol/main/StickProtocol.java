@@ -217,13 +217,13 @@ public class StickProtocol {
             List<PreKeyRecord> preKeys = PreKeyUtil.generatePreKeys(context, nextPreKeyId, count);
             JSONArray preKeysArray = new JSONArray();
             for (int i = 0; i < preKeys.size(); i++) {
-                HashMap<String, Object> map = new HashMap<String, Object>();
-                map.put("id", preKeys.get(i).getId());
-                map.put("public", Base64.encodeBytes(preKeys.get(i).getKeyPair().getPublicKey().serialize()));
+                JSONObject preKey = new JSONObject();
+                preKey.put("id", preKeys.get(i).getId());
+                preKey.put("public", Base64.encodeBytes(preKeys.get(i).getKeyPair().getPublicKey().serialize()));
                 HashMap<String, String> cipherMap = pbEncrypt(preKeys.get(i).getKeyPair().getPrivateKey().serialize(), password);
-                map.put("cipher", cipherMap.get("cipher"));
-                map.put("salt", cipherMap.get("salt"));
-                preKeysArray.put(map);
+                preKey.put("cipher", cipherMap.get("cipher"));
+                preKey.put("salt", cipherMap.get("salt"));
+                preKeysArray.put(preKey);
             }
             return preKeysArray;
         } catch (Exception e) {
@@ -235,65 +235,48 @@ public class StickProtocol {
 
     public JSONObject initialize(String userId, String password)  {
         try {
-            System.out.println("INITIALIZINGXXXX");
-            Log.d("INITALIZINGXXX", "LOGXXX");
             HashMap<String, String> serviceMap = new HashMap();
             serviceMap.put("service", context.getPackageName());
             keychain.setGenericPassword(context.getPackageName(), "password", password, serviceMap);
-            System.out.println("INITIALIZINGXXXX1");
             SignalProtocolStore store = new MySignalProtocolStore(context);
             IdentityKeyUtil.generateIdentityKeys(context);
             IdentityKeyPair identityKey = store.getIdentityKeyPair();
-            System.out.println("INITIALIZINGXXXX2");
             SignedPreKeyRecord signedPreKey = PreKeyUtil.generateSignedPreKey(context, identityKey, true);
-
             List<PreKeyRecord> preKeys = PreKeyUtil.generatePreKeys(context, 0, 10);
             ArrayList<Object> preKeysArray = new ArrayList<Object>();
-            System.out.println("INITIALIZINGXXX3");
             for (int i = 1; i < preKeys.size(); i++) {
-                System.out.println("INITIALIZINGXXXX4");
-                HashMap<String, Object> map = new HashMap();
-                System.out.println("INITIALIZINGXXXX41");
-                map.put("id", preKeys.get(i).getId());
-                System.out.println("INITIALIZINGXXXX42");
-                map.put("public", Base64.encodeBytes(preKeys.get(i).getKeyPair().getPublicKey().serialize()));
-                System.out.println("INITIALIZINGXXXX43");
+                JSONObject preKey = new JSONObject();
+                preKey.put("id", preKeys.get(i).getId());
+                preKey.put("public", Base64.encodeBytes(preKeys.get(i).getKeyPair().getPublicKey().serialize()));
                 HashMap<String, String> cipherMap = pbEncrypt(preKeys.get(i).getKeyPair().getPrivateKey().serialize(), password);
-                System.out.println("INITIALIZINGXXXX44");
-                map.put("cipher", cipherMap.get("cipher"));
-                System.out.println("INITIALIZINGXXXX45");
-                map.put("salt", cipherMap.get("salt"));
-                System.out.println("INITIALIZINGXXXX46");
-                preKeysArray.add(map);
-                System.out.println("INITIALIZINGXXXX47");
-                Log.d("PROGRESS", Integer.toString(i + 1));
-                System.out.println("INITIALIZINGXXXX48");
+                preKey.put("cipher", cipherMap.get("cipher"));
+                preKey.put("salt", cipherMap.get("salt"));
+                preKeysArray.add(preKey);
 //                        WritableMap params = Arguments.createMap();
 //                        params.putInt("progress", i + 1);
 //                        params.putInt("total", preKeys.size());
 //                        sendEvent((ReactContext) context, "KeysProgress", params);
             }
 
-            System.out.println("INITIALIZINGXXXX5");
-            HashMap<String, Object> signedMap = new HashMap<>();
-            signedMap.put("id", Preferences.getActiveSignedPreKeyId(context));
-            signedMap.put("public", Base64.encodeBytes(signedPreKey.getKeyPair().getPublicKey().serialize()));
-            signedMap.put("signature", Base64.encodeBytes(signedPreKey.getSignature()));
+            JSONObject signedPreKeyJson = new JSONObject();
+            signedPreKeyJson.put("id", Preferences.getActiveSignedPreKeyId(context));
+            signedPreKeyJson.put("public", Base64.encodeBytes(signedPreKey.getKeyPair().getPublicKey().serialize()));
+            signedPreKeyJson.put("signature", Base64.encodeBytes(signedPreKey.getSignature()));
             HashMap<String, String> signedCipherMap = pbEncrypt(signedPreKey.getKeyPair().getPrivateKey().serialize(), password);
-            signedMap.put("cipher", signedCipherMap.get("cipher"));
-            signedMap.put("salt", signedCipherMap.get("salt"));
+            signedPreKeyJson.put("cipher", signedCipherMap.get("cipher"));
+            signedPreKeyJson.put("salt", signedCipherMap.get("salt"));
 
-            HashMap<String, Object> identityMap = new HashMap<>();
-            identityMap.put("public", Base64.encodeBytes(identityKey.getPublicKey().serialize()));
-            identityMap.put("localId", KeyHelper.generateRegistrationId(false));
+            JSONObject identityKeyJson = new JSONObject();
+            identityKeyJson.put("public", Base64.encodeBytes(identityKey.getPublicKey().serialize()));
+            identityKeyJson.put("localId", KeyHelper.generateRegistrationId(false));
             HashMap<String, String> identityCipherMap = pbEncrypt(identityKey.getPrivateKey().serialize(), password);
-            identityMap.put("cipher", identityCipherMap.get("cipher"));
-            identityMap.put("salt", identityCipherMap.get("salt"));
+            identityKeyJson.put("cipher", identityCipherMap.get("cipher"));
+            identityKeyJson.put("salt", identityCipherMap.get("salt"));
 
             String oneTimeId = UUID.randomUUID().toString();
             JSONObject map = new JSONObject();
-            map.put("identityKey", identityMap);
-            map.put("signedPreKey", signedMap);
+            map.put("identityKey", identityKeyJson);
+            map.put("signedPreKey", signedPreKeyJson);
             map.put("preKeys", preKeysArray);
             map.put("password", password);
             map.put("oneTimeId", oneTimeId);
@@ -315,7 +298,6 @@ public class StickProtocol {
                     identityKey.getPublicKey()
             );
             sessionBuilder.process(preKeyBundle);
-            System.out.println("INITIALIZINGXXXX999 " + map.toString());
             return map;
         } catch (Exception e) {
             e.printStackTrace();
