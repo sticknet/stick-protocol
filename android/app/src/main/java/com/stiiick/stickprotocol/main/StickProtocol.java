@@ -234,6 +234,8 @@ public class StickProtocol {
 
     public JSONObject initialize(String userId, String password) throws Exception {
         try {
+            System.out.println("INITIALIZINGXXXX");
+            Log.d("INITALIZINGXXX", "LOGXXX");
             HashMap<String, String> serviceMap = new HashMap();
             serviceMap.put("service", context.getPackageName());
             keychain.setGenericPassword(context.getPackageName(), "password", password, serviceMap);
