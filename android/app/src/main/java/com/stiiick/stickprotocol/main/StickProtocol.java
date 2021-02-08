@@ -138,10 +138,8 @@ public class StickProtocol {
             store.storeSignedPreKey(signedPreKeId, record);
             Preferences.setActiveSignedPreKeyId(context, signedPreKeId);
             JSONArray preKeys = (JSONArray) bundle.get("preKeys");
-            JSONArray senderKeys = (JSONArray) bundle.get("preKeys");
+            JSONArray senderKeys = (JSONArray) bundle.get("senderKeys");
             System.out.println("xxx7");
-//                    ReadableArray preKeys = bundle.getArray("preKeys");
-//                    ReadableArray senderKeys = bundle.getArray("senderKeys");
             int totalKeys = preKeys.length() + senderKeys.length();
             long now = System.currentTimeMillis();
             System.out.println("xxx8");
