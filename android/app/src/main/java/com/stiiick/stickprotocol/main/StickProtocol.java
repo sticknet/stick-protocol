@@ -232,23 +232,25 @@ public class StickProtocol {
     }
 
 
-    public JSONObject initialize(String userId, String password) throws Exception {
+    public JSONObject initialize(String userId, String password)  {
         try {
             System.out.println("INITIALIZINGXXXX");
             Log.d("INITALIZINGXXX", "LOGXXX");
             HashMap<String, String> serviceMap = new HashMap();
             serviceMap.put("service", context.getPackageName());
             keychain.setGenericPassword(context.getPackageName(), "password", password, serviceMap);
-
+            System.out.println("INITIALIZINGXXXX1");
             SignalProtocolStore store = new MySignalProtocolStore(context);
             IdentityKeyUtil.generateIdentityKeys(context);
             IdentityKeyPair identityKey = store.getIdentityKeyPair();
-
+            System.out.println("INITIALIZINGXXXX2");
             SignedPreKeyRecord signedPreKey = PreKeyUtil.generateSignedPreKey(context, identityKey, true);
 
             List<PreKeyRecord> preKeys = PreKeyUtil.generatePreKeys(context, 0, 10);
             ArrayList<Object> preKeysArray = new ArrayList();
+            System.out.println("INITIALIZINGXXX3");
             for (int i = 1; i < preKeys.size(); i++) {
+                System.out.println("INITIALIZINGXXXX4");
                 HashMap<String, Object> map = new HashMap();
                 map.put("id", preKeys.get(i).getId());
                 map.put("public", Base64.encodeBytes(preKeys.get(i).getKeyPair().getPublicKey().serialize()));
@@ -303,6 +305,7 @@ public class StickProtocol {
                     identityKey.getPublicKey()
             );
             sessionBuilder.process(preKeyBundle);
+            System.out.println("INITIALIZINGXXXX999 " + map.toString());
             return map;
         } catch (Exception e) {
             e.printStackTrace();
