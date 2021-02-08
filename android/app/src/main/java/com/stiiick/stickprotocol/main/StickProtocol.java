@@ -652,7 +652,6 @@ public class StickProtocol {
     }
 
     public HashMap<String, String> pbEncrypt(byte[] text, String pass) throws Exception {
-        synchronized (LOCK) {
         // Generate salt
         SecureRandom randomSalt = new SecureRandom();
         byte[] salt = new byte[32];
@@ -697,7 +696,6 @@ public class StickProtocol {
         map.put("cipher", Base64.encodeBytes(encryptedIVAndText));
 
         return map;
-        }
     }
 
     public byte[] pbDecrypt(String encryptedIvText, String salt, String pass) throws Exception {
