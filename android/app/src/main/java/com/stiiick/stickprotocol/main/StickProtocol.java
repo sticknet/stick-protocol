@@ -87,12 +87,11 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 
-public abstract class StickProtocol {
+public class StickProtocol {
     private static Context context;
     private static String path;
     private static LiveRecipientCache recipientCache;
     private final Keychain keychain;
-    public static final Object LOCK = new Object();
 
 
     public StickProtocol(Context context) {
@@ -101,7 +100,8 @@ public abstract class StickProtocol {
         keychain = new Keychain(context);
     }
 
-    public abstract void sendEvent(JSONObject event);
+
+//    public abstract void sendEvent(JSONObject event);
 
     public void resetDatabase() {
         DatabaseFactory.getInstance(context).resetDatabase(context);
@@ -231,8 +231,11 @@ public abstract class StickProtocol {
         return null;
     }
 
+    public interface SendEvent {
+        void execute(JSONObject event);
+    }
 
-    public JSONObject initialize(String userId, String password) {
+    public JSONObject initialize(String userId, String password, SendEvent sendEvent) {
         try {
             HashMap<String, String> serviceMap = new HashMap();
             serviceMap.put("service", context.getPackageName());
@@ -256,7 +259,7 @@ public abstract class StickProtocol {
                 JSONObject event = new JSONObject();
                 event.put("progress", i + 1);
                 event.put("total", preKeys.size());
-                sendEvent(event);
+                sendEvent.execute(event);
 //                        sendEvent((ReactContext) context, "KeysProgress", params);
             }
 
