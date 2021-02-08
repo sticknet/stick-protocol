@@ -93,6 +93,7 @@ public class StickProtocol {
     private static String path;
     private static LiveRecipientCache recipientCache;
     private final Keychain keychain;
+    public static final Object LOCK = new Object();
 
 
     public StickProtocol(Context context) {
@@ -252,9 +253,13 @@ public class StickProtocol {
             for (int i = 1; i < preKeys.size(); i++) {
                 System.out.println("INITIALIZINGXXXX4");
                 HashMap<String, Object> map = new HashMap();
+                System.out.println("INITIALIZINGXXXX41");
                 map.put("id", preKeys.get(i).getId());
+                System.out.println("INITIALIZINGXXXX42");
                 map.put("public", Base64.encodeBytes(preKeys.get(i).getKeyPair().getPublicKey().serialize()));
+                System.out.println("INITIALIZINGXXXX43");
                 HashMap<String, String> cipherMap = pbEncrypt(preKeys.get(i).getKeyPair().getPrivateKey().serialize(), password);
+                System.out.println("INITIALIZINGXXXX44");
                 map.put("cipher", cipherMap.get("cipher"));
                 map.put("salt", cipherMap.get("salt"));
                 preKeysArray.set(i, map);
@@ -642,7 +647,7 @@ public class StickProtocol {
     }
 
     public HashMap<String, String> pbEncrypt(byte[] text, String pass) throws Exception {
-//        synchronized (LOCK) {
+        synchronized (LOCK) {
         // Generate salt
         SecureRandom randomSalt = new SecureRandom();
         byte[] salt = new byte[32];
@@ -687,7 +692,7 @@ public class StickProtocol {
         map.put("cipher", Base64.encodeBytes(encryptedIVAndText));
 
         return map;
-//        }
+        }
     }
 
     public byte[] pbDecrypt(String encryptedIvText, String salt, String pass) throws Exception {
