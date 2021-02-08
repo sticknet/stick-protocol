@@ -33,7 +33,6 @@ import java.security.GeneralSecurityException;
 import java.security.Key;
 import java.security.KeyStore;
 import java.security.NoSuchAlgorithmException;
-import java.security.ProviderException;
 import java.security.UnrecoverableKeyException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -390,20 +389,20 @@ abstract public class CipherStorageBase implements CipherStorage {
 
     Key secretKey = null;
 
-    // multi-threaded usage is possible
-    synchronized (_syncStrongbox) {
-      if (null == isStrongboxAvailable || isStrongboxAvailable.get()) {
-        if (null == isStrongboxAvailable) isStrongboxAvailable = new AtomicBoolean(false);
-
-        try {
-          secretKey = tryGenerateStrongBoxSecurityKey(alias);
-
-          isStrongboxAvailable.set(true);
-        } catch (GeneralSecurityException | ProviderException ex) {
-          Log.w(LOG_TAG, "StrongBox security storage is not available.", ex);
-        }
-      }
-    }
+//    // multi-threaded usage is possible
+//    synchronized (_syncStrongbox) {
+//      if (null == isStrongboxAvailable || isStrongboxAvailable.get()) {
+//        if (null == isStrongboxAvailable) isStrongboxAvailable = new AtomicBoolean(false);
+//
+//        try {
+//          secretKey = tryGenerateStrongBoxSecurityKey(alias);
+//
+//          isStrongboxAvailable.set(true);
+//        } catch (GeneralSecurityException | ProviderException ex) {
+//          Log.w(LOG_TAG, "StrongBox security storage is not available.", ex);
+//        }
+//      }
+//    }
 
     // If that is not possible, we generate the key in a regular way
     // (it still might be generated in hardware, but not in StrongBox)
