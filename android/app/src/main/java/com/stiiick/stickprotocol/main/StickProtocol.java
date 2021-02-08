@@ -9,17 +9,16 @@
 package com.stiiick.stickprotocol.main;
 
 import android.content.Context;
-import android.os.AsyncTask;
 import android.preference.PreferenceManager;
 
 import androidx.annotation.NonNull;
 
+import com.stiiick.stickprotocol.cipherstream.CipherFile;
+import com.stiiick.stickprotocol.cipherstream.CipherFileStream;
 import com.stiiick.stickprotocol.cipherstream.CipherInputStream;
 import com.stiiick.stickprotocol.cipherstream.CipherOutputStreamFactory;
 import com.stiiick.stickprotocol.cipherstream.DigestingOutputStream;
 import com.stiiick.stickprotocol.cipherstream.PaddingInputStream;
-import com.stiiick.stickprotocol.cipherstream.CipherFile;
-import com.stiiick.stickprotocol.cipherstream.CipherFileStream;
 import com.stiiick.stickprotocol.database.DatabaseFactory;
 import com.stiiick.stickprotocol.keychain.Keychain;
 import com.stiiick.stickprotocol.recipient.LiveRecipientCache;
@@ -114,66 +113,61 @@ public class StickProtocol {
 
     public void reInit(JSONObject bundle, String password, String oneTimeId) {
         //  ** Regenerate previous keys  ** //
-        AsyncTask.execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    IdentityKey publicKey = new IdentityKey(Base64.decode((String) bundle.get("identityPublic")), 0);
-                    byte[] identityCipher = pbDecrypt((String) bundle.get("identityCipher"), (String) bundle.get("identitySalt"), password);
-                    ECPrivateKey privateKey = Curve.decodePrivatePoint(identityCipher);
-                    IdentityKeyPair identityKeyPair = new IdentityKeyPair(publicKey, privateKey);
-                    IdentityKeyUtil.save(context, "pref_identity_public_v3", Base64.encodeBytes(publicKey.serialize()));
-                    IdentityKeyUtil.save(context, "pref_identity_private_v3", Base64.encodeBytes(privateKey.serialize()));
-                    SignalProtocolStore store = new MySignalProtocolStore(context);
+        try {
+            IdentityKey publicKey = new IdentityKey(Base64.decode((String) bundle.get("identityPublic")), 0);
+            byte[] identityCipher = pbDecrypt((String) bundle.get("identityCipher"), (String) bundle.get("identitySalt"), password);
+            ECPrivateKey privateKey = Curve.decodePrivatePoint(identityCipher);
+            IdentityKeyPair identityKeyPair = new IdentityKeyPair(publicKey, privateKey);
+            IdentityKeyUtil.save(context, "pref_identity_public_v3", Base64.encodeBytes(publicKey.serialize()));
+            IdentityKeyUtil.save(context, "pref_identity_private_v3", Base64.encodeBytes(privateKey.serialize()));
+            SignalProtocolStore store = new MySignalProtocolStore(context);
 
-                    ECPublicKey sigPublicKey = Curve.decodePoint(Base64.decode((String) bundle.get("signedPublic")), 0);
-                    byte[] signedCipher = pbDecrypt((String) bundle.get("signedCipher"), (String) bundle.get("signedSalt"), password);
-                    ECPrivateKey sigPrivateKey = Curve.decodePrivatePoint(signedCipher);
-                    ECKeyPair sigKeyPair = new ECKeyPair(sigPublicKey, sigPrivateKey);
-                    byte[] signature = Curve.calculateSignature(identityKeyPair.getPrivateKey(), identityKeyPair.getPublicKey().serialize());
-                    SignedPreKeyRecord record = new SignedPreKeyRecord((int) bundle.get("signedPreKeyId"), System.currentTimeMillis(), sigKeyPair, signature);
-                    store.storeSignedPreKey((int) bundle.get("signedPreKeyId"), record);
-                    Preferences.setActiveSignedPreKeyId(context, (int) bundle.get("signedPreKeyId"));
-                    JSONArray preKeys = (JSONArray) bundle.get("preKeys");
-                    JSONArray senderKeys = (JSONArray) bundle.get("preKeys");
+            ECPublicKey sigPublicKey = Curve.decodePoint(Base64.decode((String) bundle.get("signedPublic")), 0);
+            byte[] signedCipher = pbDecrypt((String) bundle.get("signedCipher"), (String) bundle.get("signedSalt"), password);
+            ECPrivateKey sigPrivateKey = Curve.decodePrivatePoint(signedCipher);
+            ECKeyPair sigKeyPair = new ECKeyPair(sigPublicKey, sigPrivateKey);
+            byte[] signature = Curve.calculateSignature(identityKeyPair.getPrivateKey(), identityKeyPair.getPublicKey().serialize());
+            SignedPreKeyRecord record = new SignedPreKeyRecord((int) bundle.get("signedPreKeyId"), System.currentTimeMillis(), sigKeyPair, signature);
+            store.storeSignedPreKey((int) bundle.get("signedPreKeyId"), record);
+            Preferences.setActiveSignedPreKeyId(context, (int) bundle.get("signedPreKeyId"));
+            JSONArray preKeys = (JSONArray) bundle.get("preKeys");
+            JSONArray senderKeys = (JSONArray) bundle.get("preKeys");
 //                    ReadableArray preKeys = bundle.getArray("preKeys");
 //                    ReadableArray senderKeys = bundle.getArray("senderKeys");
-                    int totalKeys = preKeys.length() + senderKeys.length();
-                    long now = System.currentTimeMillis();
-                    for (int i = 0; i < preKeys.length(); i++) {
-                        JSONObject preKeyJson = preKeys.getJSONObject(i);
-                        ECPublicKey prePubKey = Curve.decodePoint(Base64.decode(preKeyJson.getString("public")), 0);
-                        byte[] cipher = pbDecrypt(preKeyJson.getString("cipher"), preKeyJson.getString("salt"), password);
-                        ECPrivateKey prePrivKey = Curve.decodePrivatePoint(cipher);
-                        ECKeyPair preKey = new ECKeyPair(prePubKey, prePrivKey);
-                        PreKeyRecord pkRecord = new PreKeyRecord(preKeyJson.getInt("id"), preKey);
-                        store.storePreKey(preKeyJson.getInt("id"), pkRecord);
-                        Log.d("PROGRESS", Integer.toString(i + 1));
+            int totalKeys = preKeys.length() + senderKeys.length();
+            long now = System.currentTimeMillis();
+            for (int i = 0; i < preKeys.length(); i++) {
+                JSONObject preKeyJson = preKeys.getJSONObject(i);
+                ECPublicKey prePubKey = Curve.decodePoint(Base64.decode(preKeyJson.getString("public")), 0);
+                byte[] cipher = pbDecrypt(preKeyJson.getString("cipher"), preKeyJson.getString("salt"), password);
+                ECPrivateKey prePrivKey = Curve.decodePrivatePoint(cipher);
+                ECKeyPair preKey = new ECKeyPair(prePubKey, prePrivKey);
+                PreKeyRecord pkRecord = new PreKeyRecord(preKeyJson.getInt("id"), preKey);
+                store.storePreKey(preKeyJson.getInt("id"), pkRecord);
+                Log.d("PROGRESS", Integer.toString(i + 1));
 //                        WritableMap params = Arguments.createMap();
 //                        params.putInt("progress", i + 1);
 //                        params.putInt("total", totalKeys);
 //                        sendEvent((ReactContext) context, "KeysProgress", params);
-                    }
-                    Log.d("TOTAL TIME ", Long.toString(System.currentTimeMillis() - now));
+            }
+            Log.d("TOTAL TIME ", Long.toString(System.currentTimeMillis() - now));
 
-                    // KEYS FOR SENDING SELF
-                    SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress((String) bundle.get("userId"), 1);
-                    for (int i = 0; i < senderKeys.length(); i++) {
-                        JSONObject senderKeyJson = senderKeys.getJSONObject(i);
-                        reinitSenderKey(senderKeyJson, signalProtocolAddress, (String) bundle.get("userId"));
-                        Log.d("PROGRESS", Integer.toString(i + 1));
+            // KEYS FOR SENDING SELF
+            SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress((String) bundle.get("userId"), 1);
+            for (int i = 0; i < senderKeys.length(); i++) {
+                JSONObject senderKeyJson = senderKeys.getJSONObject(i);
+                reinitSenderKey(senderKeyJson, signalProtocolAddress, (String) bundle.get("userId"));
+                Log.d("PROGRESS", Integer.toString(i + 1));
 //                        WritableMap params = Arguments.createMap();
 //                        params.putInt("progress", preKeys.size() + i + 1);
 //                        params.putInt("total", totalKeys);
 //                        sendEvent((ReactContext) context, "KeysProgress", params);
-                    }
-                    PreferenceManager.getDefaultSharedPreferences(context).edit().putString("oneTimeId", oneTimeId).apply();
-                    PreferenceManager.getDefaultSharedPreferences(context).edit().putString("userId", (String) bundle.get("userId")).apply();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
             }
-        });
+            PreferenceManager.getDefaultSharedPreferences(context).edit().putString("oneTimeId", oneTimeId).apply();
+            PreferenceManager.getDefaultSharedPreferences(context).edit().putString("userId", (String) bundle.get("userId")).apply();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         // *** //
     }
@@ -475,7 +469,6 @@ public class StickProtocol {
         SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(userId, 1);
         reinitSenderKey(senderKey, signalProtocolAddress, userId);
     }
-
 
 
     static public void initGroupSenderSession(String senderId, String stickId, String cipherSenderKey, Boolean isSticky) {
