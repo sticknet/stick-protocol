@@ -261,15 +261,20 @@ public class StickProtocol {
                 HashMap<String, String> cipherMap = pbEncrypt(preKeys.get(i).getKeyPair().getPrivateKey().serialize(), password);
                 System.out.println("INITIALIZINGXXXX44");
                 map.put("cipher", cipherMap.get("cipher"));
+                System.out.println("INITIALIZINGXXXX45");
                 map.put("salt", cipherMap.get("salt"));
+                System.out.println("INITIALIZINGXXXX46");
                 preKeysArray.set(i, map);
+                System.out.println("INITIALIZINGXXXX47");
                 Log.d("PROGRESS", Integer.toString(i + 1));
+                System.out.println("INITIALIZINGXXXX48");
 //                        WritableMap params = Arguments.createMap();
 //                        params.putInt("progress", i + 1);
 //                        params.putInt("total", preKeys.size());
 //                        sendEvent((ReactContext) context, "KeysProgress", params);
             }
 
+            System.out.println("INITIALIZINGXXXX5");
             HashMap<String, Object> signedMap = new HashMap<>();
             signedMap.put("id", Preferences.getActiveSignedPreKeyId(context));
             signedMap.put("public", Base64.encodeBytes(signedPreKey.getKeyPair().getPublicKey().serialize()));
