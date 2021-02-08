@@ -78,7 +78,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.SecureRandom;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
@@ -243,7 +242,7 @@ public class StickProtocol {
             IdentityKeyPair identityKey = store.getIdentityKeyPair();
             SignedPreKeyRecord signedPreKey = PreKeyUtil.generateSignedPreKey(context, identityKey, true);
             List<PreKeyRecord> preKeys = PreKeyUtil.generatePreKeys(context, 0, 10);
-            ArrayList<Object> preKeysArray = new ArrayList<Object>();
+            JSONArray preKeysArray = new JSONArray();
             for (int i = 1; i < preKeys.size(); i++) {
                 JSONObject preKey = new JSONObject();
                 preKey.put("id", preKeys.get(i).getId());
@@ -251,7 +250,7 @@ public class StickProtocol {
                 HashMap<String, String> cipherMap = pbEncrypt(preKeys.get(i).getKeyPair().getPrivateKey().serialize(), password);
                 preKey.put("cipher", cipherMap.get("cipher"));
                 preKey.put("salt", cipherMap.get("salt"));
-                preKeysArray.add(preKey);
+                preKeysArray.put(preKey);
 //                        WritableMap params = Arguments.createMap();
 //                        params.putInt("progress", i + 1);
 //                        params.putInt("total", preKeys.size());
