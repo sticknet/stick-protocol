@@ -314,34 +314,6 @@ public class StickProtocol {
         return localId != 0;
     }
 
-    static public void initSessionJSON(JSONObject bundle) {
-        try {
-            SignalProtocolStore store = new MySignalProtocolStore(context);
-            SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(bundle.getString("userId"), bundle.getInt("deviceId"));
-            SessionBuilder sessionBuilder = new SessionBuilder(store, signalProtocolAddress);
-            ECPublicKey preKey = Curve.decodePoint(Base64.decode(bundle.getString("preKey")), 0);
-            ECPublicKey signedPreKey = Curve.decodePoint(Base64.decode(bundle.getString("signedPreKey")), 0);
-            ECPublicKey identityKey = Curve.decodePoint(Base64.decode(bundle.getString("identityKey")), 0);
-            IdentityKey identityPublicKey = new IdentityKey(identityKey);
-
-            PreKeyBundle preKeyBundle = new PreKeyBundle(
-                    bundle.getInt("localId"),
-                    bundle.getInt("deviceId"),
-                    bundle.getInt("preKeyId"),
-                    preKey,
-                    bundle.getInt("signedPreKeyId"),
-                    signedPreKey,
-                    Base64.decode(bundle.getString("signature")),
-                    identityPublicKey
-            );
-            sessionBuilder.process(preKeyBundle);
-        } catch (UntrustedIdentityException | InvalidKeyException e) {
-            e.printStackTrace();
-        } catch (JSONException | IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     public void initSession(JSONObject bundle) {
         try {
             SignalProtocolStore store = new MySignalProtocolStore(context);
@@ -374,7 +346,7 @@ public class StickProtocol {
         return store.containsSession(signalProtocolAddress);
     }
 
-    static private String encryptTextPairwise(String userId, int deviceId, String text) {
+    public String encryptTextPairwise(String userId, int deviceId, String text) {
         try {
             SignalProtocolStore store = new MySignalProtocolStore(context);
             SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(userId, deviceId);
@@ -410,7 +382,7 @@ public class StickProtocol {
     }
 
 
-    static public String getSenderKey(String senderId, String targetId, String stickId, Boolean isSticky) throws IOException, InvalidMessageException, LegacyMessageException {
+    public String getSenderKey(String senderId, String targetId, String stickId, Boolean isSticky) throws IOException, InvalidMessageException, LegacyMessageException {
 
         SenderKeyDistributionMessage senderKeyDistributionMessage = null;
         if (isSticky)
@@ -426,7 +398,7 @@ public class StickProtocol {
     }
 
 
-    static public int getChainStep(String userId, String stickId) {
+    public int getChainStep(String userId, String stickId) {
         SenderKeyStore senderKeyStore = new MySenderKeyStore(context);
         SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(userId, 1);
         SenderKeyName senderKeyName = new SenderKeyName(stickId, signalProtocolAddress);
@@ -439,7 +411,7 @@ public class StickProtocol {
         }
     }
 
-    static public String encryptText(String userId, String stickId, String text, Boolean isSticky) {
+    public String encryptText(String userId, String stickId, String text, Boolean isSticky) {
         try {
             SenderKeyStore senderKeyStore = new MySenderKeyStore(context);
             SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(userId, isSticky ? 1 : 0);
@@ -455,7 +427,7 @@ public class StickProtocol {
         return null;
     }
 
-    static public Boolean isSessionEmpty(String senderId, String stickId, Boolean isSticky) {
+    public Boolean isSessionEmpty(String senderId, String stickId, Boolean isSticky) {
         SenderKeyStore mySenderKeyStore = new MySenderKeyStore(context);
         SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(senderId, isSticky ? 1 : 0);
         SenderKeyName senderKeyName = new SenderKeyName(stickId, signalProtocolAddress);
@@ -471,7 +443,7 @@ public class StickProtocol {
     }
 
 
-    static public void initGroupSenderSession(String senderId, String stickId, String cipherSenderKey, Boolean isSticky) {
+    public void initGroupSenderSession(String senderId, String stickId, String cipherSenderKey, Boolean isSticky) {
         try {
             if (cipherSenderKey != null) {
                 SenderKeyStore senderKeyStore = new MySenderKeyStore(context);
@@ -489,7 +461,7 @@ public class StickProtocol {
         }
     }
 
-    static public String decryptText(String senderId, String stickId, String cipher, Boolean isSticky) {
+    public String decryptText(String senderId, String stickId, String cipher, Boolean isSticky) {
         if (cipher.length() < 4)
             return null;
         try {
@@ -519,7 +491,7 @@ public class StickProtocol {
     }
 
 
-    private static String decryptTextPairwise(String senderId, int deviceId, boolean isStickyKey, String cipher) {
+    public String decryptTextPairwise(String senderId, int deviceId, boolean isStickyKey, String cipher) {
         try {
             SignalProtocolStore store = new MySignalProtocolStore(context);
             SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(senderId, deviceId);
@@ -552,7 +524,7 @@ public class StickProtocol {
         }
     }
 
-    static public HashMap<String, String> encryptMedia(String filePath, String contentType) {
+    public HashMap<String, String> encryptMedia(String filePath, String contentType) {
         try {
             File file = new File(filePath);
             InputStream is = new FileInputStream(file);
@@ -664,7 +636,7 @@ public class StickProtocol {
         return path;
     }
 
-    private HashMap<String, String> pbEncrypt(byte[] text, String pass) throws Exception {
+    public HashMap<String, String> pbEncrypt(byte[] text, String pass) throws Exception {
 //        synchronized (LOCK) {
         // Generate salt
         SecureRandom randomSalt = new SecureRandom();
@@ -713,7 +685,7 @@ public class StickProtocol {
 //        }
     }
 
-    private byte[] pbDecrypt(String encryptedIvText, String salt, String pass) throws Exception {
+    public byte[] pbDecrypt(String encryptedIvText, String salt, String pass) throws Exception {
         int ivSize = 16;
         byte[] encryptedIvTextBytes = Base64.decode(encryptedIvText);
 
@@ -750,11 +722,11 @@ public class StickProtocol {
     }
 
 
-    private void cacheUri(String id, String uri) {
+    public void cacheUri(String id, String uri) {
         DatabaseFactory.getFileDatabase(context).insertUri(id, uri);
     }
 
-    private String getUri(String id) {
+    public String getUri(String id) {
         String uri = DatabaseFactory.getFileDatabase(context).getUri(id);
         return uri;
     }
