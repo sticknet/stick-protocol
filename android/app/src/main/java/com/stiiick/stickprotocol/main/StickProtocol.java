@@ -166,8 +166,8 @@ public class StickProtocol {
             SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress((String) bundle.get("userId"), 1);
             System.out.println("xxx10");
             for (int i = 0; i < senderKeys.length(); i++) {
-                System.out.println("xxx11");
                 JSONObject senderKeyJson = senderKeys.getJSONObject(i);
+                System.out.println("xxx11 "  + senderKeyJson.toString());
                 reinitSenderKey(senderKeyJson, signalProtocolAddress, (String) bundle.get("userId"));
                 Log.d("PROGRESS", Integer.toString(i + 1));
 //                        WritableMap params = Arguments.createMap();
