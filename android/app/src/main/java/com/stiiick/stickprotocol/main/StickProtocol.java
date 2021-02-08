@@ -101,7 +101,7 @@ public abstract class StickProtocol {
         keychain = new Keychain(context);
     }
 
-    public abstract void sendEvent();
+    public abstract void sendEvent(JSONObject event);
 
     public void resetDatabase() {
         DatabaseFactory.getInstance(context).resetDatabase(context);
@@ -253,10 +253,10 @@ public abstract class StickProtocol {
                 preKeysArray.put(preKey);
 
                 // PROGRESS
-                JSONObject params = new JSONObject();
-                params.put("progress", i + 1);
-                params.put("total", preKeys.size());
-                sendEvent();
+                JSONObject event = new JSONObject();
+                event.put("progress", i + 1);
+                event.put("total", preKeys.size());
+                sendEvent(event);
 //                        sendEvent((ReactContext) context, "KeysProgress", params);
             }
 
