@@ -11,12 +11,12 @@ plugins {
 }
 
 android {
-    compileSdkVersion 30
+    compileSdkVersion 29
     buildToolsVersion "29.0.3"
 
     defaultConfig {
         minSdkVersion 19
-        targetSdkVersion 30
+        targetSdkVersion 29
         versionCode 1
         versionName "1.0"
 
@@ -41,7 +41,7 @@ dependencies {
     implementation 'com.google.android.material:material:1.2.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
 
-    implementation 'com.stiiick:sticky-signal-protocol-java:2.8.4'
+    implementation 'com.github.STiiiCK:sticky-signal-protocol-java:2.8.7'
     implementation 'com.stiiick:encoding:1.0.1'
     implementation 'net.zetetic:android-database-sqlcipher:4.3.0'
     implementation 'org.greenrobot:eventbus:3.2.0'
