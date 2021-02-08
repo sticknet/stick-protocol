@@ -248,7 +248,7 @@ public class StickProtocol {
             SignedPreKeyRecord signedPreKey = PreKeyUtil.generateSignedPreKey(context, identityKey, true);
 
             List<PreKeyRecord> preKeys = PreKeyUtil.generatePreKeys(context, 0, 10);
-            ArrayList<Object> preKeysArray = new ArrayList();
+            ArrayList preKeysArray = new ArrayList();
             System.out.println("INITIALIZINGXXX3");
             for (int i = 1; i < preKeys.size(); i++) {
                 System.out.println("INITIALIZINGXXXX4");
@@ -264,7 +264,7 @@ public class StickProtocol {
                 System.out.println("INITIALIZINGXXXX45");
                 map.put("salt", cipherMap.get("salt"));
                 System.out.println("INITIALIZINGXXXX46");
-                preKeysArray.set(i, map);
+                preKeysArray.add(i, map);
                 System.out.println("INITIALIZINGXXXX47");
                 Log.d("PROGRESS", Integer.toString(i + 1));
                 System.out.println("INITIALIZINGXXXX48");
