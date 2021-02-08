@@ -101,18 +101,18 @@ public class StickProtocol {
     }
 
 
-//    public abstract void sendEvent(JSONObject event);
+//    public abstract void progressEvent(JSONObject event);
 
     public void resetDatabase() {
         DatabaseFactory.getInstance(context).resetDatabase(context);
     }
 
-//    private void sendEvent(ReactContext context, String eventName, @Nullable WritableMap params) {
+//    private void progressEvent(ReactContext context, String eventName, @Nullable WritableMap params) {
 //        context.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(eventName, params);
 //    }
 
 
-    public void reInit(JSONObject bundle, String password, String oneTimeId) {
+    public void reInit(JSONObject bundle, String password, String oneTimeId, ProgressEvent progressEvent) {
         //  ** Regenerate previous keys  ** //
         try {
             IdentityKey publicKey = new IdentityKey(Base64.decode((String) bundle.get("identityPublic")), 0);
@@ -144,11 +144,14 @@ public class StickProtocol {
                 ECKeyPair preKey = new ECKeyPair(prePubKey, prePrivKey);
                 PreKeyRecord pkRecord = new PreKeyRecord(preKeyJson.getInt("id"), preKey);
                 store.storePreKey(preKeyJson.getInt("id"), pkRecord);
-                Log.d("PROGRESS", Integer.toString(i + 1));
-//                        WritableMap params = Arguments.createMap();
-//                        params.putInt("progress", i + 1);
-//                        params.putInt("total", totalKeys);
-//                        sendEvent((ReactContext) context, "KeysProgress", params);
+
+                // PROGRESS
+                if (progressEvent != null) {
+                    JSONObject event = new JSONObject();
+                    event.put("progress", i + 1);
+                    event.put("total", totalKeys);
+                    progressEvent.execute(event);
+                }
             }
             Log.d("TOTAL TIME ", Long.toString(System.currentTimeMillis() - now));
 
@@ -157,11 +160,13 @@ public class StickProtocol {
             for (int i = 0; i < senderKeys.length(); i++) {
                 JSONObject senderKeyJson = senderKeys.getJSONObject(i);
                 reinitSenderKey(senderKeyJson, signalProtocolAddress, (String) bundle.get("userId"));
-                Log.d("PROGRESS", Integer.toString(i + 1));
-//                        WritableMap params = Arguments.createMap();
-//                        params.putInt("progress", preKeys.size() + i + 1);
-//                        params.putInt("total", totalKeys);
-//                        sendEvent((ReactContext) context, "KeysProgress", params);
+                // PROGRESS
+                if (progressEvent != null) {
+                    JSONObject event = new JSONObject();
+                    event.put("progress", preKeys.length() + i + 1);
+                    event.put("total", totalKeys);
+                    progressEvent.execute(event);
+                }
             }
             PreferenceManager.getDefaultSharedPreferences(context).edit().putString("oneTimeId", oneTimeId).apply();
             PreferenceManager.getDefaultSharedPreferences(context).edit().putString("userId", (String) bundle.get("userId")).apply();
@@ -231,11 +236,11 @@ public class StickProtocol {
         return null;
     }
 
-    public interface SendEvent {
+    public interface ProgressEvent {
         void execute(JSONObject event);
     }
 
-    public JSONObject initialize(String userId, String password, SendEvent sendEvent) {
+    public JSONObject initialize(String userId, String password, ProgressEvent progressEvent) {
         try {
             HashMap<String, String> serviceMap = new HashMap();
             serviceMap.put("service", context.getPackageName());
@@ -256,11 +261,13 @@ public class StickProtocol {
                 preKeysArray.put(preKey);
 
                 // PROGRESS
-                JSONObject event = new JSONObject();
-                event.put("progress", i + 1);
-                event.put("total", preKeys.size());
-                sendEvent.execute(event);
-//                        sendEvent((ReactContext) context, "KeysProgress", params);
+                if (progressEvent != null) {
+                    JSONObject event = new JSONObject();
+                    event.put("progress", i + 1);
+                    event.put("total", preKeys.size());
+                    progressEvent.execute(event);
+                }
+
             }
 
             JSONObject signedPreKeyJson = new JSONObject();
