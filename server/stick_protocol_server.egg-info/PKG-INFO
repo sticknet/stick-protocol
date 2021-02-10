@@ -1,0 +1,23 @@
+Metadata-Version: 2.1
+Name: stick-protocol-server
+Version: 1.1.14
+Summary: Stick protocol server for Django.
+Home-page: UNKNOWN
+Author: Omar Basem
+Author-email: founder@stiiick.com
+License: GPLv3
+Description: =====================
+        Stick Protocol Server
+        =====================
+        
+        UNDER DEVELOPMENT
+        
+        
+Platform: UNKNOWN
+Classifier: Environment :: Web Environment
+Classifier: Framework :: Django
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: GNU General Public License v3 (GPLv3)
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Description-Content-Type: text/x-rst

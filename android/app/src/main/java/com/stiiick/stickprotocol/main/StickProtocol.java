@@ -3,7 +3,6 @@
  *
  *  This source code is licensed under the GPLv3 license found in the
  *  LICENSE file in the root directory of this source tree.
- *
  */
 
 package com.stiiick.stickprotocol.main;
@@ -101,15 +100,9 @@ public class StickProtocol {
     }
 
 
-//    public abstract void progressEvent(JSONObject event);
-
     public void resetDatabase() {
         DatabaseFactory.getInstance(context).resetDatabase(context);
     }
-
-//    private void progressEvent(ReactContext context, String eventName, @Nullable WritableMap params) {
-//        context.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter.class).emit(eventName, params);
-//    }
 
 
     public void reInit(JSONObject bundle, String password, String oneTimeId, ProgressEvent progressEvent) {
@@ -267,7 +260,6 @@ public class StickProtocol {
                     event.put("total", preKeys.size());
                     progressEvent.execute(event);
                 }
-
             }
 
             JSONObject signedPreKeyJson = new JSONObject();
@@ -445,14 +437,14 @@ public class StickProtocol {
     }
 
 
-    public void reinitMyGroupSenderSession(JSONObject senderKey) throws IOException, InvalidKeyException, NoSessionException, JSONException {
+    public void reinitMyStickySession(JSONObject senderKey) throws IOException, InvalidKeyException, NoSessionException, JSONException {
         String userId = PreferenceManager.getDefaultSharedPreferences(context).getString("userId", "");
         SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(userId, 1);
         reinitSenderKey(senderKey, signalProtocolAddress, userId);
     }
 
 
-    public void initGroupSenderSession(String senderId, String stickId, String cipherSenderKey, Boolean isSticky) {
+    public void initStickySession(String senderId, String stickId, String cipherSenderKey, Boolean isSticky) {
         try {
             if (cipherSenderKey != null) {
                 SenderKeyStore senderKeyStore = new MySenderKeyStore(context);
