@@ -20,7 +20,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="27d443db-5470-4c13-81be-f87a87f87c39" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/../android/app/src/main/java/com/stiiick/stickprotocol/main/StickProtocol.java" beforeDir="false" afterPath="$PROJECT_DIR$/../android/app/src/main/java/com/stiiick/stickprotocol/main/StickProtocol.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/stick_protocol/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/stick_protocol/models.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/stick_protocol/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/stick_protocol/views.py" afterDir="false" />
     </list>
