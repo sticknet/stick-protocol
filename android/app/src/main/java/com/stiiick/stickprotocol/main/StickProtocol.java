@@ -86,6 +86,9 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
+/*
+ * @author Omar Basem
+ */
 
 public class StickProtocol {
     private static Context context;

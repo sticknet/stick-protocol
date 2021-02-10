@@ -8,6 +8,9 @@ import uuid
 from django.db import models
 from django.conf import settings
 
+#
+# @author Omar Basem
+#
 
 User = settings.AUTH_USER_MODEL
 Group = settings.GROUP_MODEL

@@ -10,10 +10,13 @@ from django.db.models import Q
 from firebase_admin import db
 from django.conf import settings
 
+#
+# @author Omar Basem
+#
+
 DEFAULT_APP = settings.DEFAULT_APP
 FIREBASE_REF = settings.FIREBASE_REF
 FIREBASE_REF_DEV = settings.FIREBASE_REF_DEV
-
 
 
 class StickProtocol():
