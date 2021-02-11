@@ -114,7 +114,7 @@ class Party(models.Model):
     In the context of the Stick protocol, a "party" is one of three:
     1. A Group.
     2. A collection of groups and/or users
-    3. My profile
+    3. My profile (currentUser profile - which includes of the currentUser's connections)
 
     Every user should be connected with a Party object created at registration time. Whenever a user shares
     with a collection of groups and/or users that does not correspond to any existing Party, a new Party object should

@@ -318,7 +318,7 @@ public class StickProtocol {
         return localId != 0;
     }
 
-    public void initSession(JSONObject bundle) {
+    public void initPairwiseSession(JSONObject bundle) {
         try {
             SignalProtocolStore store = new MySignalProtocolStore(context);
             SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(bundle.getString("userId"), bundle.getInt("deviceId"));
@@ -447,7 +447,7 @@ public class StickProtocol {
     }
 
 
-    public void initStickySession(String senderId, String stickId, String cipherSenderKey, Boolean isSticky) {
+    public void initSession(String senderId, String stickId, String cipherSenderKey, Boolean isSticky) {
         try {
             if (cipherSenderKey != null) {
                 SenderKeyStore senderKeyStore = new MySenderKeyStore(context);

@@ -260,7 +260,7 @@ class StickProtocol():
         * connections_ids - a list of users ids
         * isSticky - boolean, indicates whether the user is intending to use a sticky session
         * isProfile - boolean, indicates whether the user is sharing to their profile (includes all their connections)
-        * partyId (optional) - boolean, the partyId of a user
+        * partyId (optional) - the partyId of a user
         """
         groups_ids = data['groups_ids']
         connections_ids = data['connections_ids']
@@ -363,7 +363,7 @@ class StickProtocol():
 
 
 
-    def get_stick_id(self, data, currentUser):
+    def get_active_stick_id(self, data, currentUser):
         """
         This method gets the active sticky session stickId associated with a particular partyId that already exists, and
         its current step.
