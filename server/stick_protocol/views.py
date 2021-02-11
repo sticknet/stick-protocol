@@ -223,8 +223,8 @@ class StickProtocol():
                 phone = self.User.objects.get(id=memberId).phone
             else:
                 phone = data['phone']
-            dev = data['dev']
-            firebase_ref = FIREBASE_REF_DEV if dev else FIREBASE_REF
+            isDev = data['isDev']
+            firebase_ref = FIREBASE_REF_DEV if isDev else FIREBASE_REF
             ref = db.reference('users/' + phone + '/pendingKeys/', DEFAULT_APP, firebase_ref)
             ref.update({stickId + '--' + str(user.id): user.phone})
         return {'authorized': authorized, 'senderKey': key}
@@ -235,7 +235,7 @@ class StickProtocol():
         """
         This method is used to fetch the standard session sender keys of a group.
         """
-        stickId = data['chatId']
+        stickId = data['stickId']
         keysToFetch = data['keysToFetch']
         if group not in user.groups.all():
             return {'authorized': False}
@@ -276,7 +276,7 @@ class StickProtocol():
                     partyId = groups_ids[0]
                 else: # Using standard session
                     membersIds = self.Group.objects.get(id=groups_ids[0]).get_members_otids()
-                    partyId = data["chatId"]
+                    partyId = data["stickId"]
             else: # Sharing with a collection of groups and/or users
                 if len(groups_ids) > 0 and len(connections_ids) > 0:
                     party = Party.objects.filter(Q(groups=groups_ids) & Q(connections=connections_ids)).first()
@@ -428,7 +428,7 @@ class StickProtocol():
         """
         This method is used to upload the SenderKeys of a standard session.
         """
-        stickId = data['chatId']
+        stickId = data['stickId']
         keysToUpload = data['keysToUpload']
         for oneTimeId, senderKey in keysToUpload.items():
             DecryptingSenderKey.objects.create(key=senderKey, stickId=stickId, ofUser=user,
