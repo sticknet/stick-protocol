@@ -431,7 +431,7 @@ public class StickProtocol {
         return null;
     }
 
-    public Boolean stickySessionExists(String senderId, String stickId, Boolean isSticky) {
+    public Boolean sessionExists(String senderId, String stickId, Boolean isSticky) {
         SenderKeyStore mySenderKeyStore = new MySenderKeyStore(context);
         SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(senderId, isSticky ? 1 : 0);
         SenderKeyName senderKeyName = new SenderKeyName(stickId, signalProtocolAddress);
