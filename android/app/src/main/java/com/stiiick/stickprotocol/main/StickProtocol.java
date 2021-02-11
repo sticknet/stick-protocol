@@ -344,7 +344,7 @@ public class StickProtocol {
         }
     }
 
-    public boolean checkPairwiseSession(String oneTimeId) {
+    public boolean hasPairwiseSession(String oneTimeId) {
         SignalProtocolStore store = new MySignalProtocolStore(context);
         SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(oneTimeId, 0);
         return store.containsSession(signalProtocolAddress);
@@ -431,7 +431,7 @@ public class StickProtocol {
         return null;
     }
 
-    public Boolean isSessionEmpty(String senderId, String stickId, Boolean isSticky) {
+    public Boolean isStickySessionEmpty(String senderId, String stickId, Boolean isSticky) {
         SenderKeyStore mySenderKeyStore = new MySenderKeyStore(context);
         SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(senderId, isSticky ? 1 : 0);
         SenderKeyName senderKeyName = new SenderKeyName(stickId, signalProtocolAddress);

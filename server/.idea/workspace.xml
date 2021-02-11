@@ -20,8 +20,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="27d443db-5470-4c13-81be-f87a87f87c39" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/stick_protocol/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/stick_protocol/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/stick_protocol/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/stick_protocol/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -63,6 +62,7 @@
       <workItem from="1612888484750" duration="4851000" />
       <workItem from="1612931155136" duration="684000" />
       <workItem from="1612932319202" duration="9748000" />
+      <workItem from="1613020141616" duration="458000" />
     </task>
     <servers />
   </component>
@@ -79,6 +79,7 @@
         </entry>
       </map>
     </option>
+    <option name="oldMeFiltersMigrated" value="true" />
   </component>
   <component name="WindowStateProjectService">
     <state x="642" y="405" key="ANALYSIS_DLG_com.intellij.analysis.BaseAnalysisAction$1" timestamp="1612943032753">
