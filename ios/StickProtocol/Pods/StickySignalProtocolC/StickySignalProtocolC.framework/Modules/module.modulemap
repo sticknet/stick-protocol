@@ -1,0 +1,6 @@
+framework module StickySignalProtocolC {
+  umbrella header "StickySignalProtocolC.h"
+
+  export *
+  module * { export * }
+}

@@ -3,15 +3,151 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 51;
 	objects = {
 
 /* Begin PBXBuildFile section */
 		07100FC92607262A00CD0E47 /* StickProtocol.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 07100FBF2607262A00CD0E47 /* StickProtocol.framework */; };
 		07100FCE2607262A00CD0E47 /* StickProtocolTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07100FCD2607262A00CD0E47 /* StickProtocolTests.swift */; };
-		07100FD02607262A00CD0E47 /* StickProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 07100FC22607262A00CD0E47 /* StickProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		07100FE0260726A600CD0E47 /* MyProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07100FDF260726A600CD0E47 /* MyProtocol.swift */; };
-		0710108A26072E6700CD0E47 /* MyProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07100FDF260726A600CD0E47 /* MyProtocol.swift */; };
+		071017D0260741D900CD0E47 /* StorageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07101764260741D900CD0E47 /* StorageManager.swift */; };
+		071017D1260741D900CD0E47 /* StorageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07101764260741D900CD0E47 /* StorageManager.swift */; };
+		071017D4260741D900CD0E47 /* SPPreKey.m in Sources */ = {isa = PBXBuildFile; fileRef = 07101767260741D900CD0E47 /* SPPreKey.m */; };
+		071017D5260741D900CD0E47 /* SPPreKey.m in Sources */ = {isa = PBXBuildFile; fileRef = 07101767260741D900CD0E47 /* SPPreKey.m */; };
+		071017D6260741D900CD0E47 /* SPIdentity.h in Headers */ = {isa = PBXBuildFile; fileRef = 07101768260741D900CD0E47 /* SPIdentity.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		071017D7260741D900CD0E47 /* SPSenderKey.h in Headers */ = {isa = PBXBuildFile; fileRef = 07101769260741D900CD0E47 /* SPSenderKey.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		071017D8260741D900CD0E47 /* YapDatabaseObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 0710176A260741D900CD0E47 /* YapDatabaseObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		071017D9260741D900CD0E47 /* SPSignedPreKey.h in Headers */ = {isa = PBXBuildFile; fileRef = 0710176B260741D900CD0E47 /* SPSignedPreKey.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		071017DA260741D900CD0E47 /* SPObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 0710176C260741D900CD0E47 /* SPObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		071017DB260741D900CD0E47 /* SPSignalSession.h in Headers */ = {isa = PBXBuildFile; fileRef = 0710176D260741D900CD0E47 /* SPSignalSession.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		071017DC260741D900CD0E47 /* SPIdentity.m in Sources */ = {isa = PBXBuildFile; fileRef = 0710176E260741D900CD0E47 /* SPIdentity.m */; };
+		071017DD260741D900CD0E47 /* SPIdentity.m in Sources */ = {isa = PBXBuildFile; fileRef = 0710176E260741D900CD0E47 /* SPIdentity.m */; };
+		071017DE260741D900CD0E47 /* SPPreKey.h in Headers */ = {isa = PBXBuildFile; fileRef = 0710176F260741D900CD0E47 /* SPPreKey.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		071017DF260741D900CD0E47 /* YapDatabaseObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 07101770260741D900CD0E47 /* YapDatabaseObject.m */; };
+		071017E0260741D900CD0E47 /* YapDatabaseObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 07101770260741D900CD0E47 /* YapDatabaseObject.m */; };
+		071017E1260741D900CD0E47 /* SPSenderKey.m in Sources */ = {isa = PBXBuildFile; fileRef = 07101771260741D900CD0E47 /* SPSenderKey.m */; };
+		071017E2260741D900CD0E47 /* SPSenderKey.m in Sources */ = {isa = PBXBuildFile; fileRef = 07101771260741D900CD0E47 /* SPSenderKey.m */; };
+		071017E3260741D900CD0E47 /* SPObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 07101772260741D900CD0E47 /* SPObject.m */; };
+		071017E4260741D900CD0E47 /* SPObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 07101772260741D900CD0E47 /* SPObject.m */; };
+		071017E5260741D900CD0E47 /* SPSignalSession.m in Sources */ = {isa = PBXBuildFile; fileRef = 07101773260741D900CD0E47 /* SPSignalSession.m */; };
+		071017E6260741D900CD0E47 /* SPSignalSession.m in Sources */ = {isa = PBXBuildFile; fileRef = 07101773260741D900CD0E47 /* SPSignalSession.m */; };
+		071017E7260741D900CD0E47 /* SPSignedPreKey.m in Sources */ = {isa = PBXBuildFile; fileRef = 07101774260741D900CD0E47 /* SPSignedPreKey.m */; };
+		071017E8260741D900CD0E47 /* SPSignedPreKey.m in Sources */ = {isa = PBXBuildFile; fileRef = 07101774260741D900CD0E47 /* SPSignedPreKey.m */; };
+		071017E9260741D900CD0E47 /* CommonCryptoProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 07101776260741D900CD0E47 /* CommonCryptoProvider.m */; };
+		071017EA260741D900CD0E47 /* CommonCryptoProvider.m in Sources */ = {isa = PBXBuildFile; fileRef = 07101776260741D900CD0E47 /* CommonCryptoProvider.m */; };
+		071017EB260741D900CD0E47 /* CommonCryptoProvider.h in Headers */ = {isa = PBXBuildFile; fileRef = 07101777260741D900CD0E47 /* CommonCryptoProvider.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		071017ED260741D900CD0E47 /* SenderKeyState_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 0710177A260741D900CD0E47 /* SenderKeyState_Internal.h */; };
+		071017EE260741D900CD0E47 /* SignedPreKey_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 0710177B260741D900CD0E47 /* SignedPreKey_Internal.h */; };
+		071017EF260741D900CD0E47 /* SignedPreKey.m in Sources */ = {isa = PBXBuildFile; fileRef = 0710177C260741D900CD0E47 /* SignedPreKey.m */; };
+		071017F0260741D900CD0E47 /* SignedPreKey.m in Sources */ = {isa = PBXBuildFile; fileRef = 0710177C260741D900CD0E47 /* SignedPreKey.m */; };
+		071017F1260741D900CD0E47 /* PreKeyBundle_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 0710177D260741D900CD0E47 /* PreKeyBundle_Internal.h */; };
+		071017F2260741D900CD0E47 /* IdentityKeyPair.h in Headers */ = {isa = PBXBuildFile; fileRef = 0710177E260741D900CD0E47 /* IdentityKeyPair.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		071017F3260741D900CD0E47 /* SignalAddress_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 0710177F260741D900CD0E47 /* SignalAddress_Internal.h */; };
+		071017F4260741D900CD0E47 /* KeyPair.h in Headers */ = {isa = PBXBuildFile; fileRef = 07101780260741D900CD0E47 /* KeyPair.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		071017F5260741D900CD0E47 /* SenderKeyMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 07101781260741D900CD0E47 /* SenderKeyMessage.m */; };
+		071017F6260741D900CD0E47 /* SenderKeyMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 07101781260741D900CD0E47 /* SenderKeyMessage.m */; };
+		071017F7260741D900CD0E47 /* SenderKeyState.h in Headers */ = {isa = PBXBuildFile; fileRef = 07101782260741D900CD0E47 /* SenderKeyState.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		071017F8260741D900CD0E47 /* SignalAddress.h in Headers */ = {isa = PBXBuildFile; fileRef = 07101783260741D900CD0E47 /* SignalAddress.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		071017F9260741D900CD0E47 /* PreKeyMessage_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 07101784260741D900CD0E47 /* PreKeyMessage_Internal.h */; };
+		071017FA260741D900CD0E47 /* PreKey.h in Headers */ = {isa = PBXBuildFile; fileRef = 07101785260741D900CD0E47 /* PreKey.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		071017FB260741D900CD0E47 /* SenderKeyMessage_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 07101786260741D900CD0E47 /* SenderKeyMessage_Internal.h */; };
+		071017FC260741D900CD0E47 /* PreKeyBundle.h in Headers */ = {isa = PBXBuildFile; fileRef = 07101787260741D900CD0E47 /* PreKeyBundle.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		071017FD260741D900CD0E47 /* Serializable.h in Headers */ = {isa = PBXBuildFile; fileRef = 07101788260741D900CD0E47 /* Serializable.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		071017FE260741D900CD0E47 /* PreKeyMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 07101789260741D900CD0E47 /* PreKeyMessage.m */; };
+		071017FF260741D900CD0E47 /* PreKeyMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 07101789260741D900CD0E47 /* PreKeyMessage.m */; };
+		07101800260741D900CD0E47 /* SenderKeyRecord.m in Sources */ = {isa = PBXBuildFile; fileRef = 0710178A260741D900CD0E47 /* SenderKeyRecord.m */; };
+		07101801260741D900CD0E47 /* SenderKeyRecord.m in Sources */ = {isa = PBXBuildFile; fileRef = 0710178A260741D900CD0E47 /* SenderKeyRecord.m */; };
+		07101802260741D900CD0E47 /* SignalCiphertext.m in Sources */ = {isa = PBXBuildFile; fileRef = 0710178B260741D900CD0E47 /* SignalCiphertext.m */; };
+		07101803260741D900CD0E47 /* SignalCiphertext.m in Sources */ = {isa = PBXBuildFile; fileRef = 0710178B260741D900CD0E47 /* SignalCiphertext.m */; };
+		07101804260741D900CD0E47 /* SenderKeyDistributionMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 0710178C260741D900CD0E47 /* SenderKeyDistributionMessage.m */; };
+		07101805260741D900CD0E47 /* SenderKeyDistributionMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 0710178C260741D900CD0E47 /* SenderKeyDistributionMessage.m */; };
+		07101806260741D900CD0E47 /* SenderKeyName.h in Headers */ = {isa = PBXBuildFile; fileRef = 0710178D260741D900CD0E47 /* SenderKeyName.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		07101807260741D900CD0E47 /* SignalMessage.h in Headers */ = {isa = PBXBuildFile; fileRef = 0710178E260741D900CD0E47 /* SignalMessage.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		07101808260741D900CD0E47 /* SenderKeyName_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 0710178F260741D900CD0E47 /* SenderKeyName_Internal.h */; };
+		07101809260741D900CD0E47 /* SignedPreKey.h in Headers */ = {isa = PBXBuildFile; fileRef = 07101790260741D900CD0E47 /* SignedPreKey.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		0710180A260741D900CD0E47 /* PreKey_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 07101791260741D900CD0E47 /* PreKey_Internal.h */; };
+		0710180B260741D900CD0E47 /* KeyPair_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 07101792260741D900CD0E47 /* KeyPair_Internal.h */; };
+		0710180C260741D900CD0E47 /* IdentityKeyPair.m in Sources */ = {isa = PBXBuildFile; fileRef = 07101793260741D900CD0E47 /* IdentityKeyPair.m */; };
+		0710180D260741D900CD0E47 /* IdentityKeyPair.m in Sources */ = {isa = PBXBuildFile; fileRef = 07101793260741D900CD0E47 /* IdentityKeyPair.m */; };
+		0710180E260741D900CD0E47 /* SignalMessage_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 07101794260741D900CD0E47 /* SignalMessage_Internal.h */; };
+		0710180F260741D900CD0E47 /* SenderKeyDistributionMessage_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 07101795260741D900CD0E47 /* SenderKeyDistributionMessage_Internal.h */; };
+		07101810260741D900CD0E47 /* SenderKeyRecord_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 07101796260741D900CD0E47 /* SenderKeyRecord_Internal.h */; };
+		07101811260741D900CD0E47 /* SignalAddress.m in Sources */ = {isa = PBXBuildFile; fileRef = 07101797260741D900CD0E47 /* SignalAddress.m */; };
+		07101812260741D900CD0E47 /* SignalAddress.m in Sources */ = {isa = PBXBuildFile; fileRef = 07101797260741D900CD0E47 /* SignalAddress.m */; };
+		07101813260741D900CD0E47 /* SenderKeyState.m in Sources */ = {isa = PBXBuildFile; fileRef = 07101798260741D900CD0E47 /* SenderKeyState.m */; };
+		07101814260741D900CD0E47 /* SenderKeyState.m in Sources */ = {isa = PBXBuildFile; fileRef = 07101798260741D900CD0E47 /* SenderKeyState.m */; };
+		07101815260741D900CD0E47 /* SenderKeyMessage.h in Headers */ = {isa = PBXBuildFile; fileRef = 07101799260741D900CD0E47 /* SenderKeyMessage.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		07101816260741D900CD0E47 /* KeyPair.m in Sources */ = {isa = PBXBuildFile; fileRef = 0710179A260741D900CD0E47 /* KeyPair.m */; };
+		07101817260741D900CD0E47 /* KeyPair.m in Sources */ = {isa = PBXBuildFile; fileRef = 0710179A260741D900CD0E47 /* KeyPair.m */; };
+		07101818260741D900CD0E47 /* SignalMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 0710179B260741D900CD0E47 /* SignalMessage.m */; };
+		07101819260741D900CD0E47 /* SignalMessage.m in Sources */ = {isa = PBXBuildFile; fileRef = 0710179B260741D900CD0E47 /* SignalMessage.m */; };
+		0710181A260741D900CD0E47 /* SenderKeyName.m in Sources */ = {isa = PBXBuildFile; fileRef = 0710179C260741D900CD0E47 /* SenderKeyName.m */; };
+		0710181B260741D900CD0E47 /* SenderKeyName.m in Sources */ = {isa = PBXBuildFile; fileRef = 0710179C260741D900CD0E47 /* SenderKeyName.m */; };
+		0710181C260741D900CD0E47 /* SenderKeyDistributionMessage.h in Headers */ = {isa = PBXBuildFile; fileRef = 0710179D260741D900CD0E47 /* SenderKeyDistributionMessage.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		0710181D260741D900CD0E47 /* SignalCiphertext.h in Headers */ = {isa = PBXBuildFile; fileRef = 0710179E260741D900CD0E47 /* SignalCiphertext.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		0710181E260741D900CD0E47 /* PreKeyMessage.h in Headers */ = {isa = PBXBuildFile; fileRef = 0710179F260741D900CD0E47 /* PreKeyMessage.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		0710181F260741D900CD0E47 /* SenderKeyRecord.h in Headers */ = {isa = PBXBuildFile; fileRef = 071017A0260741D900CD0E47 /* SenderKeyRecord.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		07101820260741D900CD0E47 /* IdentityKeyPair_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 071017A1260741D900CD0E47 /* IdentityKeyPair_Internal.h */; };
+		07101821260741D900CD0E47 /* PreKeyBundle.m in Sources */ = {isa = PBXBuildFile; fileRef = 071017A2260741D900CD0E47 /* PreKeyBundle.m */; };
+		07101822260741D900CD0E47 /* PreKeyBundle.m in Sources */ = {isa = PBXBuildFile; fileRef = 071017A2260741D900CD0E47 /* PreKeyBundle.m */; };
+		07101823260741D900CD0E47 /* PreKey.m in Sources */ = {isa = PBXBuildFile; fileRef = 071017A3260741D900CD0E47 /* PreKey.m */; };
+		07101824260741D900CD0E47 /* PreKey.m in Sources */ = {isa = PBXBuildFile; fileRef = 071017A3260741D900CD0E47 /* PreKey.m */; };
+		07101827260741D900CD0E47 /* PreKeyStore.h in Headers */ = {isa = PBXBuildFile; fileRef = 071017A6260741D900CD0E47 /* PreKeyStore.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		07101828260741D900CD0E47 /* SignalStorage_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 071017A7260741D900CD0E47 /* SignalStorage_Internal.h */; };
+		07101829260741D900CD0E47 /* SignalStorage.m in Sources */ = {isa = PBXBuildFile; fileRef = 071017A8260741D900CD0E47 /* SignalStorage.m */; };
+		0710182A260741D900CD0E47 /* SignalStorage.m in Sources */ = {isa = PBXBuildFile; fileRef = 071017A8260741D900CD0E47 /* SignalStorage.m */; };
+		0710182B260741D900CD0E47 /* SignedPreKeyStore.h in Headers */ = {isa = PBXBuildFile; fileRef = 071017A9260741D900CD0E47 /* SignedPreKeyStore.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		0710182C260741D900CD0E47 /* SenderKeyStore.h in Headers */ = {isa = PBXBuildFile; fileRef = 071017AA260741D900CD0E47 /* SenderKeyStore.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		0710182D260741D900CD0E47 /* SignalStorage.h in Headers */ = {isa = PBXBuildFile; fileRef = 071017AB260741D900CD0E47 /* SignalStorage.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		0710182E260741D900CD0E47 /* SessionStore.h in Headers */ = {isa = PBXBuildFile; fileRef = 071017AC260741D900CD0E47 /* SessionStore.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		0710182F260741D900CD0E47 /* IdentityKeyStore.h in Headers */ = {isa = PBXBuildFile; fileRef = 071017AD260741D900CD0E47 /* IdentityKeyStore.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		07101830260741D900CD0E47 /* StickProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 071017AE260741D900CD0E47 /* StickProtocol.swift */; };
+		07101831260741D900CD0E47 /* StickProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 071017AE260741D900CD0E47 /* StickProtocol.swift */; };
+		07101834260741D900CD0E47 /* DatabaseSetup.m in Sources */ = {isa = PBXBuildFile; fileRef = 071017B0260741D900CD0E47 /* DatabaseSetup.m */; };
+		07101835260741D900CD0E47 /* DatabaseSetup.m in Sources */ = {isa = PBXBuildFile; fileRef = 071017B0260741D900CD0E47 /* DatabaseSetup.m */; };
+		07101836260741D900CD0E47 /* EncryptionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 071017B1260741D900CD0E47 /* EncryptionManager.swift */; };
+		07101837260741D900CD0E47 /* EncryptionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 071017B1260741D900CD0E47 /* EncryptionManager.swift */; };
+		07101838260741D900CD0E47 /* SessionBuilder.h in Headers */ = {isa = PBXBuildFile; fileRef = 071017B3260741D900CD0E47 /* SessionBuilder.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		07101839260741D900CD0E47 /* SessionCipher.h in Headers */ = {isa = PBXBuildFile; fileRef = 071017B4260741D900CD0E47 /* SessionCipher.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		0710183A260741D900CD0E47 /* SignalContext_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 071017B5260741D900CD0E47 /* SignalContext_Internal.h */; };
+		0710183B260741D900CD0E47 /* GroupCipher.m in Sources */ = {isa = PBXBuildFile; fileRef = 071017B6260741D900CD0E47 /* GroupCipher.m */; };
+		0710183C260741D900CD0E47 /* GroupCipher.m in Sources */ = {isa = PBXBuildFile; fileRef = 071017B6260741D900CD0E47 /* GroupCipher.m */; };
+		0710183D260741D900CD0E47 /* SignalContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 071017B7260741D900CD0E47 /* SignalContext.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		0710183E260741D900CD0E47 /* KeyHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 071017B8260741D900CD0E47 /* KeyHelper.m */; };
+		0710183F260741D900CD0E47 /* KeyHelper.m in Sources */ = {isa = PBXBuildFile; fileRef = 071017B8260741D900CD0E47 /* KeyHelper.m */; };
+		07101840260741D900CD0E47 /* GroupSessionBuilder.h in Headers */ = {isa = PBXBuildFile; fileRef = 071017B9260741D900CD0E47 /* GroupSessionBuilder.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		07101841260741D900CD0E47 /* SessionCipher.m in Sources */ = {isa = PBXBuildFile; fileRef = 071017BA260741D900CD0E47 /* SessionCipher.m */; };
+		07101842260741D900CD0E47 /* SessionCipher.m in Sources */ = {isa = PBXBuildFile; fileRef = 071017BA260741D900CD0E47 /* SessionCipher.m */; };
+		07101843260741D900CD0E47 /* SessionBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = 071017BB260741D900CD0E47 /* SessionBuilder.m */; };
+		07101844260741D900CD0E47 /* SessionBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = 071017BB260741D900CD0E47 /* SessionBuilder.m */; };
+		07101845260741D900CD0E47 /* GroupCipher.h in Headers */ = {isa = PBXBuildFile; fileRef = 071017BC260741D900CD0E47 /* GroupCipher.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		07101846260741D900CD0E47 /* KeyHelper_Internal.h in Headers */ = {isa = PBXBuildFile; fileRef = 071017BD260741D900CD0E47 /* KeyHelper_Internal.h */; };
+		07101847260741D900CD0E47 /* SignalContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 071017BE260741D900CD0E47 /* SignalContext.m */; };
+		07101848260741D900CD0E47 /* SignalContext.m in Sources */ = {isa = PBXBuildFile; fileRef = 071017BE260741D900CD0E47 /* SignalContext.m */; };
+		07101849260741D900CD0E47 /* GroupSessionBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = 071017BF260741D900CD0E47 /* GroupSessionBuilder.m */; };
+		0710184A260741D900CD0E47 /* GroupSessionBuilder.m in Sources */ = {isa = PBXBuildFile; fileRef = 071017BF260741D900CD0E47 /* GroupSessionBuilder.m */; };
+		0710184B260741D900CD0E47 /* KeyHelper.h in Headers */ = {isa = PBXBuildFile; fileRef = 071017C0260741D900CD0E47 /* KeyHelper.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		0710184C260741D900CD0E47 /* SPLogs.m in Sources */ = {isa = PBXBuildFile; fileRef = 071017C2260741D900CD0E47 /* SPLogs.m */; };
+		0710184D260741D900CD0E47 /* SPLogs.m in Sources */ = {isa = PBXBuildFile; fileRef = 071017C2260741D900CD0E47 /* SPLogs.m */; };
+		0710184E260741D900CD0E47 /* NSData+SP.m in Sources */ = {isa = PBXBuildFile; fileRef = 071017C3260741D900CD0E47 /* NSData+SP.m */; };
+		0710184F260741D900CD0E47 /* NSData+SP.m in Sources */ = {isa = PBXBuildFile; fileRef = 071017C3260741D900CD0E47 /* NSData+SP.m */; };
+		07101850260741D900CD0E47 /* Randomness.m in Sources */ = {isa = PBXBuildFile; fileRef = 071017C4260741D900CD0E47 /* Randomness.m */; };
+		07101851260741D900CD0E47 /* Randomness.m in Sources */ = {isa = PBXBuildFile; fileRef = 071017C4260741D900CD0E47 /* Randomness.m */; };
+		07101852260741D900CD0E47 /* FileCrypto.m in Sources */ = {isa = PBXBuildFile; fileRef = 071017C5260741D900CD0E47 /* FileCrypto.m */; };
+		07101853260741D900CD0E47 /* FileCrypto.m in Sources */ = {isa = PBXBuildFile; fileRef = 071017C5260741D900CD0E47 /* FileCrypto.m */; };
+		07101854260741D900CD0E47 /* CryptoError.h in Headers */ = {isa = PBXBuildFile; fileRef = 071017C6260741D900CD0E47 /* CryptoError.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		07101855260741D900CD0E47 /* NSData+SP.h in Headers */ = {isa = PBXBuildFile; fileRef = 071017C7260741D900CD0E47 /* NSData+SP.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		07101856260741D900CD0E47 /* Randomness.h in Headers */ = {isa = PBXBuildFile; fileRef = 071017C8260741D900CD0E47 /* Randomness.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		07101857260741D900CD0E47 /* SPLogs.h in Headers */ = {isa = PBXBuildFile; fileRef = 071017C9260741D900CD0E47 /* SPLogs.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		07101858260741D900CD0E47 /* FileCrypto.h in Headers */ = {isa = PBXBuildFile; fileRef = 071017CA260741D900CD0E47 /* FileCrypto.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		07101859260741D900CD0E47 /* SPAsserts.h in Headers */ = {isa = PBXBuildFile; fileRef = 071017CB260741D900CD0E47 /* SPAsserts.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		0710185A260741D900CD0E47 /* CryptoError.m in Sources */ = {isa = PBXBuildFile; fileRef = 071017CC260741D900CD0E47 /* CryptoError.m */; };
+		0710185B260741D900CD0E47 /* CryptoError.m in Sources */ = {isa = PBXBuildFile; fileRef = 071017CC260741D900CD0E47 /* CryptoError.m */; };
+		0710185C260741D900CD0E47 /* SignalError.m in Sources */ = {isa = PBXBuildFile; fileRef = 071017CE260741D900CD0E47 /* SignalError.m */; };
+		0710185D260741D900CD0E47 /* SignalError.m in Sources */ = {isa = PBXBuildFile; fileRef = 071017CE260741D900CD0E47 /* SignalError.m */; };
+		0710185E260741D900CD0E47 /* SignalError.h in Headers */ = {isa = PBXBuildFile; fileRef = 071017CF260741D900CD0E47 /* SignalError.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		071018862607452D00CD0E47 /* StickProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 071018852607452D00CD0E47 /* StickProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		1D0FD27C71B0D65281EF7F42 /* Pods_StickProtocol_StickProtocolTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DF6A18E892226C5AE1B4D80C /* Pods_StickProtocol_StickProtocolTests.framework */; };
+		FD593B7C1A54E41787E1BB63 /* Pods_StickProtocol.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C356447132ED4FB7E64F1D44 /* Pods_StickProtocol.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -26,12 +162,115 @@
 
 /* Begin PBXFileReference section */
 		07100FBF2607262A00CD0E47 /* StickProtocol.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = StickProtocol.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		07100FC22607262A00CD0E47 /* StickProtocol.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = StickProtocol.h; sourceTree = "<group>"; };
-		07100FC32607262A00CD0E47 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		07100FC82607262A00CD0E47 /* StickProtocolTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = StickProtocolTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		07100FCD2607262A00CD0E47 /* StickProtocolTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StickProtocolTests.swift; sourceTree = "<group>"; };
 		07100FCF2607262A00CD0E47 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		07100FDF260726A600CD0E47 /* MyProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MyProtocol.swift; sourceTree = "<group>"; };
+		07101764260741D900CD0E47 /* StorageManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StorageManager.swift; sourceTree = "<group>"; };
+		07101767260741D900CD0E47 /* SPPreKey.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SPPreKey.m; sourceTree = "<group>"; };
+		07101768260741D900CD0E47 /* SPIdentity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPIdentity.h; sourceTree = "<group>"; };
+		07101769260741D900CD0E47 /* SPSenderKey.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPSenderKey.h; sourceTree = "<group>"; };
+		0710176A260741D900CD0E47 /* YapDatabaseObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YapDatabaseObject.h; sourceTree = "<group>"; };
+		0710176B260741D900CD0E47 /* SPSignedPreKey.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPSignedPreKey.h; sourceTree = "<group>"; };
+		0710176C260741D900CD0E47 /* SPObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPObject.h; sourceTree = "<group>"; };
+		0710176D260741D900CD0E47 /* SPSignalSession.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPSignalSession.h; sourceTree = "<group>"; };
+		0710176E260741D900CD0E47 /* SPIdentity.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SPIdentity.m; sourceTree = "<group>"; };
+		0710176F260741D900CD0E47 /* SPPreKey.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPPreKey.h; sourceTree = "<group>"; };
+		07101770260741D900CD0E47 /* YapDatabaseObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YapDatabaseObject.m; sourceTree = "<group>"; };
+		07101771260741D900CD0E47 /* SPSenderKey.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SPSenderKey.m; sourceTree = "<group>"; };
+		07101772260741D900CD0E47 /* SPObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SPObject.m; sourceTree = "<group>"; };
+		07101773260741D900CD0E47 /* SPSignalSession.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SPSignalSession.m; sourceTree = "<group>"; };
+		07101774260741D900CD0E47 /* SPSignedPreKey.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SPSignedPreKey.m; sourceTree = "<group>"; };
+		07101776260741D900CD0E47 /* CommonCryptoProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CommonCryptoProvider.m; sourceTree = "<group>"; };
+		07101777260741D900CD0E47 /* CommonCryptoProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommonCryptoProvider.h; sourceTree = "<group>"; };
+		07101778260741D900CD0E47 /* DatabaseSetup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DatabaseSetup.h; sourceTree = "<group>"; };
+		0710177A260741D900CD0E47 /* SenderKeyState_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SenderKeyState_Internal.h; sourceTree = "<group>"; };
+		0710177B260741D900CD0E47 /* SignedPreKey_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SignedPreKey_Internal.h; sourceTree = "<group>"; };
+		0710177C260741D900CD0E47 /* SignedPreKey.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SignedPreKey.m; sourceTree = "<group>"; };
+		0710177D260741D900CD0E47 /* PreKeyBundle_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PreKeyBundle_Internal.h; sourceTree = "<group>"; };
+		0710177E260741D900CD0E47 /* IdentityKeyPair.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IdentityKeyPair.h; sourceTree = "<group>"; };
+		0710177F260741D900CD0E47 /* SignalAddress_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SignalAddress_Internal.h; sourceTree = "<group>"; };
+		07101780260741D900CD0E47 /* KeyPair.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KeyPair.h; sourceTree = "<group>"; };
+		07101781260741D900CD0E47 /* SenderKeyMessage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SenderKeyMessage.m; sourceTree = "<group>"; };
+		07101782260741D900CD0E47 /* SenderKeyState.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SenderKeyState.h; sourceTree = "<group>"; };
+		07101783260741D900CD0E47 /* SignalAddress.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SignalAddress.h; sourceTree = "<group>"; };
+		07101784260741D900CD0E47 /* PreKeyMessage_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PreKeyMessage_Internal.h; sourceTree = "<group>"; };
+		07101785260741D900CD0E47 /* PreKey.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PreKey.h; sourceTree = "<group>"; };
+		07101786260741D900CD0E47 /* SenderKeyMessage_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SenderKeyMessage_Internal.h; sourceTree = "<group>"; };
+		07101787260741D900CD0E47 /* PreKeyBundle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PreKeyBundle.h; sourceTree = "<group>"; };
+		07101788260741D900CD0E47 /* Serializable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Serializable.h; sourceTree = "<group>"; };
+		07101789260741D900CD0E47 /* PreKeyMessage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PreKeyMessage.m; sourceTree = "<group>"; };
+		0710178A260741D900CD0E47 /* SenderKeyRecord.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SenderKeyRecord.m; sourceTree = "<group>"; };
+		0710178B260741D900CD0E47 /* SignalCiphertext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SignalCiphertext.m; sourceTree = "<group>"; };
+		0710178C260741D900CD0E47 /* SenderKeyDistributionMessage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SenderKeyDistributionMessage.m; sourceTree = "<group>"; };
+		0710178D260741D900CD0E47 /* SenderKeyName.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SenderKeyName.h; sourceTree = "<group>"; };
+		0710178E260741D900CD0E47 /* SignalMessage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SignalMessage.h; sourceTree = "<group>"; };
+		0710178F260741D900CD0E47 /* SenderKeyName_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SenderKeyName_Internal.h; sourceTree = "<group>"; };
+		07101790260741D900CD0E47 /* SignedPreKey.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SignedPreKey.h; sourceTree = "<group>"; };
+		07101791260741D900CD0E47 /* PreKey_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PreKey_Internal.h; sourceTree = "<group>"; };
+		07101792260741D900CD0E47 /* KeyPair_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KeyPair_Internal.h; sourceTree = "<group>"; };
+		07101793260741D900CD0E47 /* IdentityKeyPair.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = IdentityKeyPair.m; sourceTree = "<group>"; };
+		07101794260741D900CD0E47 /* SignalMessage_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SignalMessage_Internal.h; sourceTree = "<group>"; };
+		07101795260741D900CD0E47 /* SenderKeyDistributionMessage_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SenderKeyDistributionMessage_Internal.h; sourceTree = "<group>"; };
+		07101796260741D900CD0E47 /* SenderKeyRecord_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SenderKeyRecord_Internal.h; sourceTree = "<group>"; };
+		07101797260741D900CD0E47 /* SignalAddress.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SignalAddress.m; sourceTree = "<group>"; };
+		07101798260741D900CD0E47 /* SenderKeyState.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SenderKeyState.m; sourceTree = "<group>"; };
+		07101799260741D900CD0E47 /* SenderKeyMessage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SenderKeyMessage.h; sourceTree = "<group>"; };
+		0710179A260741D900CD0E47 /* KeyPair.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KeyPair.m; sourceTree = "<group>"; };
+		0710179B260741D900CD0E47 /* SignalMessage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SignalMessage.m; sourceTree = "<group>"; };
+		0710179C260741D900CD0E47 /* SenderKeyName.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SenderKeyName.m; sourceTree = "<group>"; };
+		0710179D260741D900CD0E47 /* SenderKeyDistributionMessage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SenderKeyDistributionMessage.h; sourceTree = "<group>"; };
+		0710179E260741D900CD0E47 /* SignalCiphertext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SignalCiphertext.h; sourceTree = "<group>"; };
+		0710179F260741D900CD0E47 /* PreKeyMessage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PreKeyMessage.h; sourceTree = "<group>"; };
+		071017A0260741D900CD0E47 /* SenderKeyRecord.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SenderKeyRecord.h; sourceTree = "<group>"; };
+		071017A1260741D900CD0E47 /* IdentityKeyPair_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IdentityKeyPair_Internal.h; sourceTree = "<group>"; };
+		071017A2260741D900CD0E47 /* PreKeyBundle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PreKeyBundle.m; sourceTree = "<group>"; };
+		071017A3260741D900CD0E47 /* PreKey.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PreKey.m; sourceTree = "<group>"; };
+		071017A6260741D900CD0E47 /* PreKeyStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PreKeyStore.h; sourceTree = "<group>"; };
+		071017A7260741D900CD0E47 /* SignalStorage_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SignalStorage_Internal.h; sourceTree = "<group>"; };
+		071017A8260741D900CD0E47 /* SignalStorage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SignalStorage.m; sourceTree = "<group>"; };
+		071017A9260741D900CD0E47 /* SignedPreKeyStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SignedPreKeyStore.h; sourceTree = "<group>"; };
+		071017AA260741D900CD0E47 /* SenderKeyStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SenderKeyStore.h; sourceTree = "<group>"; };
+		071017AB260741D900CD0E47 /* SignalStorage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SignalStorage.h; sourceTree = "<group>"; };
+		071017AC260741D900CD0E47 /* SessionStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SessionStore.h; sourceTree = "<group>"; };
+		071017AD260741D900CD0E47 /* IdentityKeyStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IdentityKeyStore.h; sourceTree = "<group>"; };
+		071017AE260741D900CD0E47 /* StickProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StickProtocol.swift; sourceTree = "<group>"; };
+		071017B0260741D900CD0E47 /* DatabaseSetup.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DatabaseSetup.m; sourceTree = "<group>"; };
+		071017B1260741D900CD0E47 /* EncryptionManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EncryptionManager.swift; sourceTree = "<group>"; };
+		071017B3260741D900CD0E47 /* SessionBuilder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SessionBuilder.h; sourceTree = "<group>"; };
+		071017B4260741D900CD0E47 /* SessionCipher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SessionCipher.h; sourceTree = "<group>"; };
+		071017B5260741D900CD0E47 /* SignalContext_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SignalContext_Internal.h; sourceTree = "<group>"; };
+		071017B6260741D900CD0E47 /* GroupCipher.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GroupCipher.m; sourceTree = "<group>"; };
+		071017B7260741D900CD0E47 /* SignalContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SignalContext.h; sourceTree = "<group>"; };
+		071017B8260741D900CD0E47 /* KeyHelper.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = KeyHelper.m; sourceTree = "<group>"; };
+		071017B9260741D900CD0E47 /* GroupSessionBuilder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GroupSessionBuilder.h; sourceTree = "<group>"; };
+		071017BA260741D900CD0E47 /* SessionCipher.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SessionCipher.m; sourceTree = "<group>"; };
+		071017BB260741D900CD0E47 /* SessionBuilder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SessionBuilder.m; sourceTree = "<group>"; };
+		071017BC260741D900CD0E47 /* GroupCipher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GroupCipher.h; sourceTree = "<group>"; };
+		071017BD260741D900CD0E47 /* KeyHelper_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KeyHelper_Internal.h; sourceTree = "<group>"; };
+		071017BE260741D900CD0E47 /* SignalContext.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SignalContext.m; sourceTree = "<group>"; };
+		071017BF260741D900CD0E47 /* GroupSessionBuilder.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GroupSessionBuilder.m; sourceTree = "<group>"; };
+		071017C0260741D900CD0E47 /* KeyHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = KeyHelper.h; sourceTree = "<group>"; };
+		071017C2260741D900CD0E47 /* SPLogs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SPLogs.m; sourceTree = "<group>"; };
+		071017C3260741D900CD0E47 /* NSData+SP.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSData+SP.m"; sourceTree = "<group>"; };
+		071017C4260741D900CD0E47 /* Randomness.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Randomness.m; sourceTree = "<group>"; };
+		071017C5260741D900CD0E47 /* FileCrypto.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FileCrypto.m; sourceTree = "<group>"; };
+		071017C6260741D900CD0E47 /* CryptoError.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CryptoError.h; sourceTree = "<group>"; };
+		071017C7260741D900CD0E47 /* NSData+SP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSData+SP.h"; sourceTree = "<group>"; };
+		071017C8260741D900CD0E47 /* Randomness.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Randomness.h; sourceTree = "<group>"; };
+		071017C9260741D900CD0E47 /* SPLogs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPLogs.h; sourceTree = "<group>"; };
+		071017CA260741D900CD0E47 /* FileCrypto.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileCrypto.h; sourceTree = "<group>"; };
+		071017CB260741D900CD0E47 /* SPAsserts.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPAsserts.h; sourceTree = "<group>"; };
+		071017CC260741D900CD0E47 /* CryptoError.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CryptoError.m; sourceTree = "<group>"; };
+		071017CE260741D900CD0E47 /* SignalError.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SignalError.m; sourceTree = "<group>"; };
+		071017CF260741D900CD0E47 /* SignalError.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SignalError.h; sourceTree = "<group>"; };
+		071018852607452D00CD0E47 /* StickProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StickProtocol.h; sourceTree = "<group>"; };
+		071018A22607465E00CD0E47 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		480B013D7D38AF279D597F4E /* Pods-StickProtocol.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StickProtocol.debug.xcconfig"; path = "Target Support Files/Pods-StickProtocol/Pods-StickProtocol.debug.xcconfig"; sourceTree = "<group>"; };
+		52665AA51DCE22BE382488C8 /* Pods-StickProtocol-StickProtocolTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StickProtocol-StickProtocolTests.debug.xcconfig"; path = "Target Support Files/Pods-StickProtocol-StickProtocolTests/Pods-StickProtocol-StickProtocolTests.debug.xcconfig"; sourceTree = "<group>"; };
+		6B35F7AC4594F4E0AADA3578 /* Pods-StickProtocol.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StickProtocol.release.xcconfig"; path = "Target Support Files/Pods-StickProtocol/Pods-StickProtocol.release.xcconfig"; sourceTree = "<group>"; };
+		C356447132ED4FB7E64F1D44 /* Pods_StickProtocol.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_StickProtocol.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		DF6A18E892226C5AE1B4D80C /* Pods_StickProtocol_StickProtocolTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_StickProtocol_StickProtocolTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		F9F1F7861AC50EC78A7DF5B0 /* Pods-StickProtocol-StickProtocolTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StickProtocol-StickProtocolTests.release.xcconfig"; path = "Target Support Files/Pods-StickProtocol-StickProtocolTests/Pods-StickProtocol-StickProtocolTests.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -39,6 +278,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FD593B7C1A54E41787E1BB63 /* Pods_StickProtocol.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -47,6 +287,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				07100FC92607262A00CD0E47 /* StickProtocol.framework in Frameworks */,
+				1D0FD27C71B0D65281EF7F42 /* Pods_StickProtocol_StickProtocolTests.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -56,9 +297,11 @@
 		07100FB52607262A00CD0E47 = {
 			isa = PBXGroup;
 			children = (
-				07100FC12607262A00CD0E47 /* StickProtocol */,
+				07101763260741D900CD0E47 /* StickProtocol */,
 				07100FCC2607262A00CD0E47 /* StickProtocolTests */,
 				07100FC02607262A00CD0E47 /* Products */,
+				741EF2C16ECE300B8457D45C /* Pods */,
+				17DB993732A2C09AFF2B5521 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -71,16 +314,6 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
-		07100FC12607262A00CD0E47 /* StickProtocol */ = {
-			isa = PBXGroup;
-			children = (
-				07100FC22607262A00CD0E47 /* StickProtocol.h */,
-				07100FC32607262A00CD0E47 /* Info.plist */,
-				07100FDF260726A600CD0E47 /* MyProtocol.swift */,
-			);
-			path = StickProtocol;
-			sourceTree = "<group>";
-		};
 		07100FCC2607262A00CD0E47 /* StickProtocolTests */ = {
 			isa = PBXGroup;
 			children = (
@@ -90,6 +323,189 @@
 			path = StickProtocolTests;
 			sourceTree = "<group>";
 		};
+		07101763260741D900CD0E47 /* StickProtocol */ = {
+			isa = PBXGroup;
+			children = (
+				071018A22607465E00CD0E47 /* Info.plist */,
+				07101775260741D900CD0E47 /* CryptoProvider */,
+				071017C1260741D900CD0E47 /* FileCrypto */,
+				071017CD260741D900CD0E47 /* Utility */,
+				071017A5260741D900CD0E47 /* Storage */,
+				07101779260741D900CD0E47 /* Models */,
+				071017B2260741D900CD0E47 /* Controllers */,
+				07101766260741D900CD0E47 /* SPObjects */,
+				07101778260741D900CD0E47 /* DatabaseSetup.h */,
+				071017B0260741D900CD0E47 /* DatabaseSetup.m */,
+				07101764260741D900CD0E47 /* StorageManager.swift */,
+				071017B1260741D900CD0E47 /* EncryptionManager.swift */,
+				071017AE260741D900CD0E47 /* StickProtocol.swift */,
+				071018852607452D00CD0E47 /* StickProtocol.h */,
+			);
+			path = StickProtocol;
+			sourceTree = "<group>";
+		};
+		07101766260741D900CD0E47 /* SPObjects */ = {
+			isa = PBXGroup;
+			children = (
+				07101767260741D900CD0E47 /* SPPreKey.m */,
+				07101768260741D900CD0E47 /* SPIdentity.h */,
+				07101769260741D900CD0E47 /* SPSenderKey.h */,
+				0710176A260741D900CD0E47 /* YapDatabaseObject.h */,
+				0710176B260741D900CD0E47 /* SPSignedPreKey.h */,
+				0710176C260741D900CD0E47 /* SPObject.h */,
+				0710176D260741D900CD0E47 /* SPSignalSession.h */,
+				0710176E260741D900CD0E47 /* SPIdentity.m */,
+				0710176F260741D900CD0E47 /* SPPreKey.h */,
+				07101770260741D900CD0E47 /* YapDatabaseObject.m */,
+				07101771260741D900CD0E47 /* SPSenderKey.m */,
+				07101772260741D900CD0E47 /* SPObject.m */,
+				07101773260741D900CD0E47 /* SPSignalSession.m */,
+				07101774260741D900CD0E47 /* SPSignedPreKey.m */,
+			);
+			path = SPObjects;
+			sourceTree = "<group>";
+		};
+		07101775260741D900CD0E47 /* CryptoProvider */ = {
+			isa = PBXGroup;
+			children = (
+				07101776260741D900CD0E47 /* CommonCryptoProvider.m */,
+				07101777260741D900CD0E47 /* CommonCryptoProvider.h */,
+			);
+			path = CryptoProvider;
+			sourceTree = "<group>";
+		};
+		07101779260741D900CD0E47 /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				0710177A260741D900CD0E47 /* SenderKeyState_Internal.h */,
+				0710177B260741D900CD0E47 /* SignedPreKey_Internal.h */,
+				0710177C260741D900CD0E47 /* SignedPreKey.m */,
+				0710177D260741D900CD0E47 /* PreKeyBundle_Internal.h */,
+				0710177E260741D900CD0E47 /* IdentityKeyPair.h */,
+				0710177F260741D900CD0E47 /* SignalAddress_Internal.h */,
+				07101780260741D900CD0E47 /* KeyPair.h */,
+				07101781260741D900CD0E47 /* SenderKeyMessage.m */,
+				07101782260741D900CD0E47 /* SenderKeyState.h */,
+				07101783260741D900CD0E47 /* SignalAddress.h */,
+				07101784260741D900CD0E47 /* PreKeyMessage_Internal.h */,
+				07101785260741D900CD0E47 /* PreKey.h */,
+				07101786260741D900CD0E47 /* SenderKeyMessage_Internal.h */,
+				07101787260741D900CD0E47 /* PreKeyBundle.h */,
+				07101788260741D900CD0E47 /* Serializable.h */,
+				07101789260741D900CD0E47 /* PreKeyMessage.m */,
+				0710178A260741D900CD0E47 /* SenderKeyRecord.m */,
+				0710178B260741D900CD0E47 /* SignalCiphertext.m */,
+				0710178C260741D900CD0E47 /* SenderKeyDistributionMessage.m */,
+				0710178D260741D900CD0E47 /* SenderKeyName.h */,
+				0710178E260741D900CD0E47 /* SignalMessage.h */,
+				0710178F260741D900CD0E47 /* SenderKeyName_Internal.h */,
+				07101790260741D900CD0E47 /* SignedPreKey.h */,
+				07101791260741D900CD0E47 /* PreKey_Internal.h */,
+				07101792260741D900CD0E47 /* KeyPair_Internal.h */,
+				07101793260741D900CD0E47 /* IdentityKeyPair.m */,
+				07101794260741D900CD0E47 /* SignalMessage_Internal.h */,
+				07101795260741D900CD0E47 /* SenderKeyDistributionMessage_Internal.h */,
+				07101796260741D900CD0E47 /* SenderKeyRecord_Internal.h */,
+				07101797260741D900CD0E47 /* SignalAddress.m */,
+				07101798260741D900CD0E47 /* SenderKeyState.m */,
+				07101799260741D900CD0E47 /* SenderKeyMessage.h */,
+				0710179A260741D900CD0E47 /* KeyPair.m */,
+				0710179B260741D900CD0E47 /* SignalMessage.m */,
+				0710179C260741D900CD0E47 /* SenderKeyName.m */,
+				0710179D260741D900CD0E47 /* SenderKeyDistributionMessage.h */,
+				0710179E260741D900CD0E47 /* SignalCiphertext.h */,
+				0710179F260741D900CD0E47 /* PreKeyMessage.h */,
+				071017A0260741D900CD0E47 /* SenderKeyRecord.h */,
+				071017A1260741D900CD0E47 /* IdentityKeyPair_Internal.h */,
+				071017A2260741D900CD0E47 /* PreKeyBundle.m */,
+				071017A3260741D900CD0E47 /* PreKey.m */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		071017A5260741D900CD0E47 /* Storage */ = {
+			isa = PBXGroup;
+			children = (
+				071017A6260741D900CD0E47 /* PreKeyStore.h */,
+				071017A7260741D900CD0E47 /* SignalStorage_Internal.h */,
+				071017A8260741D900CD0E47 /* SignalStorage.m */,
+				071017A9260741D900CD0E47 /* SignedPreKeyStore.h */,
+				071017AA260741D900CD0E47 /* SenderKeyStore.h */,
+				071017AB260741D900CD0E47 /* SignalStorage.h */,
+				071017AC260741D900CD0E47 /* SessionStore.h */,
+				071017AD260741D900CD0E47 /* IdentityKeyStore.h */,
+			);
+			path = Storage;
+			sourceTree = "<group>";
+		};
+		071017B2260741D900CD0E47 /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				071017B3260741D900CD0E47 /* SessionBuilder.h */,
+				071017B4260741D900CD0E47 /* SessionCipher.h */,
+				071017B5260741D900CD0E47 /* SignalContext_Internal.h */,
+				071017B6260741D900CD0E47 /* GroupCipher.m */,
+				071017B7260741D900CD0E47 /* SignalContext.h */,
+				071017B8260741D900CD0E47 /* KeyHelper.m */,
+				071017B9260741D900CD0E47 /* GroupSessionBuilder.h */,
+				071017BA260741D900CD0E47 /* SessionCipher.m */,
+				071017BB260741D900CD0E47 /* SessionBuilder.m */,
+				071017BC260741D900CD0E47 /* GroupCipher.h */,
+				071017BD260741D900CD0E47 /* KeyHelper_Internal.h */,
+				071017BE260741D900CD0E47 /* SignalContext.m */,
+				071017BF260741D900CD0E47 /* GroupSessionBuilder.m */,
+				071017C0260741D900CD0E47 /* KeyHelper.h */,
+			);
+			path = Controllers;
+			sourceTree = "<group>";
+		};
+		071017C1260741D900CD0E47 /* FileCrypto */ = {
+			isa = PBXGroup;
+			children = (
+				071017C2260741D900CD0E47 /* SPLogs.m */,
+				071017C3260741D900CD0E47 /* NSData+SP.m */,
+				071017C4260741D900CD0E47 /* Randomness.m */,
+				071017C5260741D900CD0E47 /* FileCrypto.m */,
+				071017C6260741D900CD0E47 /* CryptoError.h */,
+				071017C7260741D900CD0E47 /* NSData+SP.h */,
+				071017C8260741D900CD0E47 /* Randomness.h */,
+				071017C9260741D900CD0E47 /* SPLogs.h */,
+				071017CA260741D900CD0E47 /* FileCrypto.h */,
+				071017CB260741D900CD0E47 /* SPAsserts.h */,
+				071017CC260741D900CD0E47 /* CryptoError.m */,
+			);
+			path = FileCrypto;
+			sourceTree = "<group>";
+		};
+		071017CD260741D900CD0E47 /* Utility */ = {
+			isa = PBXGroup;
+			children = (
+				071017CE260741D900CD0E47 /* SignalError.m */,
+				071017CF260741D900CD0E47 /* SignalError.h */,
+			);
+			path = Utility;
+			sourceTree = "<group>";
+		};
+		17DB993732A2C09AFF2B5521 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				C356447132ED4FB7E64F1D44 /* Pods_StickProtocol.framework */,
+				DF6A18E892226C5AE1B4D80C /* Pods_StickProtocol_StickProtocolTests.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		741EF2C16ECE300B8457D45C /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				480B013D7D38AF279D597F4E /* Pods-StickProtocol.debug.xcconfig */,
+				6B35F7AC4594F4E0AADA3578 /* Pods-StickProtocol.release.xcconfig */,
+				52665AA51DCE22BE382488C8 /* Pods-StickProtocol-StickProtocolTests.debug.xcconfig */,
+				F9F1F7861AC50EC78A7DF5B0 /* Pods-StickProtocol-StickProtocolTests.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -97,7 +513,65 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				07100FD02607262A00CD0E47 /* StickProtocol.h in Headers */,
+				071018862607452D00CD0E47 /* StickProtocol.h in Headers */,
+				07101856260741D900CD0E47 /* Randomness.h in Headers */,
+				0710182F260741D900CD0E47 /* IdentityKeyStore.h in Headers */,
+				07101858260741D900CD0E47 /* FileCrypto.h in Headers */,
+				0710185E260741D900CD0E47 /* SignalError.h in Headers */,
+				071017FD260741D900CD0E47 /* Serializable.h in Headers */,
+				071017F8260741D900CD0E47 /* SignalAddress.h in Headers */,
+				071017D7260741D900CD0E47 /* SPSenderKey.h in Headers */,
+				0710182E260741D900CD0E47 /* SessionStore.h in Headers */,
+				071017F4260741D900CD0E47 /* KeyPair.h in Headers */,
+				07101838260741D900CD0E47 /* SessionBuilder.h in Headers */,
+				071017FA260741D900CD0E47 /* PreKey.h in Headers */,
+				0710181D260741D900CD0E47 /* SignalCiphertext.h in Headers */,
+				071017FC260741D900CD0E47 /* PreKeyBundle.h in Headers */,
+				071017DB260741D900CD0E47 /* SPSignalSession.h in Headers */,
+				07101807260741D900CD0E47 /* SignalMessage.h in Headers */,
+				07101815260741D900CD0E47 /* SenderKeyMessage.h in Headers */,
+				0710181C260741D900CD0E47 /* SenderKeyDistributionMessage.h in Headers */,
+				071017D8260741D900CD0E47 /* YapDatabaseObject.h in Headers */,
+				0710183D260741D900CD0E47 /* SignalContext.h in Headers */,
+				07101827260741D900CD0E47 /* PreKeyStore.h in Headers */,
+				07101845260741D900CD0E47 /* GroupCipher.h in Headers */,
+				071017DE260741D900CD0E47 /* SPPreKey.h in Headers */,
+				0710181F260741D900CD0E47 /* SenderKeyRecord.h in Headers */,
+				07101859260741D900CD0E47 /* SPAsserts.h in Headers */,
+				071017DA260741D900CD0E47 /* SPObject.h in Headers */,
+				071017D9260741D900CD0E47 /* SPSignedPreKey.h in Headers */,
+				07101806260741D900CD0E47 /* SenderKeyName.h in Headers */,
+				07101809260741D900CD0E47 /* SignedPreKey.h in Headers */,
+				07101857260741D900CD0E47 /* SPLogs.h in Headers */,
+				07101854260741D900CD0E47 /* CryptoError.h in Headers */,
+				0710182B260741D900CD0E47 /* SignedPreKeyStore.h in Headers */,
+				0710182C260741D900CD0E47 /* SenderKeyStore.h in Headers */,
+				07101840260741D900CD0E47 /* GroupSessionBuilder.h in Headers */,
+				071017D6260741D900CD0E47 /* SPIdentity.h in Headers */,
+				07101855260741D900CD0E47 /* NSData+SP.h in Headers */,
+				0710182D260741D900CD0E47 /* SignalStorage.h in Headers */,
+				0710181E260741D900CD0E47 /* PreKeyMessage.h in Headers */,
+				07101839260741D900CD0E47 /* SessionCipher.h in Headers */,
+				071017EB260741D900CD0E47 /* CommonCryptoProvider.h in Headers */,
+				071017F2260741D900CD0E47 /* IdentityKeyPair.h in Headers */,
+				071017F7260741D900CD0E47 /* SenderKeyState.h in Headers */,
+				0710184B260741D900CD0E47 /* KeyHelper.h in Headers */,
+				071017FB260741D900CD0E47 /* SenderKeyMessage_Internal.h in Headers */,
+				0710180F260741D900CD0E47 /* SenderKeyDistributionMessage_Internal.h in Headers */,
+				0710180E260741D900CD0E47 /* SignalMessage_Internal.h in Headers */,
+				07101820260741D900CD0E47 /* IdentityKeyPair_Internal.h in Headers */,
+				0710183A260741D900CD0E47 /* SignalContext_Internal.h in Headers */,
+				07101846260741D900CD0E47 /* KeyHelper_Internal.h in Headers */,
+				07101810260741D900CD0E47 /* SenderKeyRecord_Internal.h in Headers */,
+				071017EE260741D900CD0E47 /* SignedPreKey_Internal.h in Headers */,
+				0710180B260741D900CD0E47 /* KeyPair_Internal.h in Headers */,
+				07101808260741D900CD0E47 /* SenderKeyName_Internal.h in Headers */,
+				071017F9260741D900CD0E47 /* PreKeyMessage_Internal.h in Headers */,
+				071017ED260741D900CD0E47 /* SenderKeyState_Internal.h in Headers */,
+				0710180A260741D900CD0E47 /* PreKey_Internal.h in Headers */,
+				071017F1260741D900CD0E47 /* PreKeyBundle_Internal.h in Headers */,
+				071017F3260741D900CD0E47 /* SignalAddress_Internal.h in Headers */,
+				07101828260741D900CD0E47 /* SignalStorage_Internal.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -108,6 +582,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 07100FD32607262A00CD0E47 /* Build configuration list for PBXNativeTarget "StickProtocol" */;
 			buildPhases = (
+				1757227F96CFDBF546EDA80B /* [CP] Check Pods Manifest.lock */,
 				07100FBA2607262A00CD0E47 /* Headers */,
 				07100FBB2607262A00CD0E47 /* Sources */,
 				07100FBC2607262A00CD0E47 /* Frameworks */,
@@ -126,9 +601,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 07100FD62607262A00CD0E47 /* Build configuration list for PBXNativeTarget "StickProtocolTests" */;
 			buildPhases = (
+				7C19E80DDA4ECADF12379673 /* [CP] Check Pods Manifest.lock */,
 				07100FC42607262A00CD0E47 /* Sources */,
 				07100FC52607262A00CD0E47 /* Frameworks */,
 				07100FC62607262A00CD0E47 /* Resources */,
+				E386FEBEA182995FE67E6BF5 /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -194,12 +671,114 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		1757227F96CFDBF546EDA80B /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-StickProtocol-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		7C19E80DDA4ECADF12379673 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-StickProtocol-StickProtocolTests-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		E386FEBEA182995FE67E6BF5 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-StickProtocol-StickProtocolTests/Pods-StickProtocol-StickProtocolTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-StickProtocol-StickProtocolTests/Pods-StickProtocol-StickProtocolTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-StickProtocol-StickProtocolTests/Pods-StickProtocol-StickProtocolTests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		07100FBB2607262A00CD0E47 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				07100FE0260726A600CD0E47 /* MyProtocol.swift in Sources */,
+				07101849260741D900CD0E47 /* GroupSessionBuilder.m in Sources */,
+				07101843260741D900CD0E47 /* SessionBuilder.m in Sources */,
+				071017DC260741D900CD0E47 /* SPIdentity.m in Sources */,
+				07101813260741D900CD0E47 /* SenderKeyState.m in Sources */,
+				0710183B260741D900CD0E47 /* GroupCipher.m in Sources */,
+				071017FE260741D900CD0E47 /* PreKeyMessage.m in Sources */,
+				07101823260741D900CD0E47 /* PreKey.m in Sources */,
+				0710181A260741D900CD0E47 /* SenderKeyName.m in Sources */,
+				07101830260741D900CD0E47 /* StickProtocol.swift in Sources */,
+				07101802260741D900CD0E47 /* SignalCiphertext.m in Sources */,
+				07101834260741D900CD0E47 /* DatabaseSetup.m in Sources */,
+				07101836260741D900CD0E47 /* EncryptionManager.swift in Sources */,
+				07101821260741D900CD0E47 /* PreKeyBundle.m in Sources */,
+				07101829260741D900CD0E47 /* SignalStorage.m in Sources */,
+				071017EF260741D900CD0E47 /* SignedPreKey.m in Sources */,
+				071017E5260741D900CD0E47 /* SPSignalSession.m in Sources */,
+				07101847260741D900CD0E47 /* SignalContext.m in Sources */,
+				0710183E260741D900CD0E47 /* KeyHelper.m in Sources */,
+				071017E1260741D900CD0E47 /* SPSenderKey.m in Sources */,
+				07101850260741D900CD0E47 /* Randomness.m in Sources */,
+				07101841260741D900CD0E47 /* SessionCipher.m in Sources */,
+				071017D0260741D900CD0E47 /* StorageManager.swift in Sources */,
+				07101804260741D900CD0E47 /* SenderKeyDistributionMessage.m in Sources */,
+				07101818260741D900CD0E47 /* SignalMessage.m in Sources */,
+				0710184C260741D900CD0E47 /* SPLogs.m in Sources */,
+				0710184E260741D900CD0E47 /* NSData+SP.m in Sources */,
+				07101800260741D900CD0E47 /* SenderKeyRecord.m in Sources */,
+				07101811260741D900CD0E47 /* SignalAddress.m in Sources */,
+				071017DF260741D900CD0E47 /* YapDatabaseObject.m in Sources */,
+				0710185C260741D900CD0E47 /* SignalError.m in Sources */,
+				07101852260741D900CD0E47 /* FileCrypto.m in Sources */,
+				071017E7260741D900CD0E47 /* SPSignedPreKey.m in Sources */,
+				0710185A260741D900CD0E47 /* CryptoError.m in Sources */,
+				071017F5260741D900CD0E47 /* SenderKeyMessage.m in Sources */,
+				071017E3260741D900CD0E47 /* SPObject.m in Sources */,
+				0710180C260741D900CD0E47 /* IdentityKeyPair.m in Sources */,
+				07101816260741D900CD0E47 /* KeyPair.m in Sources */,
+				071017E9260741D900CD0E47 /* CommonCryptoProvider.m in Sources */,
+				071017D4260741D900CD0E47 /* SPPreKey.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -207,8 +786,46 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				071017D5260741D900CD0E47 /* SPPreKey.m in Sources */,
+				071017DD260741D900CD0E47 /* SPIdentity.m in Sources */,
+				07101844260741D900CD0E47 /* SessionBuilder.m in Sources */,
+				0710183F260741D900CD0E47 /* KeyHelper.m in Sources */,
+				07101801260741D900CD0E47 /* SenderKeyRecord.m in Sources */,
+				07101842260741D900CD0E47 /* SessionCipher.m in Sources */,
+				0710184F260741D900CD0E47 /* NSData+SP.m in Sources */,
+				071017E6260741D900CD0E47 /* SPSignalSession.m in Sources */,
+				071017E0260741D900CD0E47 /* YapDatabaseObject.m in Sources */,
+				07101812260741D900CD0E47 /* SignalAddress.m in Sources */,
+				0710184A260741D900CD0E47 /* GroupSessionBuilder.m in Sources */,
+				07101814260741D900CD0E47 /* SenderKeyState.m in Sources */,
+				0710180D260741D900CD0E47 /* IdentityKeyPair.m in Sources */,
+				0710185D260741D900CD0E47 /* SignalError.m in Sources */,
+				07101837260741D900CD0E47 /* EncryptionManager.swift in Sources */,
+				07101853260741D900CD0E47 /* FileCrypto.m in Sources */,
+				0710185B260741D900CD0E47 /* CryptoError.m in Sources */,
+				071017EA260741D900CD0E47 /* CommonCryptoProvider.m in Sources */,
+				07101824260741D900CD0E47 /* PreKey.m in Sources */,
+				0710182A260741D900CD0E47 /* SignalStorage.m in Sources */,
 				07100FCE2607262A00CD0E47 /* StickProtocolTests.swift in Sources */,
-				0710108A26072E6700CD0E47 /* MyProtocol.swift in Sources */,
+				07101835260741D900CD0E47 /* DatabaseSetup.m in Sources */,
+				0710183C260741D900CD0E47 /* GroupCipher.m in Sources */,
+				07101831260741D900CD0E47 /* StickProtocol.swift in Sources */,
+				07101822260741D900CD0E47 /* PreKeyBundle.m in Sources */,
+				07101851260741D900CD0E47 /* Randomness.m in Sources */,
+				071017F0260741D900CD0E47 /* SignedPreKey.m in Sources */,
+				071017E8260741D900CD0E47 /* SPSignedPreKey.m in Sources */,
+				07101848260741D900CD0E47 /* SignalContext.m in Sources */,
+				07101805260741D900CD0E47 /* SenderKeyDistributionMessage.m in Sources */,
+				071017FF260741D900CD0E47 /* PreKeyMessage.m in Sources */,
+				0710181B260741D900CD0E47 /* SenderKeyName.m in Sources */,
+				07101803260741D900CD0E47 /* SignalCiphertext.m in Sources */,
+				071017F6260741D900CD0E47 /* SenderKeyMessage.m in Sources */,
+				07101819260741D900CD0E47 /* SignalMessage.m in Sources */,
+				0710184D260741D900CD0E47 /* SPLogs.m in Sources */,
+				071017D1260741D900CD0E47 /* StorageManager.swift in Sources */,
+				071017E2260741D900CD0E47 /* SPSenderKey.m in Sources */,
+				071017E4260741D900CD0E47 /* SPObject.m in Sources */,
+				07101817260741D900CD0E47 /* KeyPair.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -281,6 +898,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
@@ -338,6 +956,7 @@
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OBJC_BRIDGING_HEADER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 				VALIDATE_PRODUCT = YES;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -347,6 +966,7 @@
 		};
 		07100FD42607262A00CD0E47 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 480B013D7D38AF279D597F4E /* Pods-StickProtocol.debug.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
@@ -374,6 +994,7 @@
 		};
 		07100FD52607262A00CD0E47 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 6B35F7AC4594F4E0AADA3578 /* Pods-StickProtocol.release.xcconfig */;
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
@@ -400,6 +1021,7 @@
 		};
 		07100FD72607262A00CD0E47 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 52665AA51DCE22BE382488C8 /* Pods-StickProtocol-StickProtocolTests.debug.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;
@@ -419,6 +1041,7 @@
 		};
 		07100FD82607262A00CD0E47 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = F9F1F7861AC50EC78A7DF5B0 /* Pods-StickProtocol-StickProtocolTests.release.xcconfig */;
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CODE_SIGN_STYLE = Automatic;

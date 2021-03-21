@@ -2,7 +2,7 @@ Pod::Spec.new do |spec|
 
 
   spec.name         = "StickProtocol"
-  spec.version      = "1.1.31"
+  spec.version      = "1.1.7"
   spec.summary      = "Customized Signal Protocol C Library for the Stick Protocol"
 
 
@@ -23,18 +23,16 @@ Pod::Spec.new do |spec|
  
 
   spec.ios.deployment_target = "12.0"
-  # spec.ios.vendored_frameworks = "StickProtocol.framework"
+  spec.ios.vendored_frameworks = "StickProtocol.framework"
 
 
+  spec.source       = { :http => "https://stick-protocol.s3.eu-central-1.amazonaws.com/StickProtocol.zip" }
 
-  spec.source       = { git: "https://github.com/STiiiCK/stick-protocol.git", tag: spec.version.to_s}
-
-  spec.source_files = 'ios/StickProtocol/**/*.swift'
 
   # spec.exclude_files = "Classes/Exclude"
 
-  # spec.pod_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
-  # spec.user_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
+  spec.pod_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
+  spec.user_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
 
  
 

@@ -1,0 +1,22 @@
+# Uncomment the next line to define a global platform for your project
+# platform :ios, '12.0'
+
+pod 'StickySignalProtocolC', '1.0.0'
+pod 'SimpleKeychain', :modular_headers => true
+pod 'SignalArgon2'
+pod 'CryptoSwift'
+pod 'SQLCipher', ">= 4.0.1", :modular_headers => true
+pod 'YapDatabase/SQLCipher', :git => 'https://github.com/signalapp/YapDatabase.git', branch: 'signal-release'
+pod 'Mantle'
+
+target 'StickProtocol' do
+  # Comment the next line if you don't want to use dynamic frameworks
+  use_frameworks!
+
+  # Pods for StickProtocol
+
+  target 'StickProtocolTests' do
+    # Pods for testing
+  end
+
+end

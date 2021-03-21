@@ -533,13 +533,13 @@ public class StickProtocol {
             File file = new File(filePath);
             InputStream is = new FileInputStream(file);
 
-            CipherFileStream file = CipherFile.newStreamBuilder()
+            CipherFileStream cipherFileStream = CipherFile.newStreamBuilder()
                     .withStream(is)
                     .withLength(is.available()).build();
 
             byte[] fileKey = Util.getSecretBytes(64);
             byte[] fileIV = Util.getSecretBytes(16);
-            InputStream dataStream = new PaddingInputStream(file.getInputStream(), file.getLength());
+            InputStream dataStream = new PaddingInputStream(cipherFileStream.getInputStream(), cipherFileStream.getLength());
 
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             String encryptedFilePath = path + "/" + UUID.randomUUID().toString();
