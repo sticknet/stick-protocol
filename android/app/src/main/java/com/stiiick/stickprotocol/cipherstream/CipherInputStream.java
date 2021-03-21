@@ -44,7 +44,7 @@ public class CipherInputStream extends FilterInputStream {
     private long    totalRead;
     private byte[]  overflowBuffer;
 
-    public static InputStream createForAttachment(File file, long plaintextLength, byte[] combinedKeyMaterial, byte[] digest)
+    public static InputStream createForFile(File file, long plaintextLength, byte[] combinedKeyMaterial, byte[] digest)
             throws InvalidMessageException, IOException
     {
         try {

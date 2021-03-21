@@ -533,18 +533,18 @@ public class StickProtocol {
             File file = new File(filePath);
             InputStream is = new FileInputStream(file);
 
-            CipherFileStream attachment = CipherFile.newStreamBuilder()
+            CipherFileStream file = CipherFile.newStreamBuilder()
                     .withStream(is)
                     .withLength(is.available()).build();
 
-            byte[] attachmentKey = Util.getSecretBytes(64);
-            byte[] attachmentIV = Util.getSecretBytes(16);
-            InputStream dataStream = new PaddingInputStream(attachment.getInputStream(), attachment.getLength());
+            byte[] fileKey = Util.getSecretBytes(64);
+            byte[] fileIV = Util.getSecretBytes(16);
+            InputStream dataStream = new PaddingInputStream(file.getInputStream(), file.getLength());
 
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
             String encryptedFilePath = path + "/" + UUID.randomUUID().toString();
             File encryptedFile = new File(encryptedFilePath);
-            DigestingOutputStream outputStream = new CipherOutputStreamFactory(attachmentKey, attachmentIV).createFor(byteArrayOutputStream);
+            DigestingOutputStream outputStream = new CipherOutputStreamFactory(fileKey, fileIV).createFor(byteArrayOutputStream);
             byte[] buffer = new byte[4096];
             int read;
             while ((read = dataStream.read(buffer, 0, buffer.length)) != -1) {
@@ -563,7 +563,7 @@ public class StickProtocol {
             fos.close();
 
             byte[] digest = outputStream.getTransmittedDigest();
-            String secret = Base64.encodeBytes(attachmentKey) + Base64.encodeBytes(digest);
+            String secret = Base64.encodeBytes(fileKey) + Base64.encodeBytes(digest);
             HashMap<String, String> map = new HashMap<>();
             map.put("uri", "file://" + encryptedFilePath);
             map.put("secret", secret);
@@ -600,7 +600,7 @@ public class StickProtocol {
         try {
             String key = secret.substring(0, 88);
             String digest = secret.substring(88);
-            InputStream inputStream = CipherInputStream.createForAttachment(file, file.length(), Base64.decode(key), Base64.decode(digest));
+            InputStream inputStream = CipherInputStream.createForFile(file, file.length(), Base64.decode(key), Base64.decode(digest));
             File outputFile = new File(outputPath);
             byte[] buffer = new byte[8192];
             int read;
@@ -653,11 +653,7 @@ public class StickProtocol {
         random.nextBytes(iv);
         IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);
 
-        // Hashing key.
-//        KeySpec spec = new PBEKeySpec(pass.toCharArray(), salt, 10000, 256); // AES-256
-//        SecretKeyFactory f = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
-//        byte[] hash = f.generateSecret(spec).getEncoded();
-
+        // Hashing pass
         byte[] hash = new Argon2.Builder(Version.V13)
                 .type(Type.Argon2id)
                 .memoryCostKiB(4 * 1024)
@@ -700,11 +696,8 @@ public class StickProtocol {
         int encryptedSize = encryptedIvTextBytes.length - ivSize;
         byte[] encryptedBytes = new byte[encryptedSize];
         System.arraycopy(encryptedIvTextBytes, ivSize, encryptedBytes, 0, encryptedSize);
-        // Hash key.
-//        KeySpec spec = new PBEKeySpec(pass.toCharArray(), Base64.decode(salt), 10000, 256); // AES-256
-//        SecretKeyFactory f = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
-//        byte[] hash = f.generateSecret(spec).getEncoded();
 
+        // Hash pass
         byte[] hash = new Argon2.Builder(Version.V13)
                 .type(Type.Argon2id)
                 .memoryCostKiB(4 * 1024)
