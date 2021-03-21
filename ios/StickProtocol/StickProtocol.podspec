@@ -2,7 +2,7 @@ Pod::Spec.new do |spec|
 
 
   spec.name         = "StickProtocol"
-  spec.version      = "1.1.30"
+  spec.version      = "1.1.31"
   spec.summary      = "Customized Signal Protocol C Library for the Stick Protocol"
 
 
@@ -27,7 +27,7 @@ Pod::Spec.new do |spec|
 
 
 
-  spec.source       = { git: "https://github.com/STiiiCK/stick-protocol.git", tag: spec.version.to_s, submodules: true  }
+  spec.source       = { git: "https://github.com/STiiiCK/stick-protocol.git", tag: spec.version.to_s}
 
   spec.source_files = 'ios/StickProtocol/**/*.swift'
 

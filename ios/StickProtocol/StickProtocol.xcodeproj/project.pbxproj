@@ -11,6 +11,7 @@
 		07100FCE2607262A00CD0E47 /* StickProtocolTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07100FCD2607262A00CD0E47 /* StickProtocolTests.swift */; };
 		07100FD02607262A00CD0E47 /* StickProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 07100FC22607262A00CD0E47 /* StickProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		07100FE0260726A600CD0E47 /* MyProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07100FDF260726A600CD0E47 /* MyProtocol.swift */; };
+		0710108A26072E6700CD0E47 /* MyProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07100FDF260726A600CD0E47 /* MyProtocol.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -207,6 +208,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				07100FCE2607262A00CD0E47 /* StickProtocolTests.swift in Sources */,
+				0710108A26072E6700CD0E47 /* MyProtocol.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -363,6 +365,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.stiiick.StickProtocol;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -389,6 +392,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.stiiick.StickProtocol;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = NO;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
