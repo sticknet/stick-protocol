@@ -2,7 +2,7 @@ Pod::Spec.new do |spec|
 
 
   spec.name         = "StickProtocol"
-  spec.version      = "1.1.7"
+  spec.version      = "1.1.18"
   spec.summary      = "Customized Signal Protocol C Library for the Stick Protocol"
 
 
@@ -26,7 +26,7 @@ Pod::Spec.new do |spec|
   spec.ios.vendored_frameworks = "StickProtocol.framework"
 
 
-  spec.source       = { :http => "https://stick-protocol.s3.eu-central-1.amazonaws.com/StickProtocol.zip" }
+  spec.source       = { :http => "https://dl.dropboxusercontent.com/s/c6xiws1ans9u8v7/StickProtocol.zip?dl=0" }
 
 
   # spec.exclude_files = "Classes/Exclude"

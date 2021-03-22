@@ -1,4 +1,4 @@
-framework module YapDatabase {
+module YapDatabase {
   umbrella header "YapDatabase-umbrella.h"
 
   export *

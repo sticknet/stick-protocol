@@ -146,8 +146,8 @@
 		0710185D260741D900CD0E47 /* SignalError.m in Sources */ = {isa = PBXBuildFile; fileRef = 071017CE260741D900CD0E47 /* SignalError.m */; };
 		0710185E260741D900CD0E47 /* SignalError.h in Headers */ = {isa = PBXBuildFile; fileRef = 071017CF260741D900CD0E47 /* SignalError.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		071018862607452D00CD0E47 /* StickProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 071018852607452D00CD0E47 /* StickProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		1D0FD27C71B0D65281EF7F42 /* Pods_StickProtocol_StickProtocolTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DF6A18E892226C5AE1B4D80C /* Pods_StickProtocol_StickProtocolTests.framework */; };
-		FD593B7C1A54E41787E1BB63 /* Pods_StickProtocol.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C356447132ED4FB7E64F1D44 /* Pods_StickProtocol.framework */; };
+		2D83A34A2138A63D53634E4C /* libPods-StickProtocol-StickProtocolTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A0FA4D9B910C349B6BB82BE5 /* libPods-StickProtocol-StickProtocolTests.a */; };
+		53ADF596B33CABEA0811CB57 /* libPods-StickProtocol.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 90A6DF9FEE0A5CA3DF96A99B /* libPods-StickProtocol.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -265,11 +265,13 @@
 		071017CF260741D900CD0E47 /* SignalError.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SignalError.h; sourceTree = "<group>"; };
 		071018852607452D00CD0E47 /* StickProtocol.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StickProtocol.h; sourceTree = "<group>"; };
 		071018A22607465E00CD0E47 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		0710269C2607BCF800CD0E47 /* CocoaLumberjack.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = CocoaLumberjack.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		071026A32607BD2000CD0E47 /* CocoaLumberjack.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = CocoaLumberjack.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		480B013D7D38AF279D597F4E /* Pods-StickProtocol.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StickProtocol.debug.xcconfig"; path = "Target Support Files/Pods-StickProtocol/Pods-StickProtocol.debug.xcconfig"; sourceTree = "<group>"; };
 		52665AA51DCE22BE382488C8 /* Pods-StickProtocol-StickProtocolTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StickProtocol-StickProtocolTests.debug.xcconfig"; path = "Target Support Files/Pods-StickProtocol-StickProtocolTests/Pods-StickProtocol-StickProtocolTests.debug.xcconfig"; sourceTree = "<group>"; };
 		6B35F7AC4594F4E0AADA3578 /* Pods-StickProtocol.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StickProtocol.release.xcconfig"; path = "Target Support Files/Pods-StickProtocol/Pods-StickProtocol.release.xcconfig"; sourceTree = "<group>"; };
-		C356447132ED4FB7E64F1D44 /* Pods_StickProtocol.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_StickProtocol.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		DF6A18E892226C5AE1B4D80C /* Pods_StickProtocol_StickProtocolTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_StickProtocol_StickProtocolTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		90A6DF9FEE0A5CA3DF96A99B /* libPods-StickProtocol.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-StickProtocol.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		A0FA4D9B910C349B6BB82BE5 /* libPods-StickProtocol-StickProtocolTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-StickProtocol-StickProtocolTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F9F1F7861AC50EC78A7DF5B0 /* Pods-StickProtocol-StickProtocolTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StickProtocol-StickProtocolTests.release.xcconfig"; path = "Target Support Files/Pods-StickProtocol-StickProtocolTests/Pods-StickProtocol-StickProtocolTests.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -278,7 +280,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				FD593B7C1A54E41787E1BB63 /* Pods_StickProtocol.framework in Frameworks */,
+				53ADF596B33CABEA0811CB57 /* libPods-StickProtocol.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -287,7 +289,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				07100FC92607262A00CD0E47 /* StickProtocol.framework in Frameworks */,
-				1D0FD27C71B0D65281EF7F42 /* Pods_StickProtocol_StickProtocolTests.framework in Frameworks */,
+				2D83A34A2138A63D53634E4C /* libPods-StickProtocol-StickProtocolTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -489,8 +491,10 @@
 		17DB993732A2C09AFF2B5521 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				C356447132ED4FB7E64F1D44 /* Pods_StickProtocol.framework */,
-				DF6A18E892226C5AE1B4D80C /* Pods_StickProtocol_StickProtocolTests.framework */,
+				071026A32607BD2000CD0E47 /* CocoaLumberjack.framework */,
+				0710269C2607BCF800CD0E47 /* CocoaLumberjack.framework */,
+				90A6DF9FEE0A5CA3DF96A99B /* libPods-StickProtocol.a */,
+				A0FA4D9B910C349B6BB82BE5 /* libPods-StickProtocol-StickProtocolTests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -844,6 +848,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -909,6 +914,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -968,6 +974,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 480B013D7D38AF279D597F4E /* Pods-StickProtocol.debug.xcconfig */;
 			buildSettings = {
+				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;
@@ -996,6 +1003,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 6B35F7AC4594F4E0AADA3578 /* Pods-StickProtocol.release.xcconfig */;
 			buildSettings = {
+				CLANG_ALLOW_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				DEFINES_MODULE = YES;

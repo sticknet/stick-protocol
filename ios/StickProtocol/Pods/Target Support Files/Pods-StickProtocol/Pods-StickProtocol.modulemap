@@ -1,4 +1,4 @@
-framework module Pods_StickProtocol {
+module Pods_StickProtocol {
   umbrella header "Pods-StickProtocol-umbrella.h"
 
   export *

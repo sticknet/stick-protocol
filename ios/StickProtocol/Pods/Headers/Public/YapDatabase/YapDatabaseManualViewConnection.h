@@ -1,0 +1,1 @@
+../../../YapDatabase/YapDatabase/Extensions/ManualView/YapDatabaseManualViewConnection.h

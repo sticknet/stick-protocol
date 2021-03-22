@@ -8,6 +8,7 @@
 
 #import "YapDatabaseObject.h"
 
+
 @implementation YapDatabaseObject
 @synthesize uniqueId = _uniqueId;
 

@@ -1,0 +1,1 @@
+../../../YapDatabase/YapDatabase/Extensions/View/Internal/YapDatabaseViewMappingsPrivate.h

@@ -1,4 +1,4 @@
-framework module SQLCipher {
+module SQLCipher {
   umbrella header "SQLCipher-umbrella.h"
 
   export *

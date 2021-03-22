@@ -7,9 +7,10 @@
 //
 
 @import Foundation;
-
-#import <YapDatabase/YapDatabase.h>
-#import <Mantle/Mantle.h>
+//@import YapDatabase;
+//@import Mantle;
+#import "YapDatabase/YapDatabase.h"
+#import "Mantle/Mantle.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

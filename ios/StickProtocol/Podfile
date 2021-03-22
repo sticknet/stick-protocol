@@ -8,10 +8,11 @@ pod 'CryptoSwift'
 pod 'SQLCipher', ">= 4.0.1", :modular_headers => true
 pod 'YapDatabase/SQLCipher', :git => 'https://github.com/signalapp/YapDatabase.git', branch: 'signal-release'
 pod 'Mantle'
+#pod 'CocoaLumberjack'
 
 target 'StickProtocol' do
   # Comment the next line if you don't want to use dynamic frameworks
-  use_frameworks!
+#  use_frameworks!
 
   # Pods for StickProtocol
 

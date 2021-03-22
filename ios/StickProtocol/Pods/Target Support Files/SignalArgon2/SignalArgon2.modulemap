@@ -1,4 +1,4 @@
-framework module SignalArgon2 {
+module SignalArgon2 {
   umbrella header "SignalArgon2-umbrella.h"
 
   export *

@@ -175,24 +175,10 @@ code_sign_if_enabled() {
 }
 
 if [[ "$CONFIGURATION" == "Debug" ]]; then
-  install_framework "${BUILT_PRODUCTS_DIR}/CocoaLumberjack/CocoaLumberjack.framework"
-  install_framework "${BUILT_PRODUCTS_DIR}/CryptoSwift/CryptoSwift.framework"
-  install_framework "${BUILT_PRODUCTS_DIR}/Mantle/Mantle.framework"
-  install_framework "${BUILT_PRODUCTS_DIR}/SQLCipher/SQLCipher.framework"
-  install_framework "${BUILT_PRODUCTS_DIR}/SignalArgon2/SignalArgon2.framework"
-  install_framework "${BUILT_PRODUCTS_DIR}/SimpleKeychain/SimpleKeychain.framework"
   install_framework "${PODS_ROOT}/StickySignalProtocolC/StickySignalProtocolC.framework"
-  install_framework "${BUILT_PRODUCTS_DIR}/YapDatabase/YapDatabase.framework"
 fi
 if [[ "$CONFIGURATION" == "Release" ]]; then
-  install_framework "${BUILT_PRODUCTS_DIR}/CocoaLumberjack/CocoaLumberjack.framework"
-  install_framework "${BUILT_PRODUCTS_DIR}/CryptoSwift/CryptoSwift.framework"
-  install_framework "${BUILT_PRODUCTS_DIR}/Mantle/Mantle.framework"
-  install_framework "${BUILT_PRODUCTS_DIR}/SQLCipher/SQLCipher.framework"
-  install_framework "${BUILT_PRODUCTS_DIR}/SignalArgon2/SignalArgon2.framework"
-  install_framework "${BUILT_PRODUCTS_DIR}/SimpleKeychain/SimpleKeychain.framework"
   install_framework "${PODS_ROOT}/StickySignalProtocolC/StickySignalProtocolC.framework"
-  install_framework "${BUILT_PRODUCTS_DIR}/YapDatabase/YapDatabase.framework"
 fi
 if [ "${COCOAPODS_PARALLEL_CODE_SIGN}" == "true" ]; then
   wait
