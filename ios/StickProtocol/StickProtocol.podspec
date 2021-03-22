@@ -2,9 +2,9 @@ Pod::Spec.new do |spec|
 
 
   spec.name         = "StickProtocol"
-  spec.version      = "1.1.22"
+  spec.version      = "1.1.23"
   spec.summary      = "Customized Signal Protocol C Library for the Stick Protocol"
-
+  spec.swift_version = "5.0"
 
   spec.description  = <<-DESC
                   This is a ratcheting forward secrecy protocol that works in synchronous and asynchronous messaging environments.
@@ -33,6 +33,10 @@ Pod::Spec.new do |spec|
 
   spec.pod_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
   spec.user_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
+
+  spec.dependency 'CryptoSwift'
+  spec.dependency 'SignalArgon2'
+  spec.dependency 'StickySignalProtocolC', '~> 1.0.0'
 
  
 

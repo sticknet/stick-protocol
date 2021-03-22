@@ -49,6 +49,3 @@ FOUNDATION_EXPORT const unsigned char StickProtocolVersionString[];
 #import "GroupSessionBuilder.h"
 #import "SenderKeyRecord.h"
 #import "FileCrypto.h"
-//#import "DatabaseSetup.h"
-//#import "YapDatabase/YapDatabase.h"
-//#import "Mantle/Mantle.h"
