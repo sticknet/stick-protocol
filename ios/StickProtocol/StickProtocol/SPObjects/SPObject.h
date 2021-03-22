@@ -7,7 +7,6 @@
 //
 
 #import "YapDatabaseObject.h"
-#import "YapDatabase/YapDatabase.h"
 
 NS_ASSUME_NONNULL_BEGIN
 

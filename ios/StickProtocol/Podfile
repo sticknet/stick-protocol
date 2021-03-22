@@ -6,8 +6,8 @@ pod 'SimpleKeychain', :modular_headers => true
 pod 'SignalArgon2'
 pod 'CryptoSwift'
 pod 'SQLCipher', ">= 4.0.1", :modular_headers => true
-pod 'YapDatabase/SQLCipher', :git => 'https://github.com/signalapp/YapDatabase.git', branch: 'signal-release'
-pod 'Mantle'
+pod 'YapDatabase/SQLCipher', :git => 'https://github.com/signalapp/YapDatabase.git', branch: 'signal-release', :modular_headers => true
+pod 'Mantle', :modular_headers => true
 #pod 'CocoaLumberjack'
 
 target 'StickProtocol' do

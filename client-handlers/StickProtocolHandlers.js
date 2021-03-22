@@ -139,7 +139,7 @@ export default class StickProtocolHandlers {
             const body = {
                 stickId,
                 memberId,
-                dev: this.isDev,
+                isDev: this.isDev,
                 isSticky: true,
                 isInvitation: `${entityId}`.includes('invitation')
             }
@@ -209,9 +209,6 @@ export default class StickProtocolHandlers {
             const key = await this.StickProtocol.getSenderKey(this.userId, memberId, stickId, true);
             const body = {preKeyId, key, stickId, forUser: memberId}
             await axios.post(`${this.URL}/api/upload-sk/`, body, this.httpConfig)
-
-            // After uploading the sender key successfully, delete the pendingKey request.
-            await database.ref(`users/${phone}/receivedKeys/${stickId}--${memberId}`).set(0)
         }
     }
 

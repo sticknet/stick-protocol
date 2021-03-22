@@ -15,14 +15,18 @@ import SignalArgon2
 public class SP {
 
     var db: YapDatabase?
-    public init(dataBase: YapDatabase) {
-        db = dataBase
+    var service: String?
+    var accessGroup: String?
+    public init(service: String, accessGroup: String, db: YapDatabase) {
+        self.db = db
+        self.service = service
+        self.accessGroup = accessGroup
     }
 
-    public func initialize(userId: String, password: String) -> [String: Any] {
-        let keychain = A0SimpleKeychain(service: "com.stiiick", accessGroup: "group.com.stiiick")
+    public func initialize(userId: String, password: String, progressEvent: (([String: Any])  -> Void)?) -> [String: Any] {
+        let keychain = A0SimpleKeychain(service: self.service!, accessGroup: self.accessGroup!)
         keychain.setString(password, forKey: "password")
-        UserDefaults(suiteName: "group.com.stiiick")!.set(userId, forKey: "userId")
+        UserDefaults(suiteName: self.accessGroup!)!.set(userId, forKey: "userId")
         let databaseConnection = db!.newConnection()
         let encryptionManager = try? EncryptionManager(accountKey: userId, databaseConnection: databaseConnection)
 
@@ -44,8 +48,11 @@ public class SP {
                 preKeysArray.append(map)
             }
             counter += 1;
-            print("PROGRESS INITIALIZE", counter)
-//        sendEvent(withName: "KeysProgress", body: ["progress": counter, "total": preKeys!.count])
+            if (progressEvent != nil) {
+                progressEvent!(["progress": counter, "total": preKeys!.count])
+            } else {
+                print("Printing progress because progress event is null", counter)
+            }
         }
 
         var signedMap = [String: Any]()
@@ -83,11 +90,11 @@ public class SP {
         return map
     }
 
-    public func reInit(bundle: Dictionary<String, Any>, password: String, oneTimeId: String) {
+    public func reInit(bundle: Dictionary<String, Any>, password: String, oneTimeId: String, progressEvent: (([String: Any])  -> Void)?) {
         //  ** Regenerate previous keys  ** //
         let userId = bundle["userId"] as! String
-        let myId = UserDefaults(suiteName: "group.com.stiiick")!.string(forKey: "userId")
-        UserDefaults(suiteName: "group.com.stiiick")!.set(userId, forKey: "userId")
+        let myId = UserDefaults(suiteName: self.accessGroup!)!.string(forKey: "userId")
+        UserDefaults(suiteName: self.accessGroup!)!.set(userId, forKey: "userId")
         let databaseConnection = db!.newConnection()
         let encryptionManager = try? EncryptionManager(accountKey: userId, databaseConnection: databaseConnection)
 
@@ -114,8 +121,11 @@ public class SP {
             let preKey = encryptionManager!.keyHelper()?.createPreKey(withKeyId: key["id"] as! UInt32, keyPair: keyPair)
             encryptionManager!.storage.storePreKey(preKey!.serializedData()!, preKeyId: preKey!.preKeyId)
             count += 1
-            print("KEYS PROGRESS", count)
-//            sendEvent(withName: "KeysProgress", body: ["progress": count, "total": totalKeys])
+            if (progressEvent != nil) {
+                progressEvent!(["progress": count, "total": totalKeys])
+            } else {
+                print("Printing progress because progress event is null", count)
+            }
         }
         let diff = CFAbsoluteTimeGetCurrent() - start
         print("Tookx \(diff) seconds")
@@ -126,8 +136,11 @@ public class SP {
             reinitSenderKey(key: key, signalProtocolAddress: signalProtocolAddress, userId: userId, encryptionManager: encryptionManager!)
             // send progress event
             count += 1
-            print("KEYS PROGRESS", count)
-//            sendEvent(withName: "KeysProgress", body: ["progress": count, "total": totalKeys])
+            if (progressEvent != nil) {
+                progressEvent!(["progress": count, "total": totalKeys])
+            } else {
+                print("Printing progress because progress event is null", count)
+            }
         }
         // *** //
     }
@@ -142,7 +155,7 @@ public class SP {
 
     public func initPairwiseSession(bundle: Dictionary<String, Any>) {
         do {
-            let userId = UserDefaults(suiteName: "group.com.stiiick")!.string(forKey: "userId")
+            let userId = UserDefaults(suiteName: self.accessGroup!)!.string(forKey: "userId")
             let databaseConnection = db!.newConnection()
             let encryptionManager = try? EncryptionManager(accountKey: userId!, databaseConnection: databaseConnection)
             let signalProtocolAddress = SignalAddress(name: bundle["userId"] as! String, deviceId: bundle["deviceId"] as! Int32)
@@ -159,7 +172,7 @@ public class SP {
     }
 
     public func pairwiseSessionExists(oneTimeId: String) -> Bool? {
-        let myId = UserDefaults(suiteName: "group.com.stiiick")!.string(forKey: "userId")
+        let myId = UserDefaults(suiteName: self.accessGroup!)!.string(forKey: "userId")
         let databaseConnection = db!.newConnection()
         let encryptionManager = try? EncryptionManager(accountKey: myId!, databaseConnection: databaseConnection)
         let signalProtocolAddress = SignalAddress(name: oneTimeId, deviceId: 0)
@@ -170,7 +183,7 @@ public class SP {
 
     public func encryptTextPairwise(userId: String, deviceId: Int32, text: String) -> String? {
         do {
-            let myId = UserDefaults(suiteName: "group.com.stiiick")!.string(forKey: "userId")
+            let myId = UserDefaults(suiteName: self.accessGroup!)!.string(forKey: "userId")
             let databaseConnection = db!.newConnection()
             let encryptionManager = try? EncryptionManager(accountKey: myId!, databaseConnection: databaseConnection)
             let signalProtocolAddress = SignalAddress(name: userId, deviceId: deviceId)
@@ -185,7 +198,7 @@ public class SP {
 
     public func decryptTextPairwise(senderId: String, deviceId: Int32, cipher: String, isSelf: Bool) -> String? {
         do {
-            let myId = UserDefaults(suiteName: "group.com.stiiick")!.string(forKey: "userId")
+            let myId = UserDefaults(suiteName: self.accessGroup!)!.string(forKey: "userId")
             let databaseConnection = db!.newConnection()
             let encryptionManager = try? EncryptionManager(accountKey: myId!, databaseConnection: databaseConnection)
             let signalProtocolAddress = SignalAddress(name: senderId, deviceId: deviceId)
@@ -202,7 +215,7 @@ public class SP {
 
     public func encryptText(userId: String, stickId: String, text: String, isSticky: Bool) -> String? {
         do {
-            let myId = UserDefaults(suiteName: "group.com.stiiick")!.string(forKey: "userId")
+            let myId = UserDefaults(suiteName: self.accessGroup!)!.string(forKey: "userId")
             let databaseConnection = db!.newConnection()
             let encryptionManager = try? EncryptionManager(accountKey: myId!, databaseConnection: databaseConnection)
             let signalProtocolAddress = SignalAddress(name: userId, deviceId: isSticky ? 1 : 0)
@@ -221,7 +234,7 @@ public class SP {
 
     public func getChainStep(userId: String, stickId: String) -> UInt32? {
         do {
-            let myId = UserDefaults(suiteName: "group.com.stiiick")!.string(forKey: "userId")
+            let myId = UserDefaults(suiteName: self.accessGroup!)!.string(forKey: "userId")
             let databaseConnection = db!.newConnection()
             let encryptionManager = try? EncryptionManager(accountKey: myId!, databaseConnection: databaseConnection)
             let signalProtocolAddress = SignalAddress(name: userId, deviceId: 1)
@@ -237,7 +250,7 @@ public class SP {
     }
 
     public func ratchetChain(stickId: String, steps: Int32) {
-        let userId = UserDefaults(suiteName: "group.com.stiiick")!.string(forKey: "userId")!
+        let userId = UserDefaults(suiteName: self.accessGroup!)!.string(forKey: "userId")!
         let databaseConnection = db!.newConnection()
         let encryptionManager = try? EncryptionManager(accountKey: userId, databaseConnection: databaseConnection)
         let signalProtocolAddress = SignalAddress(name: userId, deviceId: 1)
@@ -252,7 +265,7 @@ public class SP {
             return nil
         }
         do {
-            let myId = UserDefaults(suiteName: "group.com.stiiick")!.string(forKey: "userId")
+            let myId = UserDefaults(suiteName: self.accessGroup!)!.string(forKey: "userId")
             let isSelf = myId == senderId
             let databaseConnection = db!.newConnection()
             let encryptionManager = try? EncryptionManager(accountKey: myId!, databaseConnection: databaseConnection)
@@ -271,7 +284,7 @@ public class SP {
     public func initSession(senderId: String, stickId: String, cipherSenderKey: String?, isSticky: Bool) {
         if (cipherSenderKey != nil) {
             do {
-                let myId = UserDefaults(suiteName: "group.com.stiiick")!.string(forKey: "userId")
+                let myId = UserDefaults(suiteName: self.accessGroup!)!.string(forKey: "userId")
                 let databaseConnection = db!.newConnection()
                 let encryptionManager = try? EncryptionManager(accountKey: myId!, databaseConnection: databaseConnection)
                 let signalProtocolAddress = SignalAddress(name: senderId, deviceId: isSticky ? 1 : 0)
@@ -296,7 +309,7 @@ public class SP {
                 distributionMessage = transaction.object(forKey: stickId, inCollection: "StickyKey") as? String
             }
         } else {
-            let myId = UserDefaults(suiteName: "group.com.stiiick")!.string(forKey: "userId")
+            let myId = UserDefaults(suiteName: self.accessGroup!)!.string(forKey: "userId")
             let databaseConnection = db!.newConnection()
             let encryptionManager = try? EncryptionManager(accountKey: myId!, databaseConnection: databaseConnection)
             let signalProtocolAddress = SignalAddress(name: senderId, deviceId: isSticky ? 1 : 0)
@@ -311,7 +324,7 @@ public class SP {
 
     public func getEncryptingSenderKey(userId: String, stickId: String, isSticky: Bool) -> Dictionary<String, Any>? {
         do {
-            let myId = UserDefaults(suiteName: "group.com.stiiick")!.string(forKey: "userId")
+            let myId = UserDefaults(suiteName: self.accessGroup!)!.string(forKey: "userId")
             let databaseConnection = db!.newConnection()
             let encryptionManager = try? EncryptionManager(accountKey: myId!, databaseConnection: databaseConnection)
             let signalProtocolAddress = SignalAddress(name: userId, deviceId: isSticky ? 1 : 0)
@@ -339,7 +352,7 @@ public class SP {
 
     public func isSessionEmpty(senderId: String, stickId: String, isSticky: Bool) -> Bool {
         do {
-            let myId = UserDefaults(suiteName: "group.com.stiiick")!.string(forKey: "userId")
+            let myId = UserDefaults(suiteName: self.accessGroup!)!.string(forKey: "userId")
             let databaseConnection = db!.newConnection()
             let encryptionManager = try? EncryptionManager(accountKey: myId!, databaseConnection: databaseConnection)
             let signalProtocolAddress = SignalAddress(name: senderId, deviceId: isSticky ? 1 : 0)
@@ -377,7 +390,7 @@ public class SP {
     }
 
     public func reinitMyStickySession(key: Dictionary<String, Any>) {
-        let userId = UserDefaults(suiteName: "group.com.stiiick")!.string(forKey: "userId")!
+        let userId = UserDefaults(suiteName: self.accessGroup!)!.string(forKey: "userId")!
         let databaseConnection = db!.newConnection()
         let encryptionManager = try? EncryptionManager(accountKey: userId, databaseConnection: databaseConnection)
         let signalProtocolAddress = SignalAddress(name: userId, deviceId: 1)
@@ -391,9 +404,8 @@ public class SP {
 
     // TODO: background
     public func generatePreKeys(nextPreKeyId: UInt, count: UInt) -> [[String: Any]] {
-//        DispatchQueue.global(qos: .background).async {
-        let myId = UserDefaults(suiteName: "group.com.stiiick")!.string(forKey: "userId")
-        let keychain = A0SimpleKeychain(service: "com.stiiick", accessGroup: "group.com.stiiick")
+        let myId = UserDefaults(suiteName: self.accessGroup!)!.string(forKey: "userId")
+        let keychain = A0SimpleKeychain(service: self.service!, accessGroup: self.accessGroup!)
         let password: String = keychain.string(forKey: "password")!
         let databaseConnection = self.db!.newConnection()
         let encryptionManager = try? EncryptionManager(accountKey: myId!, databaseConnection: databaseConnection)
@@ -409,7 +421,6 @@ public class SP {
             preKeysArray.append(map)
         }
         return preKeysArray
-//        }
     }
 
     public func encryptMedia(filePath: String, contentType: String?) -> Dictionary<String, String>? {
@@ -603,7 +614,7 @@ public class SP {
     public func cacheUri(uriId: String, uri: String) {
         let connection = db!.newConnection()
         connection.readWrite { (transaction) in
-            transaction.setObject(uri, forKey: uriId, inCollection: "GroupCover")
+            transaction.setObject(uri, forKey: uriId, inCollection: "SPImages")
         }
     }
 
@@ -611,7 +622,7 @@ public class SP {
         let connection = db!.newConnection()
         var uri: String?
         connection.read { (transaction) in
-            uri = transaction.object(forKey: uriId, inCollection: "GroupCover") as? String
+            uri = transaction.object(forKey: uriId, inCollection: "SPImages") as? String
         }
         return uri!
     }

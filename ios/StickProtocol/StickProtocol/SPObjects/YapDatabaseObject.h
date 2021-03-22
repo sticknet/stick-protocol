@@ -7,8 +7,6 @@
 //
 
 @import Foundation;
-//@import YapDatabase;
-//@import Mantle;
 #import "YapDatabase/YapDatabase.h"
 #import "Mantle/Mantle.h"
 
