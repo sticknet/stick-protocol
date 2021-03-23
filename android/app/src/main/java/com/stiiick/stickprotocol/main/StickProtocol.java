@@ -107,7 +107,8 @@ public class StickProtocol {
     public JSONObject refreshSignedPreKey() throws Exception {
         SignedPreKeyRecord oldRecord = DatabaseFactory.getSignedPreKeyDatabase(context).getSignedPreKey(Preferences.getActiveSignedPreKeyId(context));
         Log.d("XXX SIGNED RPEKEY RECORD TIMESTAMP", Long.toString(oldRecord.getTimestamp()));
-        if (oldRecord.getTimestamp() > SIGNED_PREKEY_AGE) {
+        long activeDuration = System.currentTimeMillis() - oldRecord.getTimestamp();
+        if (activeDuration > SIGNED_PREKEY_AGE) {
             Log.d("XXX GENERATING NEW SIGNED PRE KEY", "NEW");
             IdentityKeyPair             identityKey        = IdentityKeyUtil.getIdentityKeyPair(context);
             SignedPreKeyRecord          signedPreKey = PreKeyUtil.generateSignedPreKey(context, identityKey, true);
