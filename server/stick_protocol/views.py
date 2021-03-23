@@ -463,8 +463,7 @@ class StickProtocol():
         # user = self.User.objects.get(phone=data['phone'])
         if user.check_password(data['password']):
             identityKey = IdentityKey.objects.get(user=user)
-            # signedPreKey = SignedPreKey.objects.get(user=user, active=True)
-            signedPreKeysList = SignedPreKey.objects.get(user=user)
+            signedPreKeysList = SignedPreKey.objects.filter(user=user)
             preKeysList = PreKey.objects.filter(user=user)
             senderKeysList = EncryptingSenderKey.objects.filter(user=user)
             bundle = {

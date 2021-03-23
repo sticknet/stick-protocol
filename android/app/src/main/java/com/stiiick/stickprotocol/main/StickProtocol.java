@@ -95,7 +95,6 @@ public class StickProtocol {
     private static String path;
     private static LiveRecipientCache recipientCache;
     private final Keychain keychain;
-    private static final long SIGNED_PREKEY_AGE = TimeUnit.MINUTES.toMillis(3);
 
 
     public StickProtocol(Context context) {
@@ -104,12 +103,11 @@ public class StickProtocol {
         keychain = new Keychain(context);
     }
 
-    public JSONObject refreshSignedPreKey() throws Exception {
+    public JSONObject refreshSignedPreKey(int days) throws Exception {
+        long signedPreKeyAge = TimeUnit.DAYS.toMillis(30);
         SignedPreKeyRecord oldRecord = DatabaseFactory.getSignedPreKeyDatabase(context).getSignedPreKey(Preferences.getActiveSignedPreKeyId(context));
-        Log.d("XXX SIGNED RPEKEY RECORD TIMESTAMP", Long.toString(oldRecord.getTimestamp()));
         long activeDuration = System.currentTimeMillis() - oldRecord.getTimestamp();
-        if (activeDuration > SIGNED_PREKEY_AGE) {
-            Log.d("XXX GENERATING NEW SIGNED PRE KEY", "NEW");
+        if (activeDuration > signedPreKeyAge) {
             IdentityKeyPair             identityKey        = IdentityKeyUtil.getIdentityKeyPair(context);
             SignedPreKeyRecord          signedPreKey = PreKeyUtil.generateSignedPreKey(context, identityKey, true);
 
@@ -161,7 +159,7 @@ public class StickProtocol {
                 store.storeSignedPreKey(signedPreKeId, record);
                 if (SPKJson.getBoolean("active")) {
                     Preferences.setActiveSignedPreKeyId(context, signedPreKeId);
-                    Log.d("SETTING ACTIVE SPK", Integer.toString(signedPreKeId));
+                    Log.d("SETTING ACTIVE SPKXXX", Integer.toString(signedPreKeId));
                 }
 
                 // PROGRESS
@@ -185,7 +183,7 @@ public class StickProtocol {
                 // PROGRESS
                 if (progressEvent != null) {
                     JSONObject event = new JSONObject();
-                    event.put("progress", i + 1);
+                    event.put("progress", signedPreKeys.length() + i + 1);
                     event.put("total", totalKeys);
                     progressEvent.execute(event);
                 }
@@ -199,7 +197,7 @@ public class StickProtocol {
                 // PROGRESS
                 if (progressEvent != null) {
                     JSONObject event = new JSONObject();
-                    event.put("progress", preKeys.length() + i + 1);
+                    event.put("progress", signedPreKeys.length() + preKeys.length() + i + 1);
                     event.put("total", totalKeys);
                     progressEvent.execute(event);
                 }
