@@ -143,19 +143,35 @@ public class StickProtocol {
             IdentityKeyUtil.save(context, "pref_identity_private_v3", Base64.encodeBytes(privateKey.serialize()));
             SignalProtocolStore store = new MySignalProtocolStore(context);
 
-            ECPublicKey sigPublicKey = Curve.decodePoint(Base64.decode((String) bundle.get("signedPublic")), 0);
-            byte[] signedCipher = pbDecrypt((String) bundle.get("signedCipher"), (String) bundle.get("signedSalt"), password);
-            ECPrivateKey sigPrivateKey = Curve.decodePrivatePoint(signedCipher);
-            ECKeyPair sigKeyPair = new ECKeyPair(sigPublicKey, sigPrivateKey);
-            byte[] signature = Curve.calculateSignature(identityKeyPair.getPrivateKey(), identityKeyPair.getPublicKey().serialize());
-            int signedPreKeId = (int) bundle.get("signedPreKeyId");
-            SignedPreKeyRecord record = new SignedPreKeyRecord(signedPreKeId, System.currentTimeMillis(), sigKeyPair, signature);
-            store.storeSignedPreKey(signedPreKeId, record);
-            Preferences.setActiveSignedPreKeyId(context, signedPreKeId);
             JSONArray preKeys = (JSONArray) bundle.get("preKeys");
             JSONArray senderKeys = (JSONArray) bundle.get("senderKeys");
-            int totalKeys = preKeys.length() + senderKeys.length();
-            long now = System.currentTimeMillis();
+            JSONArray signedPreKeys = (JSONArray) bundle.get("signedPreKeys");
+            int totalKeys = signedPreKeys.length() + preKeys.length() + senderKeys.length();
+
+            for (int i = 0; i < signedPreKeys.length(); i++) {
+                JSONObject SPKJson = signedPreKeys.getJSONObject(i);
+                ECPublicKey sigPublicKey = Curve.decodePoint(Base64.decode((String) SPKJson.getString("public")), 0);
+                byte[] signedCipher = pbDecrypt((String) SPKJson.getString("cipher"), (String) SPKJson.getString("salt"), password);
+                ECPrivateKey sigPrivateKey = Curve.decodePrivatePoint(signedCipher);
+                ECKeyPair sigKeyPair = new ECKeyPair(sigPublicKey, sigPrivateKey);
+                byte[] signature = Curve.calculateSignature(identityKeyPair.getPrivateKey(), identityKeyPair.getPublicKey().serialize());
+                int signedPreKeId = (int) SPKJson.get("id");
+                SignedPreKeyRecord record = new SignedPreKeyRecord(signedPreKeId, System.currentTimeMillis(), sigKeyPair, signature);
+                store.storeSignedPreKey(signedPreKeId, record);
+                if (SPKJson.getBoolean("active")) {
+                    Preferences.setActiveSignedPreKeyId(context, signedPreKeId);
+                    Log.d("SETTING ACTIVE SPK", Integer.toString(signedPreKeId));
+                }
+
+                // PROGRESS
+                if (progressEvent != null) {
+                    JSONObject event = new JSONObject();
+                    event.put("progress", i + 1);
+                    event.put("total", totalKeys);
+                    progressEvent.execute(event);
+                }
+            }
+
             for (int i = 0; i < preKeys.length(); i++) {
                 JSONObject preKeyJson = preKeys.getJSONObject(i);
                 ECPublicKey prePubKey = Curve.decodePoint(Base64.decode(preKeyJson.getString("public")), 0);
@@ -173,7 +189,6 @@ public class StickProtocol {
                     progressEvent.execute(event);
                 }
             }
-            Log.d("TOTAL TIME ", Long.toString(System.currentTimeMillis() - now));
 
             // KEYS FOR SENDING SELF
             SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress((String) bundle.get("userId"), 1);

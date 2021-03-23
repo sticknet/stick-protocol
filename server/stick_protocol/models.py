@@ -34,9 +34,10 @@ class SignedPreKey(models.Model):
     keyId = models.IntegerField()
     public = models.CharField(max_length=44)
     signature = models.CharField(max_length=88)
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='signedPreKey')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='signedPreKey')
     cipher = models.CharField(max_length=88)
     salt = models.CharField(max_length=44)
+    active = models.BooleanField(default=False)
 
     class Meta:
         constraints = [models.UniqueConstraint(fields=['keyId', 'user'], name='unique_signed_prekey')]

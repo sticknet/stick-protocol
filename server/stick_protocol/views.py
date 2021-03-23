@@ -38,7 +38,7 @@ class StickProtocol():
                                    cipher=identityKey['cipher'], salt=identityKey['salt'])
         SignedPreKey.objects.create(public=signedPreKey['public'], signature=signedPreKey["signature"],
                                     keyId=signedPreKey['id'], user=user, cipher=signedPreKey['cipher'],
-                                    salt=signedPreKey['salt'])
+                                    salt=signedPreKey['salt'], active=True)
         for preKey in preKeys:
             PreKey.objects.create(public=preKey['public'], keyId=preKey["id"], user=user, cipher=preKey['cipher'],
                                   salt=preKey['salt'])
@@ -76,7 +76,7 @@ class StickProtocol():
         isSticky = data['isSticky']
         user = self.User.objects.get(id=userId)
         identityKey = IdentityKey.objects.get(user=user)
-        signedPreKey = SignedPreKey.objects.get(user=user)
+        signedPreKey = SignedPreKey.objects.get(user=user, active=True)
         preKey = PreKey.objects.filter(user=user, used=False).first()
         oneTimeId = user.oneTimeId
         PKB = {
@@ -122,7 +122,7 @@ class StickProtocol():
             except:
                 toBeRemoved.append(id)
                 continue
-            signedPreKey = SignedPreKey.objects.get(user__id=id)
+            signedPreKey = SignedPreKey.objects.get(user__id=id, active=True)
             preKey = PreKey.objects.filter(user__id=id, used=False).first()
             oneTimeId = self.User.objects.get(id=id).oneTimeId
             PKB = {
@@ -435,6 +435,18 @@ class StickProtocol():
                                                forOneTimeId=oneTimeId, ofOneTimeId=user.oneTimeId)
 
 
+    def update_active_spk(self, data, user):
+        """
+        This method is used to update the active signed prekey for a user
+        """
+        old_spk = SignedPreKey.objects.get(user=user, active=True)
+        old_spk.active = False
+        old_spk.save()
+        SignedPreKey.objects.create(user=user, public=data['public'], signature=data["signature"],
+                                    keyId=data['id'], cipher=data['cipher'], salt=data['salt'], active=True)
+
+
+
     def verify_password_and_get_keys(self, data, user):
         """
         This Login method should be called after the user have verified their phone number and got their LimitedAccessToken.
@@ -451,7 +463,8 @@ class StickProtocol():
         # user = self.User.objects.get(phone=data['phone'])
         if user.check_password(data['password']):
             identityKey = IdentityKey.objects.get(user=user)
-            signedPreKey = SignedPreKey.objects.get(user=user)
+            # signedPreKey = SignedPreKey.objects.get(user=user, active=True)
+            signedPreKeysList = SignedPreKey.objects.get(user=user)
             preKeysList = PreKey.objects.filter(user=user)
             senderKeysList = EncryptingSenderKey.objects.filter(user=user)
             bundle = {
@@ -461,12 +474,12 @@ class StickProtocol():
                 "localId": identityKey.localId,
                 "userId": user.id,
                 "deviceId": 0,
-                "signedPublic": signedPreKey.public,
-                "signedCipher": signedPreKey.cipher,
-                "signedSalt": signedPreKey.salt,
-                "signedPreKeyId": signedPreKey.keyId,
-                "signature": signedPreKey.signature,
             }
+            signedPreKeys = []
+            for spk in signedPreKeysList:
+                key = {'id': spk.keyId, 'public': spk.public, 'cipher': spk.cipher, 'salt': spk.salt, 'signature': spk.signature, 'active': spk.active}
+                signedPreKeys.append(key)
+            bundle['signedPreKeys'] = signedPreKeys
             preKeys = []
             for preKey in preKeysList:
                 key = {'id': preKey.keyId, 'public': preKey.public, 'cipher': preKey.cipher, 'salt': preKey.salt}

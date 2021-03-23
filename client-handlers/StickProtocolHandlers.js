@@ -314,8 +314,20 @@ export default class StickProtocolHandlers {
             }
         }
         if (Object.values(keysToUpload).length > 0)
-            axios.post(`${this.URL}/api/upload-standard-sks/`, {stickId, keysToUpload}, this.httpConfig)
+            await axios.post(`${this.URL}/api/upload-standard-sks/`, {stickId, keysToUpload}, this.httpConfig)
     }
+
+    /**
+     * This function check if the current active signed prekey needs to be updated. It will generate a new
+     * SPK and send to the server if needed.
+     */
+    async refreshSignedPreKey() {
+        const result = await this.StickProtocol.refreshSignedPreKey()
+        if (result) {
+            await axios.post(`${this.URL}/api/update-active-spk/`, result, this.httpConfig)
+        }
+    }
+
 
     /**
      * A helper function to reset the auth token, userId or oneTimeId
