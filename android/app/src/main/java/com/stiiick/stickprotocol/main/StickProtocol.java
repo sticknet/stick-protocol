@@ -34,6 +34,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.signal.argon2.Argon2;
+import org.signal.argon2.Argon2Exception;
 import org.signal.argon2.Type;
 import org.signal.argon2.Version;
 import org.whispersystems.libsignal.DuplicateMessageException;
@@ -108,8 +109,8 @@ public class StickProtocol {
         SignedPreKeyRecord oldRecord = DatabaseFactory.getSignedPreKeyDatabase(context).getSignedPreKey(Preferences.getActiveSignedPreKeyId(context));
         long activeDuration = System.currentTimeMillis() - oldRecord.getTimestamp();
         if (activeDuration > signedPreKeyAge) {
-            IdentityKeyPair             identityKey        = IdentityKeyUtil.getIdentityKeyPair(context);
-            SignedPreKeyRecord          signedPreKey = PreKeyUtil.generateSignedPreKey(context, identityKey, true);
+            IdentityKeyPair identityKey = IdentityKeyUtil.getIdentityKeyPair(context);
+            SignedPreKeyRecord signedPreKey = PreKeyUtil.generateSignedPreKey(context, identityKey, true);
 
             HashMap<String, String> serviceMap = new HashMap();
             serviceMap.put("service", "com.stiiick.auth_token");
@@ -134,6 +135,11 @@ public class StickProtocol {
     public void reInit(JSONObject bundle, String password, String oneTimeId, ProgressEvent progressEvent) {
         //  ** Regenerate previous keys  ** //
         try {
+            // Store password in BlockStore/KeyStore
+            HashMap<String, String> serviceMap = new HashMap();
+            serviceMap.put("service", context.getPackageName());
+            keychain.setGenericPassword(context.getPackageName(), "password", password, serviceMap);
+
             IdentityKey publicKey = new IdentityKey(Base64.decode((String) bundle.get("identityPublic")), 0);
             byte[] identityCipher = pbDecrypt((String) bundle.get("identityCipher"), (String) bundle.get("identitySalt"), password);
             ECPrivateKey privateKey = Curve.decodePrivatePoint(identityCipher);
@@ -274,11 +280,44 @@ public class StickProtocol {
         void execute(JSONObject event);
     }
 
+    /*
+        This method is used to create the initial password hash, from a provided password and salt, at login
+     */
+    public String createPasswordHash(String password, String salt) throws IOException, Argon2Exception {
+        byte[] passwordHashBytes = new Argon2.Builder(Version.V13)
+                .type(Type.Argon2id)
+                .memoryCostKiB(4 * 1024)
+                .parallelism(2)
+                .iterations(3)
+                .hashLength(32)
+                .build()
+                .hash(password.getBytes(), Base64.decode(salt))
+                .getHash();
+        return Base64.encodeBytes(passwordHashBytes);
+    }
+
     public JSONObject initialize(String userId, String password, ProgressEvent progressEvent) {
         try {
+            // Generate salt
+            SecureRandom randomSalt = new SecureRandom();
+            byte[] salt = new byte[32];
+            randomSalt.nextBytes(salt);
+
+            // Hashing pass
+            byte[] passwordHashBytes = new Argon2.Builder(Version.V13)
+                    .type(Type.Argon2id)
+                    .memoryCostKiB(4 * 1024)
+                    .parallelism(2)
+                    .iterations(3)
+                    .hashLength(32)
+                    .build()
+                    .hash(password.getBytes(), salt)
+                    .getHash();
+            String passwordHash = Base64.encodeBytes(passwordHashBytes);
             HashMap<String, String> serviceMap = new HashMap();
             serviceMap.put("service", context.getPackageName());
             keychain.setGenericPassword(context.getPackageName(), "password", password, serviceMap);
+
             SignalProtocolStore store = new MySignalProtocolStore(context);
             IdentityKeyUtil.generateIdentityKeys(context);
             IdentityKeyPair identityKey = store.getIdentityKeyPair();
@@ -323,7 +362,8 @@ public class StickProtocol {
             map.put("identityKey", identityKeyJson);
             map.put("signedPreKey", signedPreKeyJson);
             map.put("preKeys", preKeysArray);
-            map.put("password", password);
+            map.put("passwordHash", passwordHash);
+            map.put("passwordSalt", Base64.encodeBytes(salt));
             map.put("oneTimeId", oneTimeId);
             PreferenceManager.getDefaultSharedPreferences(context).edit().putString("oneTimeId", oneTimeId).apply();
             PreferenceManager.getDefaultSharedPreferences(context).edit().putString("userId", userId).apply();

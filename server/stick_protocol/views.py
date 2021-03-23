@@ -42,7 +42,8 @@ class StickProtocol():
         for preKey in preKeys:
             PreKey.objects.create(public=preKey['public'], keyId=preKey["id"], user=user, cipher=preKey['cipher'],
                                   salt=preKey['salt'])
-        user.set_password(data["password"])
+        user.passwordSalt = data["passwordSalt"]
+        user.set_password(data["passwordHash"]) # This will create a "Double-Hashed" password
         user.oneTimeId = data["oneTimeId"]
         user.nextPreKeyId = data['nextPreKeyId']
         user.finishedRegistration = True
@@ -461,7 +462,7 @@ class StickProtocol():
         as well as any of the DSKs the was sent to them, which they can fetch again from the server as needed.
         """
         # user = self.User.objects.get(phone=data['phone'])
-        if user.check_password(data['password']):
+        if user.check_password(data['passwordHash']): # This will create a "double-hash" and verify it
             identityKey = IdentityKey.objects.get(user=user)
             signedPreKeysList = SignedPreKey.objects.filter(user=user)
             preKeysList = PreKey.objects.filter(user=user)
