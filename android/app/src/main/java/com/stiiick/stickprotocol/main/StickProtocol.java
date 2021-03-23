@@ -80,6 +80,7 @@ import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
@@ -94,6 +95,7 @@ public class StickProtocol {
     private static String path;
     private static LiveRecipientCache recipientCache;
     private final Keychain keychain;
+    private static final long SIGNED_PREKEY_AGE = TimeUnit.MINUTES.toMillis(3);
 
 
     public StickProtocol(Context context) {
@@ -102,6 +104,28 @@ public class StickProtocol {
         keychain = new Keychain(context);
     }
 
+    public JSONObject refreshSignedPreKey() throws Exception {
+        SignedPreKeyRecord oldRecord = DatabaseFactory.getSignedPreKeyDatabase(context).getSignedPreKey(Preferences.getActiveSignedPreKeyId(context));
+        Log.d("XXX SIGNED RPEKEY RECORD TIMESTAMP", Long.toString(oldRecord.getTimestamp()));
+        if (oldRecord.getTimestamp() > SIGNED_PREKEY_AGE) {
+            Log.d("XXX GENERATING NEW SIGNED PRE KEY", "NEW");
+            IdentityKeyPair             identityKey        = IdentityKeyUtil.getIdentityKeyPair(context);
+            SignedPreKeyRecord          signedPreKey = PreKeyUtil.generateSignedPreKey(context, identityKey, true);
+
+            HashMap<String, String> serviceMap = new HashMap();
+            serviceMap.put("service", "com.stiiick.auth_token");
+            String password = keychain.getGenericPassword("com.stiiick", serviceMap);
+            JSONObject signedPreKeyJson = new JSONObject();
+            signedPreKeyJson.put("id", Preferences.getActiveSignedPreKeyId(context));
+            signedPreKeyJson.put("public", Base64.encodeBytes(signedPreKey.getKeyPair().getPublicKey().serialize()));
+            signedPreKeyJson.put("signature", Base64.encodeBytes(signedPreKey.getSignature()));
+            HashMap<String, String> signedCipherMap = pbEncrypt(signedPreKey.getKeyPair().getPrivateKey().serialize(), password);
+            signedPreKeyJson.put("cipher", signedCipherMap.get("cipher"));
+            signedPreKeyJson.put("salt", signedCipherMap.get("salt"));
+            return signedPreKeyJson;
+        }
+        return null;
+    }
 
     public void resetDatabase() {
         DatabaseFactory.getInstance(context).resetDatabase(context);
