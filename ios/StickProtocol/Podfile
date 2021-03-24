@@ -1,7 +1,7 @@
 # Uncomment the next line to define a global platform for your project
 # platform :ios, '12.0'
 
-pod 'StickySignalProtocolC', '1.0.0'
+pod 'StickySignalProtocolC', '1.0.2'
 pod 'SimpleKeychain', :modular_headers => true
 pod 'SignalArgon2'
 pod 'CryptoSwift'

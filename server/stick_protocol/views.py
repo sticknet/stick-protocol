@@ -21,8 +21,9 @@ FIREBASE_REF_DEV = settings.FIREBASE_REF_DEV
 
 class StickProtocol():
 
-    def __init__(self, UserModel, GroupModel):
+    def __init__(self, UserModel, DeviceModel, GroupModel):
         self.User = UserModel
+        self.Device = DeviceModel
         self.Group = GroupModel
 
 
@@ -48,6 +49,7 @@ class StickProtocol():
         user.nextPreKeyId = data['nextPreKeyId']
         user.finishedRegistration = True
         user.save()
+        self.Device.objects.create(user=user, deviceId=data['deviceId'], name=data['deviceName'])
         Party.objects.create(user=user)
 
 
@@ -494,6 +496,8 @@ class StickProtocol():
             bundle['senderKeys'] = senderKeys
             user.oneTimeId = uuid.uuid4()
             user.save()
+            if not self.Device.objects.filter(user=user, deviceId=data['deviceId']).exists():
+                self.Device.objects.create(user=user, deviceId=data['deviceId'], name=data['deviceName'])
             return {"bundle": bundle, "verify": True}
         else:
             return {"verify": False}

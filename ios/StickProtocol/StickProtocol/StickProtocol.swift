@@ -23,15 +23,24 @@ public class SP {
         self.accessGroup = accessGroup
     }
 
-    public func initialize(userId: String, password: String, progressEvent: (([String: Any])  -> Void)?) -> [String: Any] {
+    public func initialize(userId: String, password: String, progressEvent: (([String: Any]) -> Void)?) -> [String: Any] {
         let keychain = A0SimpleKeychain(service: self.service!, accessGroup: self.accessGroup!)
         keychain.setString(password, forKey: "password")
+
+        // Generate password salt
+        let passwordSalt = generateRandomBytes(count: 32)
+        // Hashing password
+        let (passwordHash, _) = try! Argon2.hash(iterations: 3, memoryInKiB: 4 * 1024, threads: 2, password: password.data(using: .utf8)!, salt: passwordSalt!, desiredLength: 32, variant: .id, version: .v13)
+
         UserDefaults(suiteName: self.accessGroup!)!.set(userId, forKey: "userId")
         let databaseConnection = db!.newConnection()
         let encryptionManager = try? EncryptionManager(accountKey: userId, databaseConnection: databaseConnection)
 
         let identityKey = encryptionManager?.storage.getIdentityKeyPair()
         let signedPreKey = encryptionManager!.keyHelper()?.generateSignedPreKey(withIdentity: identityKey!, signedPreKeyId: 0)
+        let currentTime = Date().millisecondsSince1970
+        UserDefaults(suiteName: self.accessGroup!)!.set(signedPreKey?.preKeyId, forKey: "activeSignedPreKeyId")
+        UserDefaults(suiteName: self.accessGroup!)!.set(currentTime, forKey: "activeSignedPreKeyTimestamp")
         encryptionManager!.storage.storeSignedPreKey((signedPreKey?.serializedData())!, signedPreKeyId: signedPreKey!.preKeyId)
         let preKeys = encryptionManager?.generatePreKeys(0, count: 10)
 
@@ -76,8 +85,10 @@ public class SP {
         map["identityKey"] = identityMap
         map["signedPreKey"] = signedMap
         map["preKeys"] = preKeysArray
-        map["password"] = password
         map["oneTimeId"] = oneTimeId
+        map["passwordHash"] = passwordHash.base64EncodedString()
+        map["passwordSalt"] = passwordSalt?.base64EncodedString()
+
         let signalProtocolAddress = SignalAddress(name: userId, deviceId: 0)
         do {
             let sessionBuilder = SessionBuilder(address: signalProtocolAddress, context: encryptionManager!.signalContext)
@@ -90,8 +101,10 @@ public class SP {
         return map
     }
 
-    public func reInit(bundle: Dictionary<String, Any>, password: String, oneTimeId: String, progressEvent: (([String: Any])  -> Void)?) {
+    public func reInit(bundle: Dictionary<String, Any>, password: String, oneTimeId: String, progressEvent: (([String: Any]) -> Void)?) {
         //  ** Regenerate previous keys  ** //
+        let keychain = A0SimpleKeychain(service: self.service!, accessGroup: self.accessGroup!)
+        keychain.setString(password, forKey: "password")
         let userId = bundle["userId"] as! String
         let myId = UserDefaults(suiteName: self.accessGroup!)!.string(forKey: "userId")
         UserDefaults(suiteName: self.accessGroup!)!.set(userId, forKey: "userId")
@@ -103,17 +116,31 @@ public class SP {
         let identityKeyPair = try! IdentityKeyPair(publicKey: publicKey!, privateKey: privateKey)
         encryptionManager?.storage.saveIdenityKeyPair(keyPair: identityKeyPair, regId: bundle["localId"] as! UInt32)
 
-        let sigPublicKey = Data(base64Encoded: bundle["signedPublic"] as! String)
-        let sigPrivateKey = pbDecrypt(encryptedIvText: bundle["signedCipher"] as! String, salt: bundle["signedSalt"] as! String, pass: password)
-        let sigKeyPair = try! KeyPair(publicKey: sigPublicKey!, privateKey: sigPrivateKey)
-        let signedPreKey = encryptionManager!.keyHelper()?.createSignedPreKey(withKeyId: bundle["signedPreKeyId"] as! UInt32, keyPair: sigKeyPair, signature: Data(base64Encoded: bundle["signature"] as! String)!)
-        encryptionManager!.storage.storeSignedPreKey((signedPreKey?.serializedData())!, signedPreKeyId: signedPreKey!.preKeyId)
+//        let sigPublicKey = Data(base64Encoded: bundle["signedPublic"] as! String)
+//        let sigPrivateKey = pbDecrypt(encryptedIvText: bundle["signedCipher"] as! String, salt: bundle["signedSalt"] as! String, pass: password)
+//        let sigKeyPair = try! KeyPair(publicKey: sigPublicKey!, privateKey: sigPrivateKey)
+//        let signedPreKey = encryptionManager!.keyHelper()?.createSignedPreKey(withKeyId: bundle["signedPreKeyId"] as! UInt32, keyPair: sigKeyPair, signature: Data(base64Encoded: bundle["signature"] as! String)!)
+//        encryptionManager!.storage.storeSignedPreKey((signedPreKey?.serializedData())!, signedPreKeyId: signedPreKey!.preKeyId)
+        let signedPreKeys = bundle["signedPreKeys"] as! [Dictionary<String, Any>]
         let preKeys = bundle["preKeys"] as! [Dictionary<String, Any>]
         let senderKeys = bundle["senderKeys"] as! [Dictionary<String, Any>]
-        //    var i = 0;
-        let start = CFAbsoluteTimeGetCurrent()
         var count = 1
-        let totalKeys = preKeys.count + senderKeys.count
+        let totalKeys = signedPreKeys.count + preKeys.count + senderKeys.count
+
+        for key in signedPreKeys {
+            let SPKPub = Data(base64Encoded: key["public"] as! String)
+            let SPKPriv = pbDecrypt(encryptedIvText: key["cipher"] as! String, salt: key["salt"] as! String, pass: password)
+            let keyPair = try! KeyPair(publicKey: SPKPub!, privateKey: SPKPriv)
+            let signedPreKey = encryptionManager!.keyHelper()?.createSignedPreKey(withKeyId: bundle["id"] as! UInt32, keyPair: keyPair, signature: Data(base64Encoded: key["signature"] as! String)!)
+            encryptionManager!.storage.storeSignedPreKey((signedPreKey?.serializedData())!, signedPreKeyId: signedPreKey!.preKeyId)
+            count += 1
+            if (progressEvent != nil) {
+                progressEvent!(["progress": count, "total": totalKeys])
+            } else {
+                print("Printing progress because progress event is null", count)
+            }
+        }
+
         for key in preKeys {
             let prePubKey = Data(base64Encoded: key["public"] as! String)
             let prePrivKey = pbDecrypt(encryptedIvText: key["cipher"] as! String, salt: key["salt"] as! String, pass: password)
@@ -127,10 +154,8 @@ public class SP {
                 print("Printing progress because progress event is null", count)
             }
         }
-        let diff = CFAbsoluteTimeGetCurrent() - start
-        print("Tookx \(diff) seconds")
 
-        // KEYS FOR SENDING SELF
+        // OWN SENDER KEYS
         let signalProtocolAddress = SignalAddress(name: userId, deviceId: 1)
         for key in senderKeys {
             reinitSenderKey(key: key, signalProtocolAddress: signalProtocolAddress, userId: userId, encryptionManager: encryptionManager!)
@@ -143,6 +168,41 @@ public class SP {
             }
         }
         // *** //
+    }
+
+    public func createPasswordHash(password: String, salt: String) -> String {
+        let (passwordHash, _) = try! Argon2.hash(iterations: 3, memoryInKiB: 4 * 1024, threads: 2, password: password.data(using: .utf8)!, salt: Data(base64Encoded: salt)!, desiredLength: 32, variant: .id, version: .v13)
+        return passwordHash.base64EncodedString()
+    }
+
+    public func refreshSignedPreKey(days: Int) -> [String: Any]? {
+        let signedPreKeyAge = days * 24 * 60 * 60 * 1000
+        let userId = UserDefaults(suiteName: self.accessGroup!)!.string(forKey: "userId")
+        let databaseConnection = db!.newConnection()
+        let currentTime = Date().millisecondsSince1970
+        let activeSPKTimestamp = Int64(UserDefaults(suiteName: self.accessGroup!)!.integer(forKey: "activeSignedPreKeyTimestamp"))
+        let activeDuration = currentTime - activeSPKTimestamp
+        if (activeDuration > signedPreKeyAge) {
+            let activeSPKId = Int64(UserDefaults(suiteName: self.accessGroup!)!.integer(forKey: "activeSignedPreKeyTimestamp"))
+            let encryptionManager = try? EncryptionManager(accountKey: userId!, databaseConnection: databaseConnection)
+            let identityKey = encryptionManager?.storage.getIdentityKeyPair()
+            let signedPreKey = encryptionManager!.keyHelper()?.generateSignedPreKey(withIdentity: identityKey!, signedPreKeyId: UInt32(activeSPKId) + 1)
+            let currentTime = Date().millisecondsSince1970
+            UserDefaults(suiteName: self.accessGroup!)!.set(signedPreKey?.preKeyId, forKey: "activeSignedPreKeyId")
+            UserDefaults(suiteName: self.accessGroup!)!.set(currentTime, forKey: "activeSignedPreKeyTimestamp")
+
+            let keychain = A0SimpleKeychain(service: self.service!, accessGroup: self.accessGroup!)
+            let password: String = keychain.string(forKey: "password")!
+            var signedMap = [String: Any]()
+            signedMap["id"] = signedPreKey?.preKeyId
+            signedMap["public"] = signedPreKey?.keyPair?.publicKey.base64EncodedString()
+            signedMap["signature"] = signedPreKey?.signature.base64EncodedString()
+            let signedCipherMap = pbEncrypt(text: (signedPreKey?.keyPair!.privateKey)!, pass: password)
+            signedMap["cipher"] = signedCipherMap["cipher"]!
+            signedMap["salt"] = signedCipherMap["salt"]!
+            return signedMap
+        }
+        return nil
     }
 
     public func resetDatabase() {
@@ -659,4 +719,11 @@ extension String {
         let endIndex = self.index(startIndex, offsetBy: r.upperBound - r.lowerBound)
         return String(self[startIndex...endIndex])
     }
+}
+
+extension Date {
+    var millisecondsSince1970: Int64 {
+        return Int64((self.timeIntervalSince1970 * 1000.0).rounded())
+    }
+
 }

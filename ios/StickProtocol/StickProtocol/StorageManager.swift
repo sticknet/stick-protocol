@@ -250,7 +250,8 @@ extension StorageManager: SignalStore {
         if let result = self.identity() {
             return result.identityKeyPair
         }
-        //Generate new identitiy key pair?
+        
+        //Generate new identitiy key pair
         return self.generateNewIdenityKeyPair().identityKeyPair
     }
     

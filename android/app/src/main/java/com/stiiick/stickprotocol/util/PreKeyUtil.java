@@ -53,7 +53,7 @@ public class PreKeyUtil {
             SignedPreKeyRecord record            = new SignedPreKeyRecord(signedPreKeyId, System.currentTimeMillis(), keyPair, signature);
 
             signedPreKeyStore.storeSignedPreKey(signedPreKeyId, record);
-            Preferences.setNextSignedPreKeyId(context, (signedPreKeyId + 1) % Medium.MAX_VALUE);
+            Preferences.setNextSignedPreKeyId(context, signedPreKeyId + 1);
 
             if (active) {
                 Preferences.setActiveSignedPreKeyId(context, signedPreKeyId);

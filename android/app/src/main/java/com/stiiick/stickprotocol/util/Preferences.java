@@ -74,7 +74,7 @@ public class Preferences {
     }
 
     public static int getNextSignedPreKeyId(@NonNull Context context) {
-        return getIntegerPreference(context, NEXT_SIGNED_PRE_KEY_ID, new SecureRandom().nextInt(Medium.MAX_VALUE));
+        return getIntegerPreference(context, NEXT_SIGNED_PRE_KEY_ID, 0);
     }
 
     public static void setNextSignedPreKeyId(@NonNull Context context, int value) {

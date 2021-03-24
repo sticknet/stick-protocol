@@ -105,7 +105,8 @@ public class StickProtocol {
     }
 
     public JSONObject refreshSignedPreKey(int days) throws Exception {
-        long signedPreKeyAge = TimeUnit.DAYS.toMillis(30);
+//        long signedPreKeyAge = TimeUnit.DAYS.toMillis(30);
+        long signedPreKeyAge = TimeUnit.MINUTES.toMillis(2);
         SignedPreKeyRecord oldRecord = DatabaseFactory.getSignedPreKeyDatabase(context).getSignedPreKey(Preferences.getActiveSignedPreKeyId(context));
         long activeDuration = System.currentTimeMillis() - oldRecord.getTimestamp();
         if (activeDuration > signedPreKeyAge) {
@@ -298,11 +299,14 @@ public class StickProtocol {
 
     public JSONObject initialize(String userId, String password, ProgressEvent progressEvent) {
         try {
-            // Generate salt
+            HashMap<String, String> serviceMap = new HashMap();
+            serviceMap.put("service", context.getPackageName());
+            keychain.setGenericPassword(context.getPackageName(), "password", password, serviceMap);
+
+            // Generate password salt
             SecureRandom randomSalt = new SecureRandom();
             byte[] salt = new byte[32];
             randomSalt.nextBytes(salt);
-
             // Hashing pass
             byte[] passwordHashBytes = new Argon2.Builder(Version.V13)
                     .type(Type.Argon2id)
@@ -314,9 +318,6 @@ public class StickProtocol {
                     .hash(password.getBytes(), salt)
                     .getHash();
             String passwordHash = Base64.encodeBytes(passwordHashBytes);
-            HashMap<String, String> serviceMap = new HashMap();
-            serviceMap.put("service", context.getPackageName());
-            keychain.setGenericPassword(context.getPackageName(), "password", password, serviceMap);
 
             SignalProtocolStore store = new MySignalProtocolStore(context);
             IdentityKeyUtil.generateIdentityKeys(context);
