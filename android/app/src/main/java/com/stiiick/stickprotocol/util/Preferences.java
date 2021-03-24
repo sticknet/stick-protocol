@@ -50,6 +50,10 @@ public class Preferences {
         return PreferenceManager.getDefaultSharedPreferences(context).getInt(key, defaultValue);
     }
 
+    private static long getLongPreference(Context context, String key, long defaultValue) {
+        return PreferenceManager.getDefaultSharedPreferences(context).getLong(key, defaultValue);
+    }
+
     public static @Nullable String getDatabaseEncryptedSecret(@NonNull Context context) {
         return getStringPreference(context, DATABASE_ENCRYPTED_SECRET, null);
     }
@@ -94,8 +98,8 @@ public class Preferences {
         setIntegerPrefrence(context, ACTIVE_SIGNED_PRE_KEY_ID, value);;
     }
 
-    public static int getActiveSignedPreKeyTimestamp(@NonNull Context context) {
-        return getIntegerPreference(context, ACTIVE_SIGNED_PRE_KEY_TIMESTAMP, 0);
+    public static long getActiveSignedPreKeyTimestamp(@NonNull Context context) {
+        return getLongPreference(context, ACTIVE_SIGNED_PRE_KEY_TIMESTAMP, 0);
     }
 
     public static void setActiveSignedPreKeyTimestamp(@NonNull Context context, long value) {

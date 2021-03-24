@@ -38,7 +38,7 @@ public class SP {
 
         let identityKey = encryptionManager?.storage.getIdentityKeyPair()
         let signedPreKey = encryptionManager!.keyHelper()?.generateSignedPreKey(withIdentity: identityKey!, signedPreKeyId: 0)
-        let currentTime = Date().millisecondsSince1970
+        let currentTime = Date().timestamp
         UserDefaults(suiteName: self.accessGroup!)!.set(signedPreKey?.preKeyId, forKey: "activeSignedPreKeyId")
         UserDefaults(suiteName: self.accessGroup!)!.set(currentTime, forKey: "activeSignedPreKeyTimestamp")
         encryptionManager!.storage.storeSignedPreKey((signedPreKey?.serializedData())!, signedPreKeyId: signedPreKey!.preKeyId)
@@ -131,7 +131,7 @@ public class SP {
             encryptionManager!.storage.storeSignedPreKey((signedPreKey?.serializedData())!, signedPreKeyId: signedPreKey!.preKeyId)
             if (key["active"] as! Bool == true) {
                 print("setting active SPKXXX")
-                let currentTime = Date().millisecondsSince1970
+                let currentTime = Date().timestamp
                 UserDefaults(suiteName: self.accessGroup!)!.set(signedPreKey?.preKeyId, forKey: "activeSignedPreKeyId")
                 UserDefaults(suiteName: self.accessGroup!)!.set(currentTime, forKey: "activeSignedPreKeyTimestamp")
             }
@@ -181,7 +181,7 @@ public class SP {
         let signedPreKeyAge = days * 24 * 60 * 60 * 1000
         let userId = UserDefaults(suiteName: self.accessGroup!)!.string(forKey: "userId")
         let databaseConnection = db!.newConnection()
-        let currentTime = Date().millisecondsSince1970
+        let currentTime = Date().timestamp
         let activeSPKTimestamp = Int64(UserDefaults(suiteName: self.accessGroup!)!.integer(forKey: "activeSignedPreKeyTimestamp"))
         let activeDuration = currentTime - activeSPKTimestamp
         if (activeDuration > signedPreKeyAge) {
@@ -189,7 +189,6 @@ public class SP {
             let encryptionManager = try? EncryptionManager(accountKey: userId!, databaseConnection: databaseConnection)
             let identityKey = encryptionManager?.storage.getIdentityKeyPair()
             let signedPreKey = encryptionManager!.keyHelper()?.generateSignedPreKey(withIdentity: identityKey!, signedPreKeyId: UInt32(activeSPKId) + 1)
-            let currentTime = Date().millisecondsSince1970
             UserDefaults(suiteName: self.accessGroup!)!.set(signedPreKey?.preKeyId, forKey: "activeSignedPreKeyId")
             UserDefaults(suiteName: self.accessGroup!)!.set(currentTime, forKey: "activeSignedPreKeyTimestamp")
 
@@ -724,7 +723,7 @@ extension String {
 }
 
 extension Date {
-    var millisecondsSince1970: Int64 {
+    var timestamp: Int64 {
         return Int64((self.timeIntervalSince1970 * 1000.0).rounded())
     }
 
