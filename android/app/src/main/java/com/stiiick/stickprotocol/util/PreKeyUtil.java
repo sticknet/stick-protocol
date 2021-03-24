@@ -57,7 +57,7 @@ public class PreKeyUtil {
 
             if (active) {
                 Preferences.setActiveSignedPreKeyId(context, signedPreKeyId);
-                Preferences.setActiveSignedPreKeyTimestamp(context, System.currentTimeMillis());
+                Preferences.setActiveSignedPreKeyTimestamp(context, System.currentTimeMillis() / 1000);
             }
             return record;
         } catch (InvalidKeyException e) {
