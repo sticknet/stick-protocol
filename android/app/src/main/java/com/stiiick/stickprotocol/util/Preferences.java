@@ -95,10 +95,10 @@ public class Preferences {
     }
 
     public static int getActiveSignedPreKeyTimestamp(@NonNull Context context) {
-        return getIntegerPreference(context, ACTIVE_SIGNED_PRE_KEY_ID, 0);
+        return getIntegerPreference(context, ACTIVE_SIGNED_PRE_KEY_TIMESTAMP, 0);
     }
 
     public static void setActiveSignedPreKeyTimestamp(@NonNull Context context, long value) {
-        setLongPrefrence(context, ACTIVE_SIGNED_PRE_KEY_ID, value);;
+        setLongPrefrence(context, ACTIVE_SIGNED_PRE_KEY_TIMESTAMP, value);;
     }
 }
