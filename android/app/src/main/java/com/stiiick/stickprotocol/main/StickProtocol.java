@@ -163,9 +163,9 @@ public class StickProtocol {
                 SignedPreKeyRecord record = new SignedPreKeyRecord(signedPreKeId, System.currentTimeMillis(), sigKeyPair, Base64.decode(SPKJson.getString("signature")));
                 store.storeSignedPreKey(signedPreKeId, record);
                 if (SPKJson.getBoolean("active")) {
-                    Log.d("SETTING ACTIVE SPKXXX", Long.toString(SPKJson.getLong("timestamp")));
+                    Log.d("SETTING ACTIVE SPKXXX", Long.toString(SPKJson.getLong("timestamp") * 1000));
                     Preferences.setActiveSignedPreKeyId(context, signedPreKeId);
-                    Preferences.setActiveSignedPreKeyTimestamp(context, SPKJson.getLong("timestamp"));
+                    Preferences.setActiveSignedPreKeyTimestamp(context, SPKJson.getLong("timestamp") * 1000);
                 }
 
                 // PROGRESS

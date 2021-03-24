@@ -459,7 +459,7 @@ class StickProtocol():
             signedPreKeys = []
             for spk in signedPreKeysList:
                 key = {'id': spk.keyId, 'public': spk.public, 'cipher': spk.cipher, 'salt': spk.salt,
-                       'signature': spk.signature, 'active': spk.active, 'timestamp': int(format(spk.timestamp, 'U')) * 1000}
+                       'signature': spk.signature, 'active': spk.active, 'timestamp': int(format(spk.timestamp, 'U'))}
                 signedPreKeys.append(key)
             bundle['signedPreKeys'] = signedPreKeys
             preKeys = []
