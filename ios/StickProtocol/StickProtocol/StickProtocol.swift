@@ -116,11 +116,7 @@ public class SP {
         let identityKeyPair = try! IdentityKeyPair(publicKey: publicKey!, privateKey: privateKey)
         encryptionManager?.storage.saveIdenityKeyPair(keyPair: identityKeyPair, regId: bundle["localId"] as! UInt32)
 
-//        let sigPublicKey = Data(base64Encoded: bundle["signedPublic"] as! String)
-//        let sigPrivateKey = pbDecrypt(encryptedIvText: bundle["signedCipher"] as! String, salt: bundle["signedSalt"] as! String, pass: password)
-//        let sigKeyPair = try! KeyPair(publicKey: sigPublicKey!, privateKey: sigPrivateKey)
-//        let signedPreKey = encryptionManager!.keyHelper()?.createSignedPreKey(withKeyId: bundle["signedPreKeyId"] as! UInt32, keyPair: sigKeyPair, signature: Data(base64Encoded: bundle["signature"] as! String)!)
-//        encryptionManager!.storage.storeSignedPreKey((signedPreKey?.serializedData())!, signedPreKeyId: signedPreKey!.preKeyId)
+
         let signedPreKeys = bundle["signedPreKeys"] as! [Dictionary<String, Any>]
         let preKeys = bundle["preKeys"] as! [Dictionary<String, Any>]
         let senderKeys = bundle["senderKeys"] as! [Dictionary<String, Any>]
@@ -133,6 +129,12 @@ public class SP {
             let keyPair = try! KeyPair(publicKey: SPKPub!, privateKey: SPKPriv)
             let signedPreKey = encryptionManager!.keyHelper()?.createSignedPreKey(withKeyId: bundle["id"] as! UInt32, keyPair: keyPair, signature: Data(base64Encoded: key["signature"] as! String)!)
             encryptionManager!.storage.storeSignedPreKey((signedPreKey?.serializedData())!, signedPreKeyId: signedPreKey!.preKeyId)
+            if (key["active"] as! Bool == true) {
+                print("setting active SPKXXX")
+                let currentTime = Date().millisecondsSince1970
+                UserDefaults(suiteName: self.accessGroup!)!.set(signedPreKey?.preKeyId, forKey: "activeSignedPreKeyId")
+                UserDefaults(suiteName: self.accessGroup!)!.set(currentTime, forKey: "activeSignedPreKeyTimestamp")
+            }
             count += 1
             if (progressEvent != nil) {
                 progressEvent!(["progress": count, "total": totalKeys])

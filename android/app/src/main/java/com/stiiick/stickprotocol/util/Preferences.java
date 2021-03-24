@@ -27,6 +27,7 @@ public class Preferences {
 
     private static final String NEXT_PRE_KEY_ID          = "pref_next_pre_key_id";
     private static final String ACTIVE_SIGNED_PRE_KEY_ID = "pref_active_signed_pre_key_id";
+    private static final String ACTIVE_SIGNED_PRE_KEY_TIMESTAMP = "pref_active_signed_pre_key_timestamp";
     private static final String NEXT_SIGNED_PRE_KEY_ID   = "pref_next_signed_pre_key_id";
 
     public static void setDatabaseEncryptedSecret(@NonNull Context context, @NonNull String secret) {
@@ -73,6 +74,10 @@ public class Preferences {
         PreferenceManager.getDefaultSharedPreferences(context).edit().putInt(key, value).apply();
     }
 
+    private static void setLongPrefrence(Context context, String key, long value) {
+        PreferenceManager.getDefaultSharedPreferences(context).edit().putLong(key, value).apply();
+    }
+
     public static int getNextSignedPreKeyId(@NonNull Context context) {
         return getIntegerPreference(context, NEXT_SIGNED_PRE_KEY_ID, 0);
     }
@@ -87,5 +92,13 @@ public class Preferences {
 
     public static void setActiveSignedPreKeyId(@NonNull Context context, int value) {
         setIntegerPrefrence(context, ACTIVE_SIGNED_PRE_KEY_ID, value);;
+    }
+
+    public static int getActiveSignedPreKeyTimestamp(@NonNull Context context) {
+        return getIntegerPreference(context, ACTIVE_SIGNED_PRE_KEY_ID, 0);
+    }
+
+    public static void setActiveSignedPreKeyTimestamp(@NonNull Context context, long value) {
+        setLongPrefrence(context, ACTIVE_SIGNED_PRE_KEY_ID, value);;
     }
 }

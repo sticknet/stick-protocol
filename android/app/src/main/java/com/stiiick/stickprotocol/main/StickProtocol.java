@@ -107,8 +107,7 @@ public class StickProtocol {
     public JSONObject refreshSignedPreKey(int days) throws Exception {
 //        long signedPreKeyAge = TimeUnit.DAYS.toMillis(30);
         long signedPreKeyAge = TimeUnit.MINUTES.toMillis(2);
-        SignedPreKeyRecord oldRecord = DatabaseFactory.getSignedPreKeyDatabase(context).getSignedPreKey(Preferences.getActiveSignedPreKeyId(context));
-        long activeDuration = System.currentTimeMillis() - oldRecord.getTimestamp();
+        long activeDuration = System.currentTimeMillis() - Preferences.getActiveSignedPreKeyTimestamp(context);
         if (activeDuration > signedPreKeyAge) {
             IdentityKeyPair identityKey = IdentityKeyUtil.getIdentityKeyPair(context);
             SignedPreKeyRecord signedPreKey = PreKeyUtil.generateSignedPreKey(context, identityKey, true);
@@ -164,7 +163,9 @@ public class StickProtocol {
                 SignedPreKeyRecord record = new SignedPreKeyRecord(signedPreKeId, System.currentTimeMillis(), sigKeyPair, Base64.decode(SPKJson.getString("signature")));
                 store.storeSignedPreKey(signedPreKeId, record);
                 if (SPKJson.getBoolean("active")) {
+                    Log.d("SETTING ACTIVE SPKXXX", Long.toString(SPKJson.getLong("timestamp")));
                     Preferences.setActiveSignedPreKeyId(context, signedPreKeId);
+                    Preferences.setActiveSignedPreKeyTimestamp(context, SPKJson.getLong("timestamp"));
                 }
 
                 // PROGRESS
