@@ -127,13 +127,11 @@ public class SP {
             let SPKPub = Data(base64Encoded: key["public"] as! String)
             let SPKPriv = pbDecrypt(encryptedIvText: key["cipher"] as! String, salt: key["salt"] as! String, pass: password)
             let keyPair = try! KeyPair(publicKey: SPKPub!, privateKey: SPKPriv)
-            let signedPreKey = encryptionManager!.keyHelper()?.createSignedPreKey(withKeyId: bundle["id"] as! UInt32, keyPair: keyPair, signature: Data(base64Encoded: key["signature"] as! String)!)
+            let signedPreKey = encryptionManager!.keyHelper()?.createSignedPreKey(withKeyId: key["id"] as! UInt32, keyPair: keyPair, signature: Data(base64Encoded: key["signature"] as! String)!)
             encryptionManager!.storage.storeSignedPreKey((signedPreKey?.serializedData())!, signedPreKeyId: signedPreKey!.preKeyId)
             if (key["active"] as! Bool == true) {
-                print("setting active SPKXXX")
-                let currentTime = Date().timestamp
                 UserDefaults(suiteName: self.accessGroup!)!.set(signedPreKey?.preKeyId, forKey: "activeSignedPreKeyId")
-                UserDefaults(suiteName: self.accessGroup!)!.set(currentTime, forKey: "activeSignedPreKeyTimestamp")
+                UserDefaults(suiteName: self.accessGroup!)!.set(key["timestamp"], forKey: "activeSignedPreKeyTimestamp")
             }
             count += 1
             if (progressEvent != nil) {
@@ -159,7 +157,11 @@ public class SP {
 
         // OWN SENDER KEYS
         let signalProtocolAddress = SignalAddress(name: userId, deviceId: 1)
+        var skc = 0
         for key in senderKeys {
+            print("DECRYPT A SENDERKEY", skc)
+            print("senderkey", key)
+            skc += 1
             reinitSenderKey(key: key, signalProtocolAddress: signalProtocolAddress, userId: userId, encryptionManager: encryptionManager!)
             // send progress event
             count += 1
@@ -178,7 +180,8 @@ public class SP {
     }
 
     public func refreshSignedPreKey(days: Int) -> [String: Any]? {
-        let signedPreKeyAge = days * 24 * 60 * 60 * 1000
+//        let signedPreKeyAge = days * 24 * 60 * 60
+        let signedPreKeyAge = 60
         let userId = UserDefaults(suiteName: self.accessGroup!)!.string(forKey: "userId")
         let databaseConnection = db!.newConnection()
         let currentTime = Date().timestamp
@@ -724,7 +727,7 @@ extension String {
 
 extension Date {
     var timestamp: Int64 {
-        return Int64((self.timeIntervalSince1970 * 1000.0).rounded())
+        return Int64((self.timeIntervalSince1970).rounded())
     }
 
 }

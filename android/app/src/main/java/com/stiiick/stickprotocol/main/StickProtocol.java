@@ -96,12 +96,16 @@ public class StickProtocol {
     private static String path;
     private static LiveRecipientCache recipientCache;
     private final Keychain keychain;
+    private final String service;
+    private final String passwordKey;
 
 
-    public StickProtocol(Context context) {
+    public StickProtocol(Context context, String service) {
         StickProtocol.context = context;
         path = context.getFilesDir().getPath();
         keychain = new Keychain(context);
+        this.service = service;
+        this.passwordKey = service + ".password";
     }
 
     public JSONObject refreshSignedPreKey(int days) throws Exception {
@@ -112,8 +116,8 @@ public class StickProtocol {
             SignedPreKeyRecord signedPreKey = PreKeyUtil.generateSignedPreKey(context, identityKey, true);
 
             HashMap<String, String> serviceMap = new HashMap();
-            serviceMap.put("service", "com.stiiick.auth_token");
-            String password = keychain.getGenericPassword("com.stiiick", serviceMap);
+            serviceMap.put("service", passwordKey);
+            String password = keychain.getGenericPassword(service, serviceMap);
             JSONObject signedPreKeyJson = new JSONObject();
             signedPreKeyJson.put("id", Preferences.getActiveSignedPreKeyId(context));
             signedPreKeyJson.put("public", Base64.encodeBytes(signedPreKey.getKeyPair().getPublicKey().serialize()));
@@ -254,8 +258,8 @@ public class StickProtocol {
     public JSONArray generatePreKeys(int nextPreKeyId, int count) {
         try {
             HashMap<String, String> serviceMap = new HashMap();
-            serviceMap.put("service", "com.stiiick.auth_token");
-            String password = keychain.getGenericPassword("com.stiiick", serviceMap);
+            serviceMap.put("service", passwordKey);
+            String password = keychain.getGenericPassword(service, serviceMap);
             List<PreKeyRecord> preKeys = PreKeyUtil.generatePreKeys(context, nextPreKeyId, count);
             JSONArray preKeysArray = new JSONArray();
             for (int i = 0; i < preKeys.size(); i++) {
@@ -292,6 +296,12 @@ public class StickProtocol {
                 .hash(password.getBytes(), Base64.decode(salt))
                 .getHash();
         return Base64.encodeBytes(passwordHashBytes);
+    }
+
+    public String recoverPassword() {
+        HashMap<String, String> serviceMap = new HashMap();
+        serviceMap.put("service", passwordKey);
+        return keychain.getGenericPassword(service, serviceMap);
     }
 
     public JSONObject initialize(String userId, String password, ProgressEvent progressEvent) {

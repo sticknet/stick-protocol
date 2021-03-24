@@ -221,13 +221,14 @@ extension StorageManager: SignalStore {
     
   public func storeSignedPreKey(_ signedPreKey: Data, signedPreKeyId: UInt32) -> Bool {
       guard let signedPreKeyDatabaseObject = SPSignedPreKey(accountKey: self.accountKey, keyId: signedPreKeyId, keyData: signedPreKey) else {
+            print("SPK NOT SUCCESSFUL")
           return false
       }
       self.databaseConnection.readWrite { (transaction) in
+            print("saving SPK SUCCESSFULLY")
           signedPreKeyDatabaseObject.save(with: transaction)
       }
       return true
-      
   }
     
     public func containsSignedPreKey(withId signedPreKeyId: UInt32) -> Bool {
