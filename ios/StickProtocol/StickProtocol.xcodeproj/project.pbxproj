@@ -102,8 +102,6 @@
 		0710182F260741D900CD0E47 /* IdentityKeyStore.h in Headers */ = {isa = PBXBuildFile; fileRef = 071017AD260741D900CD0E47 /* IdentityKeyStore.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		07101830260741D900CD0E47 /* StickProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 071017AE260741D900CD0E47 /* StickProtocol.swift */; };
 		07101831260741D900CD0E47 /* StickProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 071017AE260741D900CD0E47 /* StickProtocol.swift */; };
-		07101834260741D900CD0E47 /* DatabaseSetup.m in Sources */ = {isa = PBXBuildFile; fileRef = 071017B0260741D900CD0E47 /* DatabaseSetup.m */; };
-		07101835260741D900CD0E47 /* DatabaseSetup.m in Sources */ = {isa = PBXBuildFile; fileRef = 071017B0260741D900CD0E47 /* DatabaseSetup.m */; };
 		07101836260741D900CD0E47 /* EncryptionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 071017B1260741D900CD0E47 /* EncryptionManager.swift */; };
 		07101837260741D900CD0E47 /* EncryptionManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 071017B1260741D900CD0E47 /* EncryptionManager.swift */; };
 		07101838260741D900CD0E47 /* SessionBuilder.h in Headers */ = {isa = PBXBuildFile; fileRef = 071017B3260741D900CD0E47 /* SessionBuilder.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -182,7 +180,6 @@
 		07101774260741D900CD0E47 /* SPSignedPreKey.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SPSignedPreKey.m; sourceTree = "<group>"; };
 		07101776260741D900CD0E47 /* CommonCryptoProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CommonCryptoProvider.m; sourceTree = "<group>"; };
 		07101777260741D900CD0E47 /* CommonCryptoProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommonCryptoProvider.h; sourceTree = "<group>"; };
-		07101778260741D900CD0E47 /* DatabaseSetup.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DatabaseSetup.h; sourceTree = "<group>"; };
 		0710177A260741D900CD0E47 /* SenderKeyState_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SenderKeyState_Internal.h; sourceTree = "<group>"; };
 		0710177B260741D900CD0E47 /* SignedPreKey_Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SignedPreKey_Internal.h; sourceTree = "<group>"; };
 		0710177C260741D900CD0E47 /* SignedPreKey.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SignedPreKey.m; sourceTree = "<group>"; };
@@ -234,7 +231,6 @@
 		071017AC260741D900CD0E47 /* SessionStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SessionStore.h; sourceTree = "<group>"; };
 		071017AD260741D900CD0E47 /* IdentityKeyStore.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IdentityKeyStore.h; sourceTree = "<group>"; };
 		071017AE260741D900CD0E47 /* StickProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StickProtocol.swift; sourceTree = "<group>"; };
-		071017B0260741D900CD0E47 /* DatabaseSetup.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DatabaseSetup.m; sourceTree = "<group>"; };
 		071017B1260741D900CD0E47 /* EncryptionManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EncryptionManager.swift; sourceTree = "<group>"; };
 		071017B3260741D900CD0E47 /* SessionBuilder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SessionBuilder.h; sourceTree = "<group>"; };
 		071017B4260741D900CD0E47 /* SessionCipher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SessionCipher.h; sourceTree = "<group>"; };
@@ -336,8 +332,6 @@
 				07101779260741D900CD0E47 /* Models */,
 				071017B2260741D900CD0E47 /* Controllers */,
 				07101766260741D900CD0E47 /* SPObjects */,
-				07101778260741D900CD0E47 /* DatabaseSetup.h */,
-				071017B0260741D900CD0E47 /* DatabaseSetup.m */,
 				07101764260741D900CD0E47 /* StorageManager.swift */,
 				071017B1260741D900CD0E47 /* EncryptionManager.swift */,
 				071017AE260741D900CD0E47 /* StickProtocol.swift */,
@@ -754,7 +748,6 @@
 				0710181A260741D900CD0E47 /* SenderKeyName.m in Sources */,
 				07101830260741D900CD0E47 /* StickProtocol.swift in Sources */,
 				07101802260741D900CD0E47 /* SignalCiphertext.m in Sources */,
-				07101834260741D900CD0E47 /* DatabaseSetup.m in Sources */,
 				07101836260741D900CD0E47 /* EncryptionManager.swift in Sources */,
 				07101821260741D900CD0E47 /* PreKeyBundle.m in Sources */,
 				07101829260741D900CD0E47 /* SignalStorage.m in Sources */,
@@ -811,7 +804,6 @@
 				07101824260741D900CD0E47 /* PreKey.m in Sources */,
 				0710182A260741D900CD0E47 /* SignalStorage.m in Sources */,
 				07100FCE2607262A00CD0E47 /* StickProtocolTests.swift in Sources */,
-				07101835260741D900CD0E47 /* DatabaseSetup.m in Sources */,
 				0710183C260741D900CD0E47 /* GroupCipher.m in Sources */,
 				07101831260741D900CD0E47 /* StickProtocol.swift in Sources */,
 				07101822260741D900CD0E47 /* PreKeyBundle.m in Sources */,

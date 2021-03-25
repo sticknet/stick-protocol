@@ -87,6 +87,8 @@ import javax.crypto.Cipher;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
+import static java.lang.Long.parseLong;
+
 /*
     @author Omar Basem
  */
@@ -109,8 +111,8 @@ public class StickProtocol {
     }
 
     public JSONObject refreshSignedPreKey(int days) throws Exception {
-        long signedPreKeyAge = TimeUnit.MINUTES.toSeconds(1);
-        long activeDuration = (System.currentTimeMillis() / 1000) - Preferences.getActiveSignedPreKeyTimestamp(context);
+        long signedPreKeyAge = TimeUnit.MINUTES.toMillis(1);
+        long activeDuration = System.currentTimeMillis() - Preferences.getActiveSignedPreKeyTimestamp(context);
         if (activeDuration > signedPreKeyAge) {
             IdentityKeyPair identityKey = IdentityKeyUtil.getIdentityKeyPair(context);
             SignedPreKeyRecord signedPreKey = PreKeyUtil.generateSignedPreKey(context, identityKey, true);
@@ -125,6 +127,7 @@ public class StickProtocol {
             HashMap<String, String> signedCipherMap = pbEncrypt(signedPreKey.getKeyPair().getPrivateKey().serialize(), password);
             signedPreKeyJson.put("cipher", signedCipherMap.get("cipher"));
             signedPreKeyJson.put("salt", signedCipherMap.get("salt"));
+            signedPreKeyJson.put("timestamp", Long.toString(signedPreKey.getTimestamp()));
             return signedPreKeyJson;
         }
         return null;
@@ -163,11 +166,11 @@ public class StickProtocol {
                 ECPrivateKey sigPrivateKey = Curve.decodePrivatePoint(signedCipher);
                 ECKeyPair sigKeyPair = new ECKeyPair(sigPublicKey, sigPrivateKey);
                 int signedPreKeId = (int) SPKJson.get("id");
-                SignedPreKeyRecord record = new SignedPreKeyRecord(signedPreKeId, SPKJson.getLong("timestamp") * 1000, sigKeyPair, Base64.decode(SPKJson.getString("signature")));
+                SignedPreKeyRecord record = new SignedPreKeyRecord(signedPreKeId, parseLong(SPKJson.getString("timestamp")), sigKeyPair, Base64.decode(SPKJson.getString("signature")));
                 store.storeSignedPreKey(signedPreKeId, record);
                 if (SPKJson.getBoolean("active")) {
                     Preferences.setActiveSignedPreKeyId(context, signedPreKeId);
-                    Preferences.setActiveSignedPreKeyTimestamp(context, SPKJson.getLong("timestamp"));
+                    Preferences.setActiveSignedPreKeyTimestamp(context, parseLong(SPKJson.getString("timestamp")));
                 }
 
                 // PROGRESS
@@ -357,6 +360,7 @@ public class StickProtocol {
             HashMap<String, String> signedCipherMap = pbEncrypt(signedPreKey.getKeyPair().getPrivateKey().serialize(), password);
             signedPreKeyJson.put("cipher", signedCipherMap.get("cipher"));
             signedPreKeyJson.put("salt", signedCipherMap.get("salt"));
+            signedPreKeyJson.put("timestamp", Long.toString(signedPreKey.getTimestamp()));
 
             JSONObject identityKeyJson = new JSONObject();
             identityKeyJson.put("public", Base64.encodeBytes(identityKey.getPublicKey().serialize()));

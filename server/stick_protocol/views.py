@@ -39,7 +39,7 @@ class StickProtocol():
                                    cipher=identityKey['cipher'], salt=identityKey['salt'])
         SignedPreKey.objects.create(public=signedPreKey['public'], signature=signedPreKey["signature"],
                                     keyId=signedPreKey['id'], user=user, cipher=signedPreKey['cipher'],
-                                    salt=signedPreKey['salt'], active=True)
+                                    salt=signedPreKey['salt'], timestamp=signedPreKey['timestamp'], active=True)
         for preKey in preKeys:
             PreKey.objects.create(public=preKey['public'], keyId=preKey["id"], user=user, cipher=preKey['cipher'],
                                   salt=preKey['salt'])
@@ -427,7 +427,7 @@ class StickProtocol():
         old_spk.active = False
         old_spk.save()
         SignedPreKey.objects.create(user=user, public=data['public'], signature=data["signature"],
-                                    keyId=data['id'], cipher=data['cipher'], salt=data['salt'], active=True)
+                                    keyId=data['id'], cipher=data['cipher'], salt=data['salt'], timestamp=data['timestamp'], active=True)
 
     def verify_password_and_get_keys(self, data, user):
         """
@@ -459,7 +459,7 @@ class StickProtocol():
             signedPreKeys = []
             for spk in signedPreKeysList:
                 key = {'id': spk.keyId, 'public': spk.public, 'cipher': spk.cipher, 'salt': spk.salt,
-                       'signature': spk.signature, 'active': spk.active, 'timestamp': int(format(spk.timestamp, 'U'))}
+                       'signature': spk.signature, 'active': spk.active, 'timestamp': spk.timestamp}
                 signedPreKeys.append(key)
             bundle['signedPreKeys'] = signedPreKeys
             preKeys = []

@@ -37,7 +37,7 @@ public class SP {
         let encryptionManager = try? EncryptionManager(accountKey: userId, databaseConnection: databaseConnection)
 
         let identityKey = encryptionManager?.storage.getIdentityKeyPair()
-        let signedPreKey = encryptionManager!.keyHelper()?.generateSignedPreKey(withIdentity: identityKey!, signedPreKeyId: 0)
+        let signedPreKey = encryptionManager!.keyHelper()?.generateSignedPreKey(withIdentity: identityKey!, signedPreKeyId: 1000)
         let currentTime = Date().timestamp
         UserDefaults(suiteName: self.accessGroup!)!.set(signedPreKey?.preKeyId, forKey: "activeSignedPreKeyId")
         UserDefaults(suiteName: self.accessGroup!)!.set(currentTime, forKey: "activeSignedPreKeyTimestamp")
@@ -71,6 +71,7 @@ public class SP {
         let signedCipherMap = pbEncrypt(text: (signedPreKey?.keyPair!.privateKey)!, pass: password)
         signedMap["cipher"] = signedCipherMap["cipher"]!
         signedMap["salt"] = signedCipherMap["salt"]!
+        signedMap["timestamp"] = "\(String(describing: signedPreKey?.unixTimestamp))"
 
 
         var identityMap = [String: Any]()
@@ -127,7 +128,7 @@ public class SP {
             let SPKPub = Data(base64Encoded: key["public"] as! String)
             let SPKPriv = pbDecrypt(encryptedIvText: key["cipher"] as! String, salt: key["salt"] as! String, pass: password)
             let keyPair = try! KeyPair(publicKey: SPKPub!, privateKey: SPKPriv)
-            let signedPreKey = encryptionManager!.keyHelper()?.createSignedPreKey(withKeyId: key["id"] as! UInt32, keyPair: keyPair, signature: Data(base64Encoded: key["signature"] as! String)!, timestamp: (key["timestamp"] as! UInt64) * 1000)
+            let signedPreKey = encryptionManager!.keyHelper()?.createSignedPreKey(withKeyId: key["id"] as! UInt32, keyPair: keyPair, signature: Data(base64Encoded: key["signature"] as! String)!, timestamp: key["timestamp"] as! UInt64)
             encryptionManager!.storage.storeSignedPreKey((signedPreKey?.serializedData())!, signedPreKeyId: signedPreKey!.preKeyId)
             if (key["active"] as! Bool == true) {
                 UserDefaults(suiteName: self.accessGroup!)!.set(signedPreKey?.preKeyId, forKey: "activeSignedPreKeyId")
@@ -140,6 +141,11 @@ public class SP {
                 print("Printing progress because progress event is null", count)
             }
         }
+        
+        let res0 = encryptionManager!.storage.containsSignedPreKey(withId: 1000)
+        print("CONTAINER SPK0 ", res0)
+        let res1 = encryptionManager!.storage.containsSignedPreKey(withId: 1001)
+        print("CONTAINS SPK1 ", res1)
 
         for key in preKeys {
             let prePubKey = Data(base64Encoded: key["public"] as! String)
@@ -186,7 +192,7 @@ public class SP {
 
     public func refreshSignedPreKey(days: Int) -> [String: Any]? {
 //        let signedPreKeyAge = days * 24 * 60 * 60
-        let signedPreKeyAge = 60
+        let signedPreKeyAge = 60 * 1000
         let userId = UserDefaults(suiteName: self.accessGroup!)!.string(forKey: "userId")
         let databaseConnection = db!.newConnection()
         let currentTime = Date().timestamp
@@ -209,6 +215,7 @@ public class SP {
             let signedCipherMap = pbEncrypt(text: (signedPreKey?.keyPair!.privateKey)!, pass: password)
             signedMap["cipher"] = signedCipherMap["cipher"]!
             signedMap["salt"] = signedCipherMap["salt"]!
+            signedMap["timestamp"] = "\(String(describing: signedPreKey?.unixTimestamp))"
             return signedMap
         }
         return nil
@@ -734,7 +741,7 @@ extension String {
 
 extension Date {
     var timestamp: Int64 {
-        return Int64((self.timeIntervalSince1970).rounded())
+        return Int64((self.timeIntervalSince1970).rounded()) * 1000
     }
 
 }

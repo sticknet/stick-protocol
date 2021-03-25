@@ -41,6 +41,11 @@
     return date;
 }
 
+- (uint64_t) unixTimestamp {
+    uint64_t unixTimestamp = session_signed_pre_key_get_timestamp(_signed_pre_key);
+    return unixTimestamp;
+}
+
 - (NSData*) signature {
     const uint8_t *sigBytes = session_signed_pre_key_get_signature(_signed_pre_key);
     size_t sigLen = session_signed_pre_key_get_signature_len(_signed_pre_key);
