@@ -71,7 +71,7 @@ public class SP {
         let signedCipherMap = pbEncrypt(text: (signedPreKey?.keyPair!.privateKey)!, pass: password)
         signedMap["cipher"] = signedCipherMap["cipher"]!
         signedMap["salt"] = signedCipherMap["salt"]!
-        signedMap["timestamp"] = "\(String(describing: signedPreKey?.unixTimestamp))"
+        signedMap["timestamp"] = signedPreKey?.unixTimestamp
 
 
         var identityMap = [String: Any]()
@@ -107,7 +107,6 @@ public class SP {
         let keychain = A0SimpleKeychain(service: self.service!, accessGroup: self.accessGroup!)
         keychain.setString(password, forKey: "password")
         let userId = bundle["userId"] as! String
-        let myId = UserDefaults(suiteName: self.accessGroup!)!.string(forKey: "userId")
         UserDefaults(suiteName: self.accessGroup!)!.set(userId, forKey: "userId")
         let databaseConnection = db!.newConnection()
         let encryptionManager = try? EncryptionManager(accountKey: userId, databaseConnection: databaseConnection)
@@ -128,11 +127,11 @@ public class SP {
             let SPKPub = Data(base64Encoded: key["public"] as! String)
             let SPKPriv = pbDecrypt(encryptedIvText: key["cipher"] as! String, salt: key["salt"] as! String, pass: password)
             let keyPair = try! KeyPair(publicKey: SPKPub!, privateKey: SPKPriv)
-            let signedPreKey = encryptionManager!.keyHelper()?.createSignedPreKey(withKeyId: key["id"] as! UInt32, keyPair: keyPair, signature: Data(base64Encoded: key["signature"] as! String)!, timestamp: key["timestamp"] as! UInt64)
+            let signedPreKey = encryptionManager!.keyHelper()?.createSignedPreKey(withKeyId: key["id"] as! UInt32, keyPair: keyPair, signature: Data(base64Encoded: key["signature"] as! String)!, timestamp: UInt64(key["timestamp"] as! String)!)
             encryptionManager!.storage.storeSignedPreKey((signedPreKey?.serializedData())!, signedPreKeyId: signedPreKey!.preKeyId)
             if (key["active"] as! Bool == true) {
                 UserDefaults(suiteName: self.accessGroup!)!.set(signedPreKey?.preKeyId, forKey: "activeSignedPreKeyId")
-                UserDefaults(suiteName: self.accessGroup!)!.set(key["timestamp"], forKey: "activeSignedPreKeyTimestamp")
+                UserDefaults(suiteName: self.accessGroup!)!.set(UInt64(key["timestamp"] as! String), forKey: "activeSignedPreKeyTimestamp")
             }
             count += 1
             if (progressEvent != nil) {
@@ -204,7 +203,7 @@ public class SP {
             let identityKey = encryptionManager?.storage.getIdentityKeyPair()
             let signedPreKey = encryptionManager!.keyHelper()?.generateSignedPreKey(withIdentity: identityKey!, signedPreKeyId: UInt32(activeSPKId) + 1)
             UserDefaults(suiteName: self.accessGroup!)!.set(signedPreKey?.preKeyId, forKey: "activeSignedPreKeyId")
-            UserDefaults(suiteName: self.accessGroup!)!.set(currentTime, forKey: "activeSignedPreKeyTimestamp")
+            UserDefaults(suiteName: self.accessGroup!)!.set(UInt64(signedPreKey!.unixTimestamp), forKey: "activeSignedPreKeyTimestamp")
 
             let keychain = A0SimpleKeychain(service: self.service!, accessGroup: self.accessGroup!)
             let password: String = keychain.string(forKey: "password")!
@@ -215,7 +214,7 @@ public class SP {
             let signedCipherMap = pbEncrypt(text: (signedPreKey?.keyPair!.privateKey)!, pass: password)
             signedMap["cipher"] = signedCipherMap["cipher"]!
             signedMap["salt"] = signedCipherMap["salt"]!
-            signedMap["timestamp"] = "\(String(describing: signedPreKey?.unixTimestamp))"
+            signedMap["timestamp"] = signedPreKey?.unixTimestamp
             return signedMap
         }
         return nil

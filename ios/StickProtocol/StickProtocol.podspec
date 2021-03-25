@@ -2,7 +2,7 @@ Pod::Spec.new do |spec|
 
 
   spec.name         = "StickProtocol"
-  spec.version      = "1.1.35"
+  spec.version      = "1.1.37"
   spec.summary      = "Customized Signal Protocol C Library for the Stick Protocol"
   spec.swift_version = "5.0"
 

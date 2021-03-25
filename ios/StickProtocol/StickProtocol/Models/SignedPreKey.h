@@ -15,7 +15,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, readonly) uint32_t preKeyId;
 @property (nonatomic, readonly) NSDate *timestamp;
-@property (nonatomic, readonly) uint64_t *unixTimestamp;
+@property (nonatomic, readonly) NSString *unixTimestamp;
 @property (nonatomic, readonly) NSData *signature;
 @property (nonatomic, readonly, nullable) KeyPair *keyPair;
 

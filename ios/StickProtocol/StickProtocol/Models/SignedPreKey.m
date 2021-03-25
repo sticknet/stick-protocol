@@ -41,10 +41,11 @@
     return date;
 }
 
-- (uint64_t) unixTimestamp {
+- (NSString*) unixTimestamp {
     uint64_t unixTimestamp = session_signed_pre_key_get_timestamp(_signed_pre_key);
-    return unixTimestamp;
+    return [NSString stringWithFormat:@"%llu",unixTimestamp];
 }
+
 
 - (NSData*) signature {
     const uint8_t *sigBytes = session_signed_pre_key_get_signature(_signed_pre_key);

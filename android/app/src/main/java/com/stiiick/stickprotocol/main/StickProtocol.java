@@ -202,17 +202,17 @@ public class StickProtocol {
 
             // KEYS FOR SENDING SELF
             SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress((String) bundle.get("userId"), 1);
-            for (int i = 0; i < senderKeys.length(); i++) {
-                JSONObject senderKeyJson = senderKeys.getJSONObject(i);
-                reinitSenderKey(senderKeyJson, signalProtocolAddress, (String) bundle.get("userId"));
-                // PROGRESS
-                if (progressEvent != null) {
-                    JSONObject event = new JSONObject();
-                    event.put("progress", signedPreKeys.length() + preKeys.length() + i + 1);
-                    event.put("total", totalKeys);
-                    progressEvent.execute(event);
-                }
-            }
+//            for (int i = 0; i < senderKeys.length(); i++) {
+//                JSONObject senderKeyJson = senderKeys.getJSONObject(i);
+//                reinitSenderKey(senderKeyJson, signalProtocolAddress, (String) bundle.get("userId"));
+//                // PROGRESS
+//                if (progressEvent != null) {
+//                    JSONObject event = new JSONObject();
+//                    event.put("progress", signedPreKeys.length() + preKeys.length() + i + 1);
+//                    event.put("total", totalKeys);
+//                    progressEvent.execute(event);
+//                }
+//            }
             PreferenceManager.getDefaultSharedPreferences(context).edit().putString("oneTimeId", oneTimeId).apply();
             PreferenceManager.getDefaultSharedPreferences(context).edit().putString("userId", (String) bundle.get("userId")).apply();
         } catch (Exception e) {
