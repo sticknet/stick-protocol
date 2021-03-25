@@ -84,11 +84,11 @@
     return signedPreKey;
 }
 
-- (SignedPreKey*)createSignedPreKeyWithKeyId:(uint32_t)keyId keyPair:(KeyPair *)keyPair signature:(NSData *)signature {
-  NSDate *timestamp = [NSDate date];
+- (SignedPreKey*)createSignedPreKeyWithKeyId:(uint32_t)keyId keyPair:(KeyPair *)keyPair signature:(NSData *)signature timestamp:(uint64_t)timestamp {
+//  NSDate *timestamp = [NSDate date];
+//  uint64_t unixTimestamp = [timestamp timeIntervalSince1970] * 1000;
   session_signed_pre_key *signed_pre_key = NULL;
-  uint64_t unixTimestamp = [timestamp timeIntervalSince1970] * 1000;
-  int result = session_signed_pre_key_create(&signed_pre_key, keyId, unixTimestamp, keyPair.ec_key_pair, signature.bytes, signature.length);
+  int result = session_signed_pre_key_create(&signed_pre_key, keyId, timestamp, keyPair.ec_key_pair, signature.bytes, signature.length);
   if (result < 0 || !signed_pre_key) {
       return nil;
   }

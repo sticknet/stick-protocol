@@ -127,7 +127,7 @@ public class SP {
             let SPKPub = Data(base64Encoded: key["public"] as! String)
             let SPKPriv = pbDecrypt(encryptedIvText: key["cipher"] as! String, salt: key["salt"] as! String, pass: password)
             let keyPair = try! KeyPair(publicKey: SPKPub!, privateKey: SPKPriv)
-            let signedPreKey = encryptionManager!.keyHelper()?.createSignedPreKey(withKeyId: key["id"] as! UInt32, keyPair: keyPair, signature: Data(base64Encoded: key["signature"] as! String)!)
+            let signedPreKey = encryptionManager!.keyHelper()?.createSignedPreKey(withKeyId: key["id"] as! UInt32, keyPair: keyPair, signature: Data(base64Encoded: key["signature"] as! String)!, timestamp: (key["timestamp"] as! UInt64) * 1000)
             encryptionManager!.storage.storeSignedPreKey((signedPreKey?.serializedData())!, signedPreKeyId: signedPreKey!.preKeyId)
             if (key["active"] as! Bool == true) {
                 UserDefaults(suiteName: self.accessGroup!)!.set(signedPreKey?.preKeyId, forKey: "activeSignedPreKeyId")
@@ -178,6 +178,11 @@ public class SP {
         let (passwordHash, _) = try! Argon2.hash(iterations: 3, memoryInKiB: 4 * 1024, threads: 2, password: password.data(using: .utf8)!, salt: Data(base64Encoded: salt)!, desiredLength: 32, variant: .id, version: .v13)
         return passwordHash.base64EncodedString()
     }
+    
+    public func recoverPassword() -> String {
+        let keychain = A0SimpleKeychain(service: self.service!, accessGroup: self.accessGroup!)
+        return keychain.string(forKey: "password")!
+    }
 
     public func refreshSignedPreKey(days: Int) -> [String: Any]? {
 //        let signedPreKeyAge = days * 24 * 60 * 60
@@ -188,7 +193,7 @@ public class SP {
         let activeSPKTimestamp = Int64(UserDefaults(suiteName: self.accessGroup!)!.integer(forKey: "activeSignedPreKeyTimestamp"))
         let activeDuration = currentTime - activeSPKTimestamp
         if (activeDuration > signedPreKeyAge) {
-            let activeSPKId = Int64(UserDefaults(suiteName: self.accessGroup!)!.integer(forKey: "activeSignedPreKeyTimestamp"))
+            let activeSPKId = Int64(UserDefaults(suiteName: self.accessGroup!)!.integer(forKey: "activeSignedPreKeyId"))
             let encryptionManager = try? EncryptionManager(accountKey: userId!, databaseConnection: databaseConnection)
             let identityKey = encryptionManager?.storage.getIdentityKeyPair()
             let signedPreKey = encryptionManager!.keyHelper()?.generateSignedPreKey(withIdentity: identityKey!, signedPreKeyId: UInt32(activeSPKId) + 1)
@@ -260,7 +265,7 @@ public class SP {
         return nil
     }
 
-    public func decryptTextPairwise(senderId: String, deviceId: Int32, cipher: String, isSelf: Bool) -> String? {
+    public func decryptTextPairwise(senderId: String, deviceId: Int32, isStickyKey: Bool, cipher: String) -> String? {
         do {
             let myId = UserDefaults(suiteName: self.accessGroup!)!.string(forKey: "userId")
             let databaseConnection = db!.newConnection()
@@ -268,7 +273,8 @@ public class SP {
             let signalProtocolAddress = SignalAddress(name: senderId, deviceId: deviceId)
             let sessionCipher = SessionCipher(address: signalProtocolAddress, context: encryptionManager!.signalContext)
             var signalCiphertext: SignalCiphertext?
-            signalCiphertext = SignalCiphertext(data: Data(base64Encoded: cipher)!, type: SignalCiphertextType.unknown)
+            let type = isStickyKey ? SignalCiphertextType.preKeyMessage : SignalCiphertextType.unknown
+            signalCiphertext = SignalCiphertext(data: Data(base64Encoded: cipher)!, type: type)
             let decryptedBytes = try sessionCipher.decryptCiphertext(signalCiphertext!)
             return String(decoding: decryptedBytes, as: UTF8.self)
         } catch {
@@ -354,7 +360,7 @@ public class SP {
                 let signalProtocolAddress = SignalAddress(name: senderId, deviceId: isSticky ? 1 : 0)
                 let senderKeyName = SenderKeyName(groupId: stickId, address: signalProtocolAddress)
                 let groupSesisonBuilder = GroupSessionBuilder(context: encryptionManager!.signalContext)
-                let senderKey = decryptTextPairwise(senderId: senderId, deviceId: isSticky ? 1 : 0, cipher: cipherSenderKey!, isSelf: false)
+                let senderKey = decryptTextPairwise(senderId: senderId, deviceId: isSticky ? 1 : 0, isStickyKey: true, cipher: cipherSenderKey!)
                 if (senderKey != nil) {
                     let senderKeyDistributionMessage = try SenderKeyDistributionMessage(data: Data(base64Encoded: senderKey!)!, context: encryptionManager!.signalContext)
                     try groupSesisonBuilder.processSession(with: senderKeyName, senderKeyDistributionMessage: senderKeyDistributionMessage)
@@ -433,7 +439,8 @@ public class SP {
     public func reinitSenderKey(key: Dictionary<String, Any>, signalProtocolAddress: SignalAddress, userId: String, encryptionManager: EncryptionManager) {
         let senderKeyName = SenderKeyName(groupId: key["stickId"] as! String, address: signalProtocolAddress)
         let senderPubKey = Data(base64Encoded: key["public"] as! String)
-        let cipher = decryptTextPairwise(senderId: userId, deviceId: 1, cipher: key["cipher"] as! String, isSelf: true)
+        let cipher = decryptTextPairwise(senderId: userId, deviceId: 1, isStickyKey: true, cipher: key["cipher"] as! String)
+        print("Cipher", cipher)
         let senderPrivKey = Data(base64Encoded: cipher!)
         let signedSenderKey = try! KeyPair(publicKey: senderPubKey!, privateKey: senderPrivKey!)
         let senderKeyRecord = try! SenderKeyRecord(context: encryptionManager.signalContext)
@@ -563,7 +570,7 @@ public class SP {
 
 
     public func decryptFilePairwise(senderId: String, filePath: String, cipher: String, size: NSInteger, outputPath: String) -> String? {
-        let secret = decryptTextPairwise(senderId: senderId, deviceId: 0, cipher: cipher, isSelf: false)
+        let secret = decryptTextPairwise(senderId: senderId, deviceId: 0, isStickyKey: false, cipher: cipher)
         var path: String? = nil
         if (secret != nil) {
             path = decryptMedia(filePath: filePath, secret: secret!, size: size, outputPath: outputPath)

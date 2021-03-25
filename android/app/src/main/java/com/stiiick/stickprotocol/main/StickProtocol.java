@@ -163,7 +163,7 @@ public class StickProtocol {
                 ECPrivateKey sigPrivateKey = Curve.decodePrivatePoint(signedCipher);
                 ECKeyPair sigKeyPair = new ECKeyPair(sigPublicKey, sigPrivateKey);
                 int signedPreKeId = (int) SPKJson.get("id");
-                SignedPreKeyRecord record = new SignedPreKeyRecord(signedPreKeId, System.currentTimeMillis(), sigKeyPair, Base64.decode(SPKJson.getString("signature")));
+                SignedPreKeyRecord record = new SignedPreKeyRecord(signedPreKeId, SPKJson.getLong("timestamp") * 1000, sigKeyPair, Base64.decode(SPKJson.getString("signature")));
                 store.storeSignedPreKey(signedPreKeId, record);
                 if (SPKJson.getBoolean("active")) {
                     Preferences.setActiveSignedPreKeyId(context, signedPreKeId);

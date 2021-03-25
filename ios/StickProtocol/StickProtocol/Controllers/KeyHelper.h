@@ -48,7 +48,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (nullable SignedPreKey*)generateSignedPreKeyWithIdentity:(IdentityKeyPair*)identityKeyPair
                                             signedPreKeyId:(uint32_t)signedPreKeyId;
 
-- (nullable SignedPreKey*)createSignedPreKeyWithKeyId:(uint32_t)keyId keyPair:(KeyPair*)keyPair signature:(NSData*)signature;
+- (nullable SignedPreKey*)createSignedPreKeyWithKeyId:(uint32_t)keyId keyPair:(KeyPair*)keyPair signature:(NSData*)signature timestamp:(uint64_t)timestamp;
 
 - (nullable PreKey*)createPreKeyWithKeyId:(uint32_t)keyId keyPair:(KeyPair*)keyPair;
 
