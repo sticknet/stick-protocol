@@ -39,7 +39,7 @@ class StickProtocol():
                                    cipher=identityKey['cipher'], salt=identityKey['salt'])
         SignedPreKey.objects.create(public=signedPreKey['public'], signature=signedPreKey["signature"],
                                     keyId=signedPreKey['id'], user=user, cipher=signedPreKey['cipher'],
-                                    salt=signedPreKey['salt'], timestamp=signedPreKey['timestamp'], active=True)
+                                    salt=signedPreKey['salt'], unixTimestamp=signedPreKey['timestamp'], active=True)
         for preKey in preKeys:
             PreKey.objects.create(public=preKey['public'], keyId=preKey["id"], user=user, cipher=preKey['cipher'],
                                   salt=preKey['salt'])
@@ -427,12 +427,13 @@ class StickProtocol():
         old_spk.active = False
         old_spk.save()
         SignedPreKey.objects.create(user=user, public=data['public'], signature=data["signature"],
-                                    keyId=data['id'], cipher=data['cipher'], salt=data['salt'], timestamp=data['timestamp'], active=True)
+                                    keyId=data['id'], cipher=data['cipher'], salt=data['salt'], unixTimestamp=data['timestamp'], active=True)
 
     def verify_password_and_get_keys(self, data, user):
         """
         This Login method should be called after the user have verified their phone number and got their LimitedAccessToken.
-        As a 2FA mechanism, the user need to provide their password. If the password is correct, return to the user their keys:
+        As a 2FA mechanism, the user need to provide their password (initial password hash). If the password is correct,
+        return to the user their keys:
             * Identity Key
             * Signed Pre Key
             * Pre Keys
@@ -445,7 +446,7 @@ class StickProtocol():
         # user = self.User.objects.get(phone=data['phone'])
         if user.check_password(data['passwordHash']):  # This will create a "double-hash" and verify it
             identityKey = IdentityKey.objects.get(user=user)
-            signedPreKeysList = SignedPreKey.objects.filter(user=user)
+            signedPreKeysList = SignedPreKey.objects.filter(user=user).order_by('timestamp')
             preKeysList = PreKey.objects.filter(user=user)
             senderKeysList = EncryptingSenderKey.objects.filter(user=user)
             bundle = {
@@ -459,7 +460,7 @@ class StickProtocol():
             signedPreKeys = []
             for spk in signedPreKeysList:
                 key = {'id': spk.keyId, 'public': spk.public, 'cipher': spk.cipher, 'salt': spk.salt,
-                       'signature': spk.signature, 'active': spk.active, 'timestamp': spk.timestamp}
+                       'signature': spk.signature, 'active': spk.active, 'timestamp': spk.unixTimestamp}
                 signedPreKeys.append(key)
             bundle['signedPreKeys'] = signedPreKeys
             preKeys = []

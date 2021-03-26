@@ -85,25 +85,19 @@
     }
     SignalMessage *message = nil;
     PreKeyMessage *preKeyMessage = nil;
-    NSLog(@"DECRYPTING CIPHER TEXT OF TYPE: %ld", (long)ciphertext.type);
     if (ciphertext.type == SignalCiphertextTypePreKeyMessage) {
-        NSLog(@"DECRYPTING CIPHER TEXT OF TYPE PREKEYMESSAGE PRINT");
         preKeyMessage = [[PreKeyMessage alloc] initWithData:ciphertext.data context:_context error:error];
         if (!preKeyMessage) {
-            NSLog(@"RETURNING NIL BECUASE IT IS NOT PREKEY MESSAGE");
             return nil;
         }
     } else if (ciphertext.type == SignalCiphertextTypeMessage) {
-        NSLog(@"DECRYPTING CIPHER TEXT OF TYPE MESSAGE PRINT");
         message = [[SignalMessage alloc] initWithData:ciphertext.data context:_context error:error];
         if (!message) { return nil; }
     } else {
-        NSLog(@"DECRYPTING CIPHER TEXT OF TYPE BRUTE PRINT");
         // Fall back to brute force type detection...
         preKeyMessage = [[PreKeyMessage alloc] initWithData:ciphertext.data context:_context error:error];
         message = [[SignalMessage alloc] initWithData:ciphertext.data context:_context error:error];
         if (!preKeyMessage && !message) {
-            NSLog(@"NOTE PREKEYMESSAGE AND NOT MESSAGE");
             if (error) {
                 if (!*error) {
                     *error = ErrorFromSignalError(SignalErrorInvalidArgument);

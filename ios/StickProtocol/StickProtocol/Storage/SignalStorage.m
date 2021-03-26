@@ -133,8 +133,10 @@ static int remove_pre_key(uint32_t pre_key_id, void *user_data) {
 #pragma mark signal_protocol_signed_pre_key_store
 
 static int load_signed_pre_key(signal_buffer **record, uint32_t signed_pre_key_id, void *user_data) {
+    NSLog(@"LOADING SIGNED PRE KEY %d", signed_pre_key_id);
     id <SignedPreKeyStore> signedPreKeyStore = (__bridge id<SignedPreKeyStore>)(user_data);
     NSData *key = [signedPreKeyStore loadSignedPreKeyWithId:signed_pre_key_id];
+    NSLog(@"SPK DATA %@", key);
     if (!key) {
         return SG_ERR_INVALID_KEY_ID;
     }

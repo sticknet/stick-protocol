@@ -117,9 +117,10 @@ public class StickProtocol {
             IdentityKeyPair identityKey = IdentityKeyUtil.getIdentityKeyPair(context);
             SignedPreKeyRecord signedPreKey = PreKeyUtil.generateSignedPreKey(context, identityKey, true);
 
+            String userId = PreferenceManager.getDefaultSharedPreferences(context).getString("userId", "");
             HashMap<String, String> serviceMap = new HashMap();
             serviceMap.put("service", passwordKey);
-            String password = keychain.getGenericPassword(service, serviceMap);
+            String password = keychain.getGenericPassword(userId, serviceMap);
             JSONObject signedPreKeyJson = new JSONObject();
             signedPreKeyJson.put("id", Preferences.getActiveSignedPreKeyId(context));
             signedPreKeyJson.put("public", Base64.encodeBytes(signedPreKey.getKeyPair().getPublicKey().serialize()));
@@ -144,7 +145,7 @@ public class StickProtocol {
             // Store password in BlockStore/KeyStore
             HashMap<String, String> serviceMap = new HashMap();
             serviceMap.put("service", context.getPackageName());
-            keychain.setGenericPassword(context.getPackageName(), "password", password, serviceMap);
+            keychain.setGenericPassword(bundle.getString("userId"), bundle.getString("userId"), password, serviceMap);
 
             IdentityKey publicKey = new IdentityKey(Base64.decode((String) bundle.get("identityPublic")), 0);
             byte[] identityCipher = pbDecrypt((String) bundle.get("identityCipher"), (String) bundle.get("identitySalt"), password);
@@ -202,17 +203,17 @@ public class StickProtocol {
 
             // KEYS FOR SENDING SELF
             SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress((String) bundle.get("userId"), 1);
-//            for (int i = 0; i < senderKeys.length(); i++) {
-//                JSONObject senderKeyJson = senderKeys.getJSONObject(i);
-//                reinitSenderKey(senderKeyJson, signalProtocolAddress, (String) bundle.get("userId"));
-//                // PROGRESS
-//                if (progressEvent != null) {
-//                    JSONObject event = new JSONObject();
-//                    event.put("progress", signedPreKeys.length() + preKeys.length() + i + 1);
-//                    event.put("total", totalKeys);
-//                    progressEvent.execute(event);
-//                }
-//            }
+            for (int i = 0; i < senderKeys.length(); i++) {
+                JSONObject senderKeyJson = senderKeys.getJSONObject(i);
+                reinitSenderKey(senderKeyJson, signalProtocolAddress, (String) bundle.get("userId"));
+                // PROGRESS
+                if (progressEvent != null) {
+                    JSONObject event = new JSONObject();
+                    event.put("progress", signedPreKeys.length() + preKeys.length() + i + 1);
+                    event.put("total", totalKeys);
+                    progressEvent.execute(event);
+                }
+            }
             PreferenceManager.getDefaultSharedPreferences(context).edit().putString("oneTimeId", oneTimeId).apply();
             PreferenceManager.getDefaultSharedPreferences(context).edit().putString("userId", (String) bundle.get("userId")).apply();
         } catch (Exception e) {
@@ -260,9 +261,10 @@ public class StickProtocol {
 
     public JSONArray generatePreKeys(int nextPreKeyId, int count) {
         try {
+            String userId = PreferenceManager.getDefaultSharedPreferences(context).getString("userId", "");
             HashMap<String, String> serviceMap = new HashMap();
             serviceMap.put("service", passwordKey);
-            String password = keychain.getGenericPassword(service, serviceMap);
+            String password = keychain.getGenericPassword(userId, serviceMap);
             List<PreKeyRecord> preKeys = PreKeyUtil.generatePreKeys(context, nextPreKeyId, count);
             JSONArray preKeysArray = new JSONArray();
             for (int i = 0; i < preKeys.size(); i++) {
@@ -301,17 +303,17 @@ public class StickProtocol {
         return Base64.encodeBytes(passwordHashBytes);
     }
 
-    public String recoverPassword() {
+    public String recoverPassword(String userId) {
         HashMap<String, String> serviceMap = new HashMap();
         serviceMap.put("service", passwordKey);
-        return keychain.getGenericPassword(service, serviceMap);
+        return keychain.getGenericPassword(userId, serviceMap);
     }
 
     public JSONObject initialize(String userId, String password, ProgressEvent progressEvent) {
         try {
             HashMap<String, String> serviceMap = new HashMap();
-            serviceMap.put("service", context.getPackageName());
-            keychain.setGenericPassword(context.getPackageName(), "password", password, serviceMap);
+            serviceMap.put("service", passwordKey);
+            keychain.setGenericPassword(userId, userId, password, serviceMap);
 
             // Generate password salt
             SecureRandom randomSalt = new SecureRandom();

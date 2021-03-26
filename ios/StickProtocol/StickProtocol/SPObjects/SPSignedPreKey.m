@@ -6,13 +6,14 @@
 //  Copyright © 2020 STiiiCK. All rights reserved.
 //
 
+#import <Foundation/Foundation.h>
 #import "SPSignedPreKey.h"
 
 @implementation SPSignedPreKey
 
-- (instancetype) initWithAccountKey:(NSString *)accountKey keyId:(uint32_t)keyId keyData:(NSData *)keyData
-{
-    if (self = [super initWithUniqueId:accountKey]) {
+- (nullable instancetype)initWithAccountKey:(NSString *)accountKey keyId:(uint32_t)keyId keyData:(NSData *)keyData {
+    NSString *yapKey = [[self class] uniqueKeyForAccountKey:accountKey keyId:keyId];
+    if (self = [super initWithUniqueId:yapKey]) {
         self.accountKey = accountKey;
         self.keyId = keyId;
         self.keyData = keyData;
@@ -20,5 +21,9 @@
     return self;
 }
 
-@end
++ (NSString *)uniqueKeyForAccountKey:(NSString *)accountKey keyId:(uint32_t)keyId
+{
+    return [NSString stringWithFormat:@"%@-%d",accountKey,keyId];
+}
 
+@end

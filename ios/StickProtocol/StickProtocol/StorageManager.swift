@@ -169,8 +169,8 @@ extension StorageManager: SignalStore {
         var preKeyData:Data? = nil
         self.databaseConnection.read { (transaction) in
             let yapKey = SPPreKey.uniqueKey(forAccountKey: self.accountKey, keyId: preKeyId)
-            if let signedPreKey = SPPreKey.fetchObject(withUniqueID: yapKey, transaction: transaction) {
-                preKeyData = signedPreKey.keyData
+            if let preKey = SPPreKey.fetchObject(withUniqueID: yapKey, transaction: transaction) {
+                preKeyData = preKey.keyData
             }
         }
         return preKeyData
@@ -209,23 +209,22 @@ extension StorageManager: SignalStore {
     
   //MARK: SignedPreKeyStore
   public func loadSignedPreKey(withId signedPreKeyId: UInt32) -> Data? {
-      var preKeyData:Data? = nil
+    
+      var signedPreKeyData:Data? = nil
       self.databaseConnection.read { (transaction) in
-          if let signedPreKey = SPSignedPreKey.fetchObject(withUniqueID: self.accountKey, transaction: transaction) {
-              preKeyData = signedPreKey.keyData
+        let yapKey = SPSignedPreKey.uniqueKey(forAccountKey: self.accountKey, keyId: signedPreKeyId)
+          if let signedPreKey = SPSignedPreKey.fetchObject(withUniqueID: yapKey, transaction: transaction) {
+              signedPreKeyData = signedPreKey.keyData
           }
       }
-      
-      return preKeyData
+      return signedPreKeyData
   }
     
   public func storeSignedPreKey(_ signedPreKey: Data, signedPreKeyId: UInt32) -> Bool {
       guard let signedPreKeyDatabaseObject = SPSignedPreKey(accountKey: self.accountKey, keyId: signedPreKeyId, keyData: signedPreKey) else {
-            print("SPK NOT SUCCESSFUL")
           return false
       }
       self.databaseConnection.readWrite { (transaction) in
-            print("saving SPK SUCCESSFULLY")
           signedPreKeyDatabaseObject.save(with: transaction)
       }
       return true

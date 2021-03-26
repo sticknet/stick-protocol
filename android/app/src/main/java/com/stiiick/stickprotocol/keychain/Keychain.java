@@ -418,13 +418,8 @@ public class Keychain {
     throws CryptoFailedException, KeyStoreAccessException {
     final String storageName = resultSet.cipherStorageName;
 
-    Log.d("yyy1", alias);
-    Log.d("yyy2", current.getCipherStorageName());
-    Log.d("yyy3", storageName);
-
     // The encrypted data is encrypted using the current CipherStorage, so we just decrypt and return
     if (storageName.equals(current.getCipherStorageName())) {
-      Log.d("DECRYPT HEREX", "XX");
       return decryptToResult(alias, current, resultSet);
     }
 

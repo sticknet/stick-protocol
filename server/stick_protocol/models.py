@@ -38,7 +38,7 @@ class SignedPreKey(models.Model):
     cipher = models.CharField(max_length=88)
     salt = models.CharField(max_length=44)
     active = models.BooleanField(default=False)
-    timestamp = models.CharField(max_length=100)
+    unixTimestamp = models.CharField(max_length=100)
 
     class Meta:
         constraints = [models.UniqueConstraint(fields=['keyId', 'user'], name='unique_signed_prekey')]

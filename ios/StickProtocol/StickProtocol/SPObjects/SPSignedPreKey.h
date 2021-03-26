@@ -17,6 +17,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (nullable instancetype)initWithAccountKey:(NSString *)accountKey keyId:(uint32_t)keyId keyData:(NSData *)keyData;
 
++ (NSString *)uniqueKeyForAccountKey:(NSString *)accountKey keyId:(uint32_t)keyId;
+
+
 @end
 
 NS_ASSUME_NONNULL_END
+
