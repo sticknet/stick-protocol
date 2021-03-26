@@ -24,8 +24,8 @@ import java.io.IOException;
 
 public class IdentityKeyUtil {
 
-    private static final String IDENTITY_PUBLIC_KEY_PREF                    = "pref_identity_public_v3";
-    private static final String IDENTITY_PRIVATE_KEY_PREF                   = "pref_identity_private_v3";
+    private static final String IDENTITY_PUBLIC_KEY_PREF                    = "pref_identity_public";
+    private static final String IDENTITY_PRIVATE_KEY_PREF                   = "pref_identity_private";
 
 
     public static boolean hasIdentityKey(Context context) {

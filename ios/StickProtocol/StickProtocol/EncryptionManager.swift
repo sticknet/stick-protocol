@@ -88,14 +88,14 @@ extension EncryptionManager {
 
 extension EncryptionManager: StorageManagerDelegate {
 
-  public func generateNewIdenityKeyPairForAccountKey(_ accountKey: String) -> SPIdentity {
+  public func generateNewIdentityKeyPairForAccountKey(_ accountKey: String) -> SPIdentity {
     let keyHelper = self.keyHelper()!
     let keyPair = keyHelper.generateIdentityKeyPair()!
     let registrationId = keyHelper.generateRegistrationId()
     return SPIdentity(accountKey: accountKey, identityKeyPair: keyPair, registrationId: UInt32(registrationId))!
   }
 
-  public func saveIdenityKeyPairForAccountKey(_ accountKey: String, keyPair: IdentityKeyPair, regId registrationId: UInt32) -> SPIdentity {
+  public func saveIdentityKeyPairForAccountKey(_ accountKey: String, keyPair: IdentityKeyPair, regId registrationId: UInt32) -> SPIdentity {
     return SPIdentity(accountKey: accountKey, identityKeyPair: keyPair, registrationId: registrationId)!
   }
 }

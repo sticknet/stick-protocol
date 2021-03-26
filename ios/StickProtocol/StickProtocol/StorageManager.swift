@@ -10,8 +10,8 @@ import UIKit
 
 public protocol StorageManagerDelegate: class {
     /** Generate a new account key*/
-    func generateNewIdenityKeyPairForAccountKey(_ accountKey:String) -> SPIdentity
-  func saveIdenityKeyPairForAccountKey(_ accountKey:String, keyPair: IdentityKeyPair, regId: UInt32) -> SPIdentity
+    func generateNewIdentityKeyPairForAccountKey(_ accountKey:String) -> SPIdentity
+  func saveIdentityKeyPairForAccountKey(_ accountKey:String, keyPair: IdentityKeyPair, regId: UInt32) -> SPIdentity
 }
 
 /**
@@ -40,9 +40,9 @@ open class StorageManager: NSObject {
      
      - returns: an SPIdentity that is already saved to the database
      */
-    fileprivate func generateNewIdenityKeyPair() -> SPIdentity {
+    fileprivate func generateNewIdentityKeyPair() -> SPIdentity {
         // Might be a better way to guarantee we have an SPIdentity
-        let identityKeyPair = (self.delegate?.generateNewIdenityKeyPairForAccountKey(self.accountKey))!
+        let identityKeyPair = (self.delegate?.generateNewIdentityKeyPairForAccountKey(self.accountKey))!
         
         self.databaseConnection.readWrite { (transaction) in
             identityKeyPair.save(with: transaction)
@@ -50,9 +50,9 @@ open class StorageManager: NSObject {
         return identityKeyPair
     }
   
-    public func saveIdenityKeyPair(keyPair: IdentityKeyPair, regId: UInt32) -> SPIdentity {
+    public func saveIdentityKeyPair(keyPair: IdentityKeyPair, regId: UInt32) -> SPIdentity {
         // Might be a better way to guarantee we have an OTRIdentity
-        let identityKeyPair = (self.delegate?.saveIdenityKeyPairForAccountKey(self.accountKey, keyPair: keyPair, regId: regId))!
+        let identityKeyPair = (self.delegate?.saveIdentityKeyPairForAccountKey(self.accountKey, keyPair: keyPair, regId: regId))!
 
         self.databaseConnection.readWrite { (transaction) in
             identityKeyPair.save(with: transaction)
@@ -252,7 +252,7 @@ extension StorageManager: SignalStore {
         }
         
         //Generate new identitiy key pair
-        return self.generateNewIdenityKeyPair().identityKeyPair
+        return self.generateNewIdentityKeyPair().identityKeyPair
     }
     
     public func getLocalRegistrationId() -> UInt32 {
@@ -261,7 +261,7 @@ extension StorageManager: SignalStore {
             return result.registrationId;
         } else {
             //Generate new registration ID?
-            return self.generateNewIdenityKeyPair().registrationId
+            return self.generateNewIdentityKeyPair().registrationId
         }
     }
     

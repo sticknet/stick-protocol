@@ -114,7 +114,7 @@ public class SP {
         let publicKey = Data(base64Encoded: bundle["identityPublic"] as! String)
         let privateKey = pbDecrypt(encryptedIvText: bundle["identityCipher"] as! String, salt: bundle["identitySalt"] as! String, pass: password)
         let identityKeyPair = try! IdentityKeyPair(publicKey: publicKey!, privateKey: privateKey)
-        encryptionManager?.storage.saveIdenityKeyPair(keyPair: identityKeyPair, regId: bundle["localId"] as! UInt32)
+        encryptionManager?.storage.saveIdentityKeyPair(keyPair: identityKeyPair, regId: bundle["localId"] as! UInt32)
 
 
         let signedPreKeys = bundle["signedPreKeys"] as! [Dictionary<String, Any>]

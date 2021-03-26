@@ -19,6 +19,7 @@ import com.stiiick.stickprotocol.cipherstream.CipherOutputStreamFactory;
 import com.stiiick.stickprotocol.cipherstream.DigestingOutputStream;
 import com.stiiick.stickprotocol.cipherstream.PaddingInputStream;
 import com.stiiick.stickprotocol.database.DatabaseFactory;
+import com.stiiick.stickprotocol.internal.GroupCipher;
 import com.stiiick.stickprotocol.keychain.Keychain;
 import com.stiiick.stickprotocol.recipient.LiveRecipientCache;
 import com.stiiick.stickprotocol.store.MySenderKeyStore;
@@ -54,7 +55,7 @@ import org.whispersystems.libsignal.ecc.Curve;
 import org.whispersystems.libsignal.ecc.ECKeyPair;
 import org.whispersystems.libsignal.ecc.ECPrivateKey;
 import org.whispersystems.libsignal.ecc.ECPublicKey;
-import org.whispersystems.libsignal.groups.GroupCipher;
+//import org.whispersystems.libsignal.groups.GroupCipher;
 import org.whispersystems.libsignal.groups.GroupSessionBuilder;
 import org.whispersystems.libsignal.groups.SenderKeyName;
 import org.whispersystems.libsignal.groups.state.SenderKeyRecord;
@@ -140,7 +141,7 @@ public class StickProtocol {
 
 
     public void reInit(JSONObject bundle, String password, String oneTimeId, ProgressEvent progressEvent) {
-        //  ** Regenerate previous keys  ** //
+        // ** Regenerate previous keys ** //
         try {
             // Store password in BlockStore/KeyStore
             HashMap<String, String> serviceMap = new HashMap();
@@ -150,9 +151,8 @@ public class StickProtocol {
             IdentityKey publicKey = new IdentityKey(Base64.decode((String) bundle.get("identityPublic")), 0);
             byte[] identityCipher = pbDecrypt((String) bundle.get("identityCipher"), (String) bundle.get("identitySalt"), password);
             ECPrivateKey privateKey = Curve.decodePrivatePoint(identityCipher);
-            IdentityKeyPair identityKeyPair = new IdentityKeyPair(publicKey, privateKey);
-            IdentityKeyUtil.save(context, "pref_identity_public_v3", Base64.encodeBytes(publicKey.serialize()));
-            IdentityKeyUtil.save(context, "pref_identity_private_v3", Base64.encodeBytes(privateKey.serialize()));
+            IdentityKeyUtil.save(context, "pref_identity_public", Base64.encodeBytes(publicKey.serialize()));
+            IdentityKeyUtil.save(context, "pref_identity_private", Base64.encodeBytes(privateKey.serialize()));
             SignalProtocolStore store = new MySignalProtocolStore(context);
 
             JSONArray preKeys = (JSONArray) bundle.get("preKeys");
@@ -219,7 +219,6 @@ public class StickProtocol {
         } catch (Exception e) {
             e.printStackTrace();
         }
-
         // *** //
     }
 
