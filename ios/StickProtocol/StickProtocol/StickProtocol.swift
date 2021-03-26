@@ -175,9 +175,9 @@ public class SP {
         return passwordHash.base64EncodedString()
     }
 
-    public func recoverPassword(userId: String) -> String {
+    public func recoverPassword(userId: String) -> String? {
         let keychain = A0SimpleKeychain(service: self.service!, accessGroup: self.accessGroup!)
-        return keychain.string(forKey: userId + "-password")!
+        return keychain.string(forKey: userId + "-password")
     }
 
     public func refreshSignedPreKey(days: Int) -> [String: Any]? {
@@ -200,7 +200,7 @@ public class SP {
             UserDefaults(suiteName: self.accessGroup!)!.set(UInt64(signedPreKey!.unixTimestamp), forKey: "activeSignedPreKeyTimestamp")
 
             let keychain = A0SimpleKeychain(service: self.service!, accessGroup: self.accessGroup!)
-            let password: String = keychain.string(forKey: userId + "-password")!
+            let password: String = keychain.string(forKey: userId! + "-password")!
             var signedMap = [String: Any]()
             signedMap["id"] = signedPreKey?.preKeyId
             signedMap["public"] = signedPreKey?.keyPair?.publicKey.base64EncodedString()
@@ -481,7 +481,7 @@ public class SP {
     public func generatePreKeys(nextPreKeyId: UInt, count: UInt) -> [[String: Any]] {
         let myId = UserDefaults(suiteName: self.accessGroup!)!.string(forKey: "userId")
         let keychain = A0SimpleKeychain(service: self.service!, accessGroup: self.accessGroup!)
-        let password: String = keychain.string(forKey: myId + "-password")!
+        let password: String = keychain.string(forKey: myId! + "-password")!
         let databaseConnection = self.db!.newConnection()
         let encryptionManager = try? EncryptionManager(accountKey: myId!, databaseConnection: databaseConnection)
         let preKeys = encryptionManager?.generatePreKeys(nextPreKeyId, count: count)
