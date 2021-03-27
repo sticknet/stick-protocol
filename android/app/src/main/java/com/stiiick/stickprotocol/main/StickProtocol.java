@@ -143,6 +143,15 @@ public class StickProtocol {
             IdentityKeyUtil.generateIdentityKeys(context);
             IdentityKeyPair identityKey = store.getIdentityKeyPair();
 
+            int regId = KeyHelper.generateRegistrationId(false);
+//            Preferences.setLocalRegistrationId(context, regId);
+
+//            IdentityKeyUtil.save(context, "pref_identity_public", Base64.encodeBytes(publicKey.serialize()));
+//            IdentityKeyUtil.save(context, "pref_identity_private", Base64.encodeBytes(privateKey.serialize()));
+//            Preferences.setNextIdentityKeyId(context, identityKeyId + 1);
+//            Preferences.setActiveIdentityKeyId(context, identityKeyId);
+//            Preferences.setActiveIdentityKeyTimestamp(context, parseLong(IKJson.getString("timestamp")));
+
             String userId = PreferenceManager.getDefaultSharedPreferences(context).getString("userId", "");
             HashMap<String, String> serviceMap = new HashMap();
             serviceMap.put("service", passwordKey);
@@ -154,7 +163,7 @@ public class StickProtocol {
             identityKeyJson.put("cipher", signedCipherMap.get("cipher"));
             identityKeyJson.put("salt", signedCipherMap.get("salt"));
             identityKeyJson.put("timestamp", Long.toString(Preferences.getActiveIdentityKeyTimestamp(context)));
-            identityKeyJson.put("localId", KeyHelper.generateRegistrationId(false));
+            identityKeyJson.put("localId", regId);
             return identityKeyJson;
         }
         return null;
@@ -437,10 +446,12 @@ public class StickProtocol {
             signedPreKeyJson.put("salt", signedCipherMap.get("salt"));
             signedPreKeyJson.put("timestamp", Long.toString(signedPreKey.getTimestamp()));
 
+            int regId = KeyHelper.generateRegistrationId(false);
+//            Preferences.setLocalRegistrationId(context, regId);
             JSONObject identityKeyJson = new JSONObject();
             identityKeyJson.put("id", Preferences.getActiveIdentityKeyId(context));
             identityKeyJson.put("public", Base64.encodeBytes(identityKey.getPublicKey().serialize()));
-            identityKeyJson.put("localId", KeyHelper.generateRegistrationId(false));
+            identityKeyJson.put("localId", regId);
             HashMap<String, String> identityCipherMap = pbEncrypt(identityKey.getPrivateKey().serialize(), password);
             identityKeyJson.put("cipher", identityCipherMap.get("cipher"));
             identityKeyJson.put("salt", identityCipherMap.get("salt"));
@@ -681,6 +692,10 @@ public class StickProtocol {
 
 
     public String decryptTextPairwise(String senderId, int deviceId, boolean isStickyKey, String cipher) {
+        Log.d("SENDERIDX", senderId);
+        Log.d("DEVICEIDX", Integer.toString(deviceId));
+        Log.d("ISSTICKY", Boolean.toString(isStickyKey));
+        Log.d("CIPHERX", cipher);
         try {
             SignalProtocolStore store = new MySignalProtocolStore(context);
             SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(senderId, deviceId);

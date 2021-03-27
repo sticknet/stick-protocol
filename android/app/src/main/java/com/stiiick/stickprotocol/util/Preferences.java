@@ -50,6 +50,9 @@ public class Preferences {
         return getIntegerPreference(context, LOCAL_REGISTRATION_ID_PREF, 0);
     }
 
+    public static void setLocalRegistrationId(Context context, int registrationId) {
+        setIntegerPrefrence(context, LOCAL_REGISTRATION_ID_PREF, registrationId);
+    }
     private static int getIntegerPreference(Context context, String key, int defaultValue) {
         return PreferenceManager.getDefaultSharedPreferences(context).getInt(key, defaultValue);
     }

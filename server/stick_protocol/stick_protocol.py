@@ -211,10 +211,10 @@ class StickProtocol():
         key = None
         if senderKey:  # If the SenderKey exists, we will return it
             if memberId != user.id:
-                key = {'key': senderKey.key, 'identityKeyId': senderKey.identityKey.id}
+                key = {'key': senderKey.key, 'identityKeyId': senderKey.identityKey.keyId}
             else:
                 key = {'id': senderKey.keyId, 'chainKey': senderKey.chainKey, 'public': senderKey.public,
-                       'cipher': senderKey.cipher, 'step': senderKey.step, 'identityKeyId': senderKey.identityKey.id}
+                       'cipher': senderKey.cipher, 'step': senderKey.step, 'identityKeyId': senderKey.identityKey.keyId}
         # SenderKey does not exist, send a `PendingKey` request to the target user to upload their key,
         # through a realtime database.
         else:
@@ -488,7 +488,7 @@ class StickProtocol():
                 stickId = senderKey.partyId + senderKey.chainId
                 key = {'id': senderKey.keyId, 'chainKey': senderKey.chainKey, 'public': senderKey.public,
                        'cipher': senderKey.cipher, 'stickId': stickId, 'step': senderKey.step,
-                       'identityKeyId': senderKey.identityKey.id}
+                       'identityKeyId': senderKey.identityKey.keyId}
                 senderKeys.append(key)
             bundle['senderKeys'] = senderKeys
             user.oneTimeId = uuid.uuid4()
