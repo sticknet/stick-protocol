@@ -81,33 +81,35 @@ public class MyIdentityKeyStore implements IdentityKeyStore {
                 Log.d("NEW", "Saving new identity...");
                 identityDatabase.saveIdentity(recipient.getId(), identityKey, VerifiedStatus.DEFAULT, true, System.currentTimeMillis(), nonBlockingApproval);
                 return false;
-            }
-
-            if (!identityRecord.get().getIdentityKey().equals(identityKey)) {
-                Log.d("REPLACING", "Replacing existing identity...");
-                VerifiedStatus verifiedStatus;
-
-                if (identityRecord.get().getVerifiedStatus() == VerifiedStatus.VERIFIED ||
-                        identityRecord.get().getVerifiedStatus() == VerifiedStatus.UNVERIFIED)
-                {
-                    verifiedStatus = VerifiedStatus.UNVERIFIED;
-                } else {
-                    verifiedStatus = VerifiedStatus.DEFAULT;
-                }
-
-                identityDatabase.saveIdentity(recipient.getId(), identityKey, verifiedStatus, false, System.currentTimeMillis(), nonBlockingApproval);
-                Log.d("ARHIVINGGG", "ARHIVIING");
-                SessionUtil.archiveSiblingSessions(context, address);
+            } else {
                 return true;
             }
 
-            if (isNonBlockingApprovalRequired(identityRecord.get())) {
-                Log.i("SETTING", "Setting approval status...");
-                identityDatabase.setApproval(recipient.getId(), nonBlockingApproval);
-                return false;
-            }
+//            if (!identityRecord.get().getIdentityKey().equals(identityKey)) {
+//                Log.d("REPLACING", "Replacing existing identity...");
+//                VerifiedStatus verifiedStatus;
+//
+//                if (identityRecord.get().getVerifiedStatus() == VerifiedStatus.VERIFIED ||
+//                        identityRecord.get().getVerifiedStatus() == VerifiedStatus.UNVERIFIED)
+//                {
+//                    verifiedStatus = VerifiedStatus.UNVERIFIED;
+//                } else {
+//                    verifiedStatus = VerifiedStatus.DEFAULT;
+//                }
+//
+//                identityDatabase.saveIdentity(recipient.getId(), identityKey, verifiedStatus, false, System.currentTimeMillis(), nonBlockingApproval);
+//                Log.d("ARHIVINGGG", "ARHIVIING");
+//                SessionUtil.archiveSiblingSessions(context, address);
+//                return true;
+//            }
 
-            return false;
+//            if (isNonBlockingApprovalRequired(identityRecord.get())) {
+//                Log.i("SETTING", "Setting approval status...");
+//                identityDatabase.setApproval(recipient.getId(), nonBlockingApproval);
+//                return false;
+//            }
+
+//            return false;
         }
     }
 
