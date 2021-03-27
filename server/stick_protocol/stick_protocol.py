@@ -47,7 +47,7 @@ class StickProtocol():
         user.passwordSalt = data["passwordSalt"]
         user.set_password(data["passwordHash"])  # This will create a "Double-Hashed" password
         user.oneTimeId = data["oneTimeId"]
-        user.SPID = data['SPID']
+        user.localId = data['localId']
         user.nextPreKeyId = data['nextPreKeyId']
         user.finishedRegistration = True
         user.save()

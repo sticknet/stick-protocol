@@ -433,18 +433,17 @@ public class StickProtocol {
             signedPreKeyJson.put("salt", signedCipherMap.get("salt"));
             signedPreKeyJson.put("timestamp", Long.toString(signedPreKey.getTimestamp()));
 
-            int localId = KeyHelper.generateRegistrationId(false);
-            Preferences.setLocalRegistrationId(context, localId);
             JSONObject identityKeyJson = new JSONObject();
             identityKeyJson.put("id", Preferences.getActiveIdentityKeyId(context));
             identityKeyJson.put("public", Base64.encodeBytes(identityKey.getPublicKey().serialize()));
-            identityKeyJson.put("localId", localId);
             HashMap<String, String> identityCipherMap = pbEncrypt(identityKey.getPrivateKey().serialize(), password);
             identityKeyJson.put("cipher", identityCipherMap.get("cipher"));
             identityKeyJson.put("salt", identityCipherMap.get("salt"));
             identityKeyJson.put("timestamp", Preferences.getActiveIdentityKeyTimestamp(context));
 
             String oneTimeId = UUID.randomUUID().toString();
+            int localId = KeyHelper.generateRegistrationId(false);
+            Preferences.setLocalRegistrationId(context, localId);
             JSONObject map = new JSONObject();
             map.put("identityKey", identityKeyJson);
             map.put("signedPreKey", signedPreKeyJson);
@@ -452,6 +451,8 @@ public class StickProtocol {
             map.put("passwordHash", passwordHash);
             map.put("passwordSalt", Base64.encodeBytes(salt));
             map.put("oneTimeId", oneTimeId);
+            map.put("localId", localId);
+
             PreferenceManager.getDefaultSharedPreferences(context).edit().putString("oneTimeId", oneTimeId).apply();
             PreferenceManager.getDefaultSharedPreferences(context).edit().putString("userId", userId).apply();
 
