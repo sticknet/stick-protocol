@@ -36,8 +36,7 @@ class StickProtocol():
         signedPreKey = data["signedPreKey"]
         preKeys = data["preKeys"]
         IdentityKey.objects.create(keyId=identityKey['id'], public=identityKey['public'],
-                                   localId=identityKey['localId'], user=user,
-                                   cipher=identityKey['cipher'], salt=identityKey['salt'],
+                                   user=user, cipher=identityKey['cipher'], salt=identityKey['salt'],
                                    timestamp=identityKey['timestamp'], active=True)
         SignedPreKey.objects.create(public=signedPreKey['public'], signature=signedPreKey["signature"],
                                     keyId=signedPreKey['id'], user=user, cipher=signedPreKey['cipher'],
@@ -48,6 +47,7 @@ class StickProtocol():
         user.passwordSalt = data["passwordSalt"]
         user.set_password(data["passwordHash"])  # This will create a "Double-Hashed" password
         user.oneTimeId = data["oneTimeId"]
+        user.SPID = data['SPID']
         user.nextPreKeyId = data['nextPreKeyId']
         user.finishedRegistration = True
         user.save()
@@ -79,19 +79,18 @@ class StickProtocol():
         identityKey = IdentityKey.objects.get(user=user, active=True)
         signedPreKey = SignedPreKey.objects.get(user=user, active=True)
         preKey = PreKey.objects.filter(user=user, used=False).first()
-        oneTimeId = user.oneTimeId
         PKB = {
             "identityKey": identityKey.public,
             "identityKeyId": identityKey.keyId,
-            "localId": identityKey.localId,
             "userId": userId,
+            "localId": user.localId,
             "deviceId": deviceId,
             "signedPreKey": signedPreKey.public,
             "signedPreKeyId": signedPreKey.keyId,
             "signature": signedPreKey.signature,
             "preKey": preKey.public,
             "preKeyId": preKey.keyId,
-            "oneTimeId": oneTimeId,
+            "oneTimeId": user.oneTimeId,
             "phone": user.phone
         }
         if not isSticky:
@@ -123,19 +122,19 @@ class StickProtocol():
                 continue
             signedPreKey = SignedPreKey.objects.get(user__id=id, active=True)
             preKey = PreKey.objects.filter(user__id=id, used=False).first()
-            oneTimeId = self.User.objects.get(id=id).oneTimeId
+            user = self.User.objects.get(id=id)
             PKB = {
                 "identityKey": identityKey.public,
                 "identityKeyId": identityKey.keyId,
-                "localId": identityKey.localId,
+                "localId": user.localId,
                 "userId": id,
+                "oneTimeId": user.oneTimeId,
                 "deviceId": 1,
                 "signedPreKey": signedPreKey.public,
                 "signedPreKeyId": signedPreKey.keyId,
                 "signature": signedPreKey.signature,
                 "preKey": preKey.public,
                 "preKeyId": preKey.keyId,
-                "oneTimeId": oneTimeId
             }
             preKey.used = True
             preKey.save()
@@ -444,7 +443,7 @@ class StickProtocol():
         old_ik.save()
         IdentityKey.objects.create(user=user, public=data['public'],
                                    keyId=data['id'], cipher=data['cipher'], salt=data['salt'],
-                                   timestamp=data['timestamp'], localId=data['localId'], active=True)
+                                   timestamp=data['timestamp'], active=True)
 
     def verify_password_and_get_keys(self, data, user):
         """
@@ -465,7 +464,7 @@ class StickProtocol():
             identityKeysList = IdentityKey.objects.filter(user=user)
             preKeysList = PreKey.objects.filter(user=user)
             senderKeysList = EncryptingSenderKey.objects.filter(user=user)
-            bundle = {}
+            bundle = {'localId': user.localId}
             identityKeys = []
             for ik in identityKeysList:
                 key = {'id': ik.keyId, 'public': ik.public, 'cipher': ik.cipher, 'salt': ik.salt, 'active': ik.active,

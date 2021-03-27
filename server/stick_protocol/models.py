@@ -21,7 +21,6 @@ class IdentityKey(models.Model):
     """
     keyId = models.IntegerField()
     public = models.CharField(max_length=44)
-    localId = models.IntegerField()
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='identityKeys')
     cipher = models.CharField(max_length=88)
     salt = models.CharField(max_length=44)

@@ -136,21 +136,12 @@ public class StickProtocol {
     }
 
     public JSONObject refreshIdentityKey(int days) throws Exception {
-        long identityKeyAge = TimeUnit.MINUTES.toMillis(1);
+        long identityKeyAge = TimeUnit.MINUTES.toMillis(1) / 2;
         long activeDuration = System.currentTimeMillis() - Preferences.getActiveIdentityKeyTimestamp(context);
         if (activeDuration > identityKeyAge) {
             SignalProtocolStore store = new MySignalProtocolStore(context);
             IdentityKeyUtil.generateIdentityKeys(context);
             IdentityKeyPair identityKey = store.getIdentityKeyPair();
-
-            int regId = KeyHelper.generateRegistrationId(false);
-//            Preferences.setLocalRegistrationId(context, regId);
-
-//            IdentityKeyUtil.save(context, "pref_identity_public", Base64.encodeBytes(publicKey.serialize()));
-//            IdentityKeyUtil.save(context, "pref_identity_private", Base64.encodeBytes(privateKey.serialize()));
-//            Preferences.setNextIdentityKeyId(context, identityKeyId + 1);
-//            Preferences.setActiveIdentityKeyId(context, identityKeyId);
-//            Preferences.setActiveIdentityKeyTimestamp(context, parseLong(IKJson.getString("timestamp")));
 
             String userId = PreferenceManager.getDefaultSharedPreferences(context).getString("userId", "");
             HashMap<String, String> serviceMap = new HashMap();
@@ -163,7 +154,6 @@ public class StickProtocol {
             identityKeyJson.put("cipher", signedCipherMap.get("cipher"));
             identityKeyJson.put("salt", signedCipherMap.get("salt"));
             identityKeyJson.put("timestamp", Long.toString(Preferences.getActiveIdentityKeyTimestamp(context)));
-            identityKeyJson.put("localId", regId);
             return identityKeyJson;
         }
         return null;
@@ -184,7 +174,7 @@ public class StickProtocol {
 
 
             SignalProtocolStore store = new MySignalProtocolStore(context);
-
+            Preferences.setLocalRegistrationId(context, bundle.getInt("localId"));
             JSONArray preKeys = (JSONArray) bundle.get("preKeys");
             JSONArray senderKeys = (JSONArray) bundle.get("senderKeys");
             JSONArray signedPreKeys = (JSONArray) bundle.get("signedPreKeys");
@@ -201,9 +191,7 @@ public class StickProtocol {
                 int identityKeyId = IKJson.getInt("id");
                 IdentityKeyRecord identityKeyRecord = new IdentityKeyRecord(identityKeyId, parseLong(IKJson.getString("timestamp")), ecKeyPair);
                 DatabaseFactory.getIdentityKeyDatabase(context).insertIdentityKey(identityKeyId, identityKeyRecord);
-                Log.d("SUCCESSFULLY INSERTED IK INTO DB", Integer.toString(identityKeyId));
                 if (IKJson.getBoolean("active")) {
-                    Log.d("SETTING ACTIVE IK", Integer.toString(identityKeyId));
                     IdentityKeyUtil.save(context, "pref_identity_public", Base64.encodeBytes(publicKey.serialize()));
                     IdentityKeyUtil.save(context, "pref_identity_private", Base64.encodeBytes(privateKey.serialize()));
                     Preferences.setNextIdentityKeyId(context, identityKeyId + 1);
@@ -233,6 +221,7 @@ public class StickProtocol {
                 if (SPKJson.getBoolean("active")) {
                     Preferences.setActiveSignedPreKeyId(context, signedPreKeId);
                     Preferences.setActiveSignedPreKeyTimestamp(context, parseLong(SPKJson.getString("timestamp")));
+                    Preferences.setNextSignedPreKeyId(context, signedPreKeId + 1);
                 }
 
                 // PROGRESS
@@ -295,7 +284,6 @@ public class StickProtocol {
         int identityKeyId = senderKey.getInt("identityKeyId");
         // Swap identity key if needed
         if (Preferences.getActiveIdentityKeyId(context) != identityKeyId) {
-            Log.d("SWAPPING IDENTITY KEY reinit", "current: " + Preferences.getActiveIdentityKeyId(context) + " with: " + identityKeyId);
             IdentityKeyRecord identityKeyRecord = DatabaseFactory.getIdentityKeyDatabase(context).getIdentityKey(identityKeyId);
             IdentityKeyUtil.save(context, "pref_identity_public", Base64.encodeBytes(identityKeyRecord.getKeyPair().getPublicKey().serialize()));
             IdentityKeyUtil.save(context, "pref_identity_private", Base64.encodeBytes(identityKeyRecord.getKeyPair().getPrivateKey().serialize()));
@@ -305,7 +293,6 @@ public class StickProtocol {
 
         // Reverse identity key back if was swapped
         if (Preferences.getActiveIdentityKeyId(context) != identityKeyId) {
-            Log.d("SWAPPING back IDENTITY KEY reinit", "current: " + Preferences.getActiveIdentityKeyId(context) + " with: " + identityKeyId);
             IdentityKeyRecord identityKeyRecord = DatabaseFactory.getIdentityKeyDatabase(context).getIdentityKey(Preferences.getActiveIdentityKeyId(context));
             IdentityKeyUtil.save(context, "pref_identity_public", Base64.encodeBytes(identityKeyRecord.getKeyPair().getPublicKey().serialize()));
             IdentityKeyUtil.save(context, "pref_identity_private", Base64.encodeBytes(identityKeyRecord.getKeyPair().getPrivateKey().serialize()));
@@ -446,12 +433,12 @@ public class StickProtocol {
             signedPreKeyJson.put("salt", signedCipherMap.get("salt"));
             signedPreKeyJson.put("timestamp", Long.toString(signedPreKey.getTimestamp()));
 
-            int regId = KeyHelper.generateRegistrationId(false);
-//            Preferences.setLocalRegistrationId(context, regId);
+            int localId = KeyHelper.generateRegistrationId(false);
+            Preferences.setLocalRegistrationId(context, localId);
             JSONObject identityKeyJson = new JSONObject();
             identityKeyJson.put("id", Preferences.getActiveIdentityKeyId(context));
             identityKeyJson.put("public", Base64.encodeBytes(identityKey.getPublicKey().serialize()));
-            identityKeyJson.put("localId", regId);
+            identityKeyJson.put("localId", localId);
             HashMap<String, String> identityCipherMap = pbEncrypt(identityKey.getPrivateKey().serialize(), password);
             identityKeyJson.put("cipher", identityCipherMap.get("cipher"));
             identityKeyJson.put("salt", identityCipherMap.get("salt"));
@@ -635,7 +622,6 @@ public class StickProtocol {
 
                 // Swap identity key if needed
                 if (identityKeyId != -1 && Preferences.getActiveIdentityKeyId(context) != identityKeyId) {
-                    Log.d("SWAPPING IDENTITY KEY", Integer.toString(identityKeyId));
                     IdentityKeyRecord identityKeyRecord = DatabaseFactory.getIdentityKeyDatabase(context).getIdentityKey(identityKeyId);
                     IdentityKeyUtil.save(context, "pref_identity_public", Base64.encodeBytes(identityKeyRecord.getKeyPair().getPublicKey().serialize()));
                     IdentityKeyUtil.save(context, "pref_identity_private", Base64.encodeBytes(identityKeyRecord.getKeyPair().getPrivateKey().serialize()));
@@ -645,7 +631,6 @@ public class StickProtocol {
 
                 // Reverse identity key back if was swapped
                 if (identityKeyId != -1 && Preferences.getActiveIdentityKeyId(context) != identityKeyId) {
-                    Log.d("SWAPPING BACK IDENTITY KEY", Integer.toString(Preferences.getActiveIdentityKeyId(context)));
                     IdentityKeyRecord identityKeyRecord = DatabaseFactory.getIdentityKeyDatabase(context).getIdentityKey(Preferences.getActiveIdentityKeyId(context));
                     IdentityKeyUtil.save(context, "pref_identity_public", Base64.encodeBytes(identityKeyRecord.getKeyPair().getPublicKey().serialize()));
                     IdentityKeyUtil.save(context, "pref_identity_private", Base64.encodeBytes(identityKeyRecord.getKeyPair().getPrivateKey().serialize()));
@@ -692,10 +677,6 @@ public class StickProtocol {
 
 
     public String decryptTextPairwise(String senderId, int deviceId, boolean isStickyKey, String cipher) {
-        Log.d("SENDERIDX", senderId);
-        Log.d("DEVICEIDX", Integer.toString(deviceId));
-        Log.d("ISSTICKY", Boolean.toString(isStickyKey));
-        Log.d("CIPHERX", cipher);
         try {
             SignalProtocolStore store = new MySignalProtocolStore(context);
             SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(senderId, deviceId);
