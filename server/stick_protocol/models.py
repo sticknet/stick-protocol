@@ -19,12 +19,15 @@ class IdentityKey(models.Model):
     """
     A user has one IdentityKey created at registration time
     """
+    keyId = models.IntegerField()
     public = models.CharField(max_length=44)
-    deviceId = models.IntegerField(default=0)
     localId = models.IntegerField()
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='identityKey')
     cipher = models.CharField(max_length=88)
     salt = models.CharField(max_length=44)
+    active = models.BooleanField(default=False)
+    timestamp = models.CharField(max_length=100)
+    dt_timestamp = models.DateTimeField(auto_now_add=True)
 
 
 class SignedPreKey(models.Model):
@@ -38,7 +41,8 @@ class SignedPreKey(models.Model):
     cipher = models.CharField(max_length=88)
     salt = models.CharField(max_length=44)
     active = models.BooleanField(default=False)
-    unixTimestamp = models.CharField(max_length=100)
+    timestamp = models.CharField(max_length=100)
+    dt_timestamp = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         constraints = [models.UniqueConstraint(fields=['keyId', 'user'], name='unique_signed_prekey')]
@@ -46,7 +50,7 @@ class SignedPreKey(models.Model):
 
 class PreKey(models.Model):
     """
-    A user has a bunch of PreKeys created at registration time
+    A user has a list of PreKeys created at registration time
     """
     keyId = models.IntegerField()
     public = models.CharField(max_length=44)
@@ -54,6 +58,7 @@ class PreKey(models.Model):
     used = models.BooleanField(default=False)
     cipher = models.CharField(max_length=88)
     salt = models.CharField(max_length=44)
+    dt_timestamp = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         constraints = [models.UniqueConstraint(fields=['keyId', 'user'], name='unique_prekey')]
@@ -71,7 +76,8 @@ class EncryptingSenderKey(models.Model):
     * The root key of an EncryptingSenderKey chain for a sticky session is called `StickyKey`.
     """
     keyId = models.IntegerField()
-    preKey = models.OneToOneField(PreKey, on_delete=models.CASCADE, related_name='encryptingSenderKey')
+    preKey = models.OneToOneField(PreKey, on_delete=models.CASCADE, related_name='esk_pk')
+    identityKey = models.ForeignKey(IdentityKey, on_delete=models.CASCADE, related_name='esk_ik')
     partyId = models.CharField(max_length=100)
     chainId = models.CharField(max_length=10)
     step = models.IntegerField(default=0)
@@ -100,7 +106,8 @@ class DecryptingSenderKey(models.Model):
     fields.
     """
     key = models.CharField(max_length=500)
-    preKey = models.OneToOneField(PreKey, on_delete=models.CASCADE, related_name='decryptingSenderKey', blank=True, null=True)
+    preKey = models.OneToOneField(PreKey, on_delete=models.CASCADE, related_name='dsk_pk', blank=True, null=True)
+    identityKey = models.ForeignKey(IdentityKey, on_delete=models.CASCADE, related_name='dsk_ik', blank=True, null=True)
     stickId = models.CharField(max_length=100)
     partyId = models.CharField(max_length=100, blank=True, null=True)
     ofUser = models.ForeignKey(User, on_delete=models.CASCADE, related_name='decryptingSenderKeys', null=True)

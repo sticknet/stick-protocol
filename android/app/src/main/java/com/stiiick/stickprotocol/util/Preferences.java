@@ -30,6 +30,10 @@ public class Preferences {
     private static final String ACTIVE_SIGNED_PRE_KEY_TIMESTAMP = "pref_active_signed_pre_key_timestamp";
     private static final String NEXT_SIGNED_PRE_KEY_ID   = "pref_next_signed_pre_key_id";
 
+    private static final String ACTIVE_IDENTITY_KEY_ID = "pref_active_identity_key_id";
+    private static final String ACTIVE_IDENTITY_KEY_TIMESTAMP = "pref_active_identity_key_timestamp";
+    private static final String NEXT_IDENTITY_KEY_ID   = "pref_next_identity_key_id";
+
     public static void setDatabaseEncryptedSecret(@NonNull Context context, @NonNull String secret) {
         setStringPreference(context, DATABASE_ENCRYPTED_SECRET, secret);
     }
@@ -90,6 +94,14 @@ public class Preferences {
         setIntegerPrefrence(context, NEXT_SIGNED_PRE_KEY_ID, value);
     }
 
+    public static int getNextIdentityKeyId(@NonNull Context context) {
+        return getIntegerPreference(context, NEXT_IDENTITY_KEY_ID, 0);
+    }
+
+    public static void setNextIdentityKeyId(@NonNull Context context, int value) {
+        setIntegerPrefrence(context, NEXT_IDENTITY_KEY_ID, value);
+    }
+
     public static int getActiveSignedPreKeyId(@NonNull Context context) {
         return getIntegerPreference(context, ACTIVE_SIGNED_PRE_KEY_ID, -1);
     }
@@ -105,4 +117,21 @@ public class Preferences {
     public static void setActiveSignedPreKeyTimestamp(@NonNull Context context, long value) {
         setLongPrefrence(context, ACTIVE_SIGNED_PRE_KEY_TIMESTAMP, value);;
     }
+
+    public static int getActiveIdentityKeyId(@NonNull Context context) {
+        return getIntegerPreference(context, ACTIVE_IDENTITY_KEY_ID, -1);
+    }
+
+    public static void setActiveIdentityKeyId(@NonNull Context context, int value) {
+        setIntegerPrefrence(context, ACTIVE_IDENTITY_KEY_ID, value);;
+    }
+
+    public static long getActiveIdentityKeyTimestamp(@NonNull Context context) {
+        return getLongPreference(context, ACTIVE_IDENTITY_KEY_TIMESTAMP, 0);
+    }
+
+    public static void setActiveIdentityKeyTimestamp(@NonNull Context context, long value) {
+        setLongPrefrence(context, ACTIVE_IDENTITY_KEY_TIMESTAMP, value);;
+    }
+
 }

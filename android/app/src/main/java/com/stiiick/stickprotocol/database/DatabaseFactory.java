@@ -26,11 +26,13 @@ public class DatabaseFactory {
     private final IdentityDatabase identityDatabase;
     private final OneTimePreKeyDatabase preKeyDatabase;
     private final SignedPreKeyDatabase signedPreKeyDatabase;
+    private final IdentityKeyDatabase identityKeyDatabase;
     private final SessionDatabase sessionDatabase;
     private final RecipientDatabase recipientDatabase;
     private final SenderKeyDatabase senderKeyDatabse;
     private final FileDatabase fileDatabase;
     private final StickyKeyDatabase stickyKeyDatabase;
+
 
 
     public static DatabaseFactory getInstance(Context context) {
@@ -62,6 +64,10 @@ public class DatabaseFactory {
         return getInstance(context).signedPreKeyDatabase;
     }
 
+    public static IdentityKeyDatabase getIdentityKeyDatabase(Context context) {
+        return getInstance(context).identityKeyDatabase;
+    }
+
     public static SessionDatabase getSessionDatabase(Context context) {
         return getInstance(context).sessionDatabase;
     }
@@ -91,6 +97,7 @@ public class DatabaseFactory {
         this.identityDatabase     = new IdentityDatabase(context, databaseHelper);
         this.preKeyDatabase       = new OneTimePreKeyDatabase(context, databaseHelper);
         this.signedPreKeyDatabase = new SignedPreKeyDatabase(context, databaseHelper);
+        this.identityKeyDatabase = new IdentityKeyDatabase(context, databaseHelper);
         this.sessionDatabase      = new SessionDatabase(context, databaseHelper);
         this.recipientDatabase     = new RecipientDatabase(context, databaseHelper);
         this.senderKeyDatabse      = new SenderKeyDatabase(context, databaseHelper);

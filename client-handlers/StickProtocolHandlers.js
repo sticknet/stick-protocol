@@ -107,12 +107,14 @@ export default class StickProtocolHandlers {
             const memberId = users_id[i];
             await this.StickProtocol.initPairwiseSession(bundles[memberId])
             const preKeyId = bundles[memberId].preKeyId
+            const identityKeyId = bundles[memberId].preKeyId
             if (memberId !== this.userId) {
                 const key = await this.StickProtocol.getSenderKey(this.userId, memberId, stickId, true);
-                keys[memberId] = {preKeyId, key, stickId, forUser: memberId}
+                keys[memberId] = {identityKeyId, preKeyId, key, stickId, forUser: memberId}
             } else {
                 let encryptingSenderKey = await this.StickProtocol.getEncryptingSenderKey(this.userId, stickId, true)
                 encryptingSenderKey['preKeyId'] = preKeyId
+                encryptingSenderKey['identityKeyId'] = identityKeyId
                 encryptingSenderKey['stickId'] = stickId
                 keys[memberId] = encryptingSenderKey
             }
@@ -127,7 +129,7 @@ export default class StickProtocolHandlers {
      * The following method is called before trying to decrypt a piece of data to check if there is an initialized sticky
      * session corresponding that data's stickId. If there is no sticky session, it will try to fetch the sender key
      * from the server, and if it succeeds it will initialize the sticky session. This method returns a boolean indicating
-     * whether the decryption can proceed or not.
+     * whether the decryption process can proceed or not.
      */
     async fetchSenderKey(entityId, stickId, memberId, dispatch) {
         let canDecrypt = true
@@ -149,9 +151,9 @@ export default class StickProtocolHandlers {
                 canDecrypt = false
                 await dispatch({type: 'PENDING_SESSION', payload: stickId})
                 dispatch({type: 'DOWNLOADED', payload: entityId});
-            } else { // other initialize the session
+            } else { // otherwise initialize the session
                 if (memberId !== userId)
-                    await this.StickProtocol.initSession(memberId, stickId, response.data.senderKey)
+                    await this.StickProtocol.initSession(memberId, stickId, response.data.senderKey.key, true, response.data.senderKey.identityKeyId)
                 else {
                     response.data.senderKey.stickId = stickId
                     await this.StickProtocol.reinitMyStickySession(response.data.senderKey)

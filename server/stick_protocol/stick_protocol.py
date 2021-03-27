@@ -35,11 +35,13 @@ class StickProtocol():
         identityKey = data["identityKey"]
         signedPreKey = data["signedPreKey"]
         preKeys = data["preKeys"]
-        IdentityKey.objects.create(public=identityKey['public'], localId=identityKey['localId'], deviceId=0, user=user,
-                                   cipher=identityKey['cipher'], salt=identityKey['salt'])
+        IdentityKey.objects.create(keyId=identityKey['id'], public=identityKey['public'],
+                                   localId=identityKey['localId'], user=user,
+                                   cipher=identityKey['cipher'], salt=identityKey['salt'],
+                                   timestamp=identityKey['timestamp'], active=True)
         SignedPreKey.objects.create(public=signedPreKey['public'], signature=signedPreKey["signature"],
                                     keyId=signedPreKey['id'], user=user, cipher=signedPreKey['cipher'],
-                                    salt=signedPreKey['salt'], unixTimestamp=signedPreKey['timestamp'], active=True)
+                                    salt=signedPreKey['salt'], timestamp=signedPreKey['timestamp'], active=True)
         for preKey in preKeys:
             PreKey.objects.create(public=preKey['public'], keyId=preKey["id"], user=user, cipher=preKey['cipher'],
                                   salt=preKey['salt'])
@@ -80,6 +82,7 @@ class StickProtocol():
         oneTimeId = user.oneTimeId
         PKB = {
             "identityKey": identityKey.public,
+            "identityKeyId": identityKey.keyId,
             "localId": identityKey.localId,
             "userId": userId,
             "deviceId": deviceId,
@@ -123,6 +126,7 @@ class StickProtocol():
             oneTimeId = self.User.objects.get(id=id).oneTimeId
             PKB = {
                 "identityKey": identityKey.public,
+                "identityKeyId": identityKey.keyId,
                 "localId": identityKey.localId,
                 "userId": id,
                 "deviceId": 1,
@@ -207,10 +211,10 @@ class StickProtocol():
         key = None
         if senderKey:  # If the SenderKey exists, we will return it
             if memberId != user.id:
-                key = senderKey.key
+                key = {'key': senderKey.key, 'identityKeyId': senderKey.identityKey.id}
             else:
                 key = {'id': senderKey.keyId, 'chainKey': senderKey.chainKey, 'public': senderKey.public,
-                       'cipher': senderKey.cipher, 'step': senderKey.step}
+                       'cipher': senderKey.cipher, 'step': senderKey.step, 'identityKeyId': senderKey.identityKey.id}
         # SenderKey does not exist, send a `PendingKey` request to the target user to upload their key,
         # through a realtime database.
         else:
@@ -391,22 +395,23 @@ class StickProtocol():
         users_id = data['users_id']
         keys = data['keys']
         for id in users_id:
-            data = keys[id]
-            preKey = PreKey.objects.get(keyId=data['preKeyId'], user__id=id)
+            senderKey = keys[id]
+            preKey = PreKey.objects.get(keyId=senderKey['preKeyId'], user__id=id)
+            identityKey = Identity.objects.get(keyId=senderKey['identityKeyId'], user__id=id)
             if id != user.id:  # Other user? Create a DSK
-                forUser = self.User.objects.get(id=data['forUser'])
-                DecryptingSenderKey.objects.create(key=data['key'],
-                                                   stickId=data['stickId'], ofUser=user,
-                                                   preKey=preKey, forUser=forUser)
+                forUser = self.User.objects.get(id=senderKey['forUser'])
+                DecryptingSenderKey.objects.create(key=senderKey['key'],
+                                                   stickId=senderKey['stickId'], ofUser=user,
+                                                   preKey=preKey, identityKey=identityKey, forUser=forUser)
             else:  # Current user? Create an ESK
-                partyId = data['stickId'][:36]
-                chainId = data['stickId'][36:]
-                EncryptingSenderKey.objects.create(keyId=data['id'], preKey=preKey,
+                partyId = senderKey['stickId'][:36]
+                chainId = senderKey['stickId'][36:]
+                EncryptingSenderKey.objects.create(keyId=senderKey['id'], preKey=preKey, identityKey=identityKey,
                                                    partyId=partyId, chainId=chainId,
-                                                   user=user, chainKey=data['chainKey'],
-                                                   public=data['public'],
-                                                   cipher=data['cipher'])
-        if "group_id" in data:
+                                                   user=user, chainKey=senderKey['chainKey'],
+                                                   public=senderKey['public'],
+                                                   cipher=senderKey['cipher'])
+        if "group_id" in data: # TODO: REMOVE FROM HERE MAYBE?
             user.just_added_groups.remove(data["group_id"])
 
     def process_standard_sender_keys(self, data, user):
@@ -427,7 +432,19 @@ class StickProtocol():
         old_spk.active = False
         old_spk.save()
         SignedPreKey.objects.create(user=user, public=data['public'], signature=data["signature"],
-                                    keyId=data['id'], cipher=data['cipher'], salt=data['salt'], unixTimestamp=data['timestamp'], active=True)
+                                    keyId=data['id'], cipher=data['cipher'], salt=data['salt'],
+                                    timestamp=data['timestamp'], active=True)
+
+    def update_active_ik(self, data, user):
+        """
+        This method is used to update the active identity key for a user
+        """
+        old_ik = IdentityKey.objects.get(user=user, active=True)
+        old_ik.active = False
+        old_ik.save()
+        IdentityKey.objects.create(user=user, public=data['public'], signature=data["signature"],
+                                   keyId=data['id'], cipher=data['cipher'], salt=data['salt'],
+                                   timestamp=data['timestamp'], localId=data['localId'], active=True)
 
     def verify_password_and_get_keys(self, data, user):
         """
@@ -445,22 +462,20 @@ class StickProtocol():
         """
         # user = self.User.objects.get(phone=data['phone'])
         if user.check_password(data['passwordHash']):  # This will create a "double-hash" and verify it
-            identityKey = IdentityKey.objects.get(user=user)
-            signedPreKeysList = SignedPreKey.objects.filter(user=user).order_by('timestamp')
+            signedPreKeysList = SignedPreKey.objects.filter(user=user)
+            identityKeysList = IdentityKey.objects.filter(user=user)
             preKeysList = PreKey.objects.filter(user=user)
             senderKeysList = EncryptingSenderKey.objects.filter(user=user)
-            bundle = {
-                "identityPublic": identityKey.public,
-                "identityCipher": identityKey.cipher,
-                "identitySalt": identityKey.salt,
-                "localId": identityKey.localId,
-                "userId": user.id,
-                "deviceId": 0,
-            }
+            identityKeys = []
+            for ik in identityKeysList:
+                key = {'id': ik.keyId, 'public': ik.public, 'cipher': ik.cipher, 'salt': ik.salt, 'active': ik.active,
+                       'timestamp': ik.timestamp}
+                identityKeys.append(key)
+            bundle['identityKeys'] = identityKeys
             signedPreKeys = []
             for spk in signedPreKeysList:
                 key = {'id': spk.keyId, 'public': spk.public, 'cipher': spk.cipher, 'salt': spk.salt,
-                       'signature': spk.signature, 'active': spk.active, 'timestamp': spk.unixTimestamp}
+                       'signature': spk.signature, 'active': spk.active, 'timestamp': spk.timestamp}
                 signedPreKeys.append(key)
             bundle['signedPreKeys'] = signedPreKeys
             preKeys = []
@@ -472,7 +487,7 @@ class StickProtocol():
             for senderKey in senderKeysList:
                 stickId = senderKey.partyId + senderKey.chainId
                 key = {'id': senderKey.keyId, 'chainKey': senderKey.chainKey, 'public': senderKey.public,
-                       'cipher': senderKey.cipher, 'stickId': stickId, 'step': senderKey.step}
+                       'cipher': senderKey.cipher, 'stickId': stickId, 'step': senderKey.step, 'identityKeyId': senderKey.identityKey.id}
                 senderKeys.append(key)
             bundle['senderKeys'] = senderKeys
             user.oneTimeId = uuid.uuid4()
