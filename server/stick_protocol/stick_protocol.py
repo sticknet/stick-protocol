@@ -76,7 +76,7 @@ class StickProtocol():
         deviceId = data['deviceId']
         isSticky = data['isSticky']
         user = self.User.objects.get(id=userId)
-        identityKey = IdentityKey.objects.get(user=user)
+        identityKey = IdentityKey.objects.get(user=user, active=True)
         signedPreKey = SignedPreKey.objects.get(user=user, active=True)
         preKey = PreKey.objects.filter(user=user, used=False).first()
         oneTimeId = user.oneTimeId
@@ -117,7 +117,7 @@ class StickProtocol():
         for id in users_id:
             # If a non-existent user_id was provided, then their id must be removed from the list
             try:
-                identityKey = IdentityKey.objects.get(user__id=id)
+                identityKey = IdentityKey.objects.get(user__id=id, active=True)
             except:
                 toBeRemoved.append(id)
                 continue
@@ -397,7 +397,7 @@ class StickProtocol():
         for id in users_id:
             senderKey = keys[id]
             preKey = PreKey.objects.get(keyId=senderKey['preKeyId'], user__id=id)
-            identityKey = Identity.objects.get(keyId=senderKey['identityKeyId'], user__id=id)
+            identityKey = IdentityKey.objects.get(keyId=senderKey['identityKeyId'], user__id=id)
             if id != user.id:  # Other user? Create a DSK
                 forUser = self.User.objects.get(id=senderKey['forUser'])
                 DecryptingSenderKey.objects.create(key=senderKey['key'],
@@ -411,7 +411,7 @@ class StickProtocol():
                                                    user=user, chainKey=senderKey['chainKey'],
                                                    public=senderKey['public'],
                                                    cipher=senderKey['cipher'])
-        if "group_id" in data: # TODO: REMOVE FROM HERE MAYBE?
+        if "group_id" in data:  # TODO: REMOVE FROM HERE MAYBE?
             user.just_added_groups.remove(data["group_id"])
 
     def process_standard_sender_keys(self, data, user):
@@ -442,7 +442,7 @@ class StickProtocol():
         old_ik = IdentityKey.objects.get(user=user, active=True)
         old_ik.active = False
         old_ik.save()
-        IdentityKey.objects.create(user=user, public=data['public'], signature=data["signature"],
+        IdentityKey.objects.create(user=user, public=data['public'],
                                    keyId=data['id'], cipher=data['cipher'], salt=data['salt'],
                                    timestamp=data['timestamp'], localId=data['localId'], active=True)
 
@@ -451,8 +451,8 @@ class StickProtocol():
         This Login method should be called after the user have verified their phone number and got their LimitedAccessToken.
         As a 2FA mechanism, the user need to provide their password (initial password hash). If the password is correct,
         return to the user their keys:
-            * Identity Key
-            * Signed Pre Key
+            * Identity Keys
+            * Signed Pre Keys
             * Pre Keys
             * Encrypting Sender Keys
         On the client-side, the password will be used to decrypt the private keys of the IdentityKey, SignedPreKey
@@ -460,12 +460,12 @@ class StickProtocol():
         The user will be able to re-establish their pairwise signal sessions. After that, the user can decrypt their ESKs
         as well as any of the DSKs the was sent to them, which they can fetch again from the server as needed.
         """
-        # user = self.User.objects.get(phone=data['phone'])
         if user.check_password(data['passwordHash']):  # This will create a "double-hash" and verify it
             signedPreKeysList = SignedPreKey.objects.filter(user=user)
             identityKeysList = IdentityKey.objects.filter(user=user)
             preKeysList = PreKey.objects.filter(user=user)
             senderKeysList = EncryptingSenderKey.objects.filter(user=user)
+            bundle = {}
             identityKeys = []
             for ik in identityKeysList:
                 key = {'id': ik.keyId, 'public': ik.public, 'cipher': ik.cipher, 'salt': ik.salt, 'active': ik.active,
@@ -487,7 +487,8 @@ class StickProtocol():
             for senderKey in senderKeysList:
                 stickId = senderKey.partyId + senderKey.chainId
                 key = {'id': senderKey.keyId, 'chainKey': senderKey.chainKey, 'public': senderKey.public,
-                       'cipher': senderKey.cipher, 'stickId': stickId, 'step': senderKey.step, 'identityKeyId': senderKey.identityKey.id}
+                       'cipher': senderKey.cipher, 'stickId': stickId, 'step': senderKey.step,
+                       'identityKeyId': senderKey.identityKey.id}
                 senderKeys.append(key)
             bundle['senderKeys'] = senderKeys
             user.oneTimeId = uuid.uuid4()

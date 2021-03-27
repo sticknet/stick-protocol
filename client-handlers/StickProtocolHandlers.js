@@ -107,7 +107,7 @@ export default class StickProtocolHandlers {
             const memberId = users_id[i];
             await this.StickProtocol.initPairwiseSession(bundles[memberId])
             const preKeyId = bundles[memberId].preKeyId
-            const identityKeyId = bundles[memberId].preKeyId
+            const identityKeyId = bundles[memberId].identityKeyId
             if (memberId !== this.userId) {
                 const key = await this.StickProtocol.getSenderKey(this.userId, memberId, stickId, true);
                 keys[memberId] = {identityKeyId, preKeyId, key, stickId, forUser: memberId}
@@ -320,13 +320,24 @@ export default class StickProtocolHandlers {
     }
 
     /**
-     * This function check if the current active signed prekey needs to be updated. It will generate a new
-     * SPK and send to the server if needed.
+     * This function check if the current active signed prekey needs to be updated. If needed, it will generate a new
+     * SPK and send to the server.
      */
     async refreshSignedPreKey() {
         const result = await this.StickProtocol.refreshSignedPreKey()
         if (result) {
             await axios.post(`${this.URL}/api/update-active-spk/`, result, this.httpConfig)
+        }
+    }
+
+     /**
+     * This function check if the current active identity key needs to be updated. If needed, it will generate a new
+     * identity key and send it to the server.
+     */
+    async refreshIdentityKey() {
+        const result = await this.StickProtocol.refreshIdentityKey()
+        if (result) {
+            await axios.post(`${this.URL}/api/update-active-ik/`, result, this.httpConfig)
         }
     }
 

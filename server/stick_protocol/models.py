@@ -22,12 +22,15 @@ class IdentityKey(models.Model):
     keyId = models.IntegerField()
     public = models.CharField(max_length=44)
     localId = models.IntegerField()
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='identityKey')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='identityKeys')
     cipher = models.CharField(max_length=88)
     salt = models.CharField(max_length=44)
     active = models.BooleanField(default=False)
     timestamp = models.CharField(max_length=100)
     dt_timestamp = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        constraints = [models.UniqueConstraint(fields=['keyId', 'user'], name='unique_identity_key')]
 
 
 class SignedPreKey(models.Model):
@@ -37,7 +40,7 @@ class SignedPreKey(models.Model):
     keyId = models.IntegerField()
     public = models.CharField(max_length=44)
     signature = models.CharField(max_length=88)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='signedPreKey')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='signedPreKeys')
     cipher = models.CharField(max_length=88)
     salt = models.CharField(max_length=44)
     active = models.BooleanField(default=False)

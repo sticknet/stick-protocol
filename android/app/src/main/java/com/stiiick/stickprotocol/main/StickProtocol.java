@@ -165,13 +165,13 @@ public class StickProtocol {
     }
 
 
-    public void reInit(JSONObject bundle, String password, String oneTimeId, ProgressEvent progressEvent) {
+    public void reInit(JSONObject bundle, String password, String userId, String oneTimeId, ProgressEvent progressEvent) {
         // ** Regenerate previous keys ** //
         try {
             // Store password in BlockStore/KeyStore
             HashMap<String, String> serviceMap = new HashMap();
             serviceMap.put("service", context.getPackageName());
-            keychain.setGenericPassword(bundle.getString("userId"), bundle.getString("userId"), password, serviceMap);
+            keychain.setGenericPassword(userId, userId, password, serviceMap);
 
 
             SignalProtocolStore store = new MySignalProtocolStore(context);
@@ -254,10 +254,10 @@ public class StickProtocol {
             }
 
             // KEYS FOR SENDING SELF
-            SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress((String) bundle.get("userId"), 1);
+            SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(userId, 1);
             for (int i = 0; i < senderKeys.length(); i++) {
                 JSONObject senderKeyJson = senderKeys.getJSONObject(i);
-                reinitSenderKey(senderKeyJson, signalProtocolAddress, (String) bundle.get("userId"));
+                reinitSenderKey(senderKeyJson, signalProtocolAddress, userId);
 
                 // PROGRESS
                 progress += 1;
@@ -269,7 +269,7 @@ public class StickProtocol {
                 }
             }
             PreferenceManager.getDefaultSharedPreferences(context).edit().putString("oneTimeId", oneTimeId).apply();
-            PreferenceManager.getDefaultSharedPreferences(context).edit().putString("userId", (String) bundle.get("userId")).apply();
+            PreferenceManager.getDefaultSharedPreferences(context).edit().putString("userId", userId).apply();
         } catch (Exception e) {
             e.printStackTrace();
         }
