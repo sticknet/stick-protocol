@@ -358,7 +358,7 @@ public class StickProtocol {
     }
 
     /*
-        This method is used to create the initial password hash, from a provided password and salt, at login
+        This method is used to create the initial password hash using Argon2, from a provided password and salt, at login
      */
     public String createPasswordHash(String password, String salt) throws IOException, Argon2Exception {
         byte[] passwordHashBytes = new Argon2.Builder(Version.V13)
@@ -389,7 +389,7 @@ public class StickProtocol {
             SecureRandom randomSalt = new SecureRandom();
             byte[] salt = new byte[32];
             randomSalt.nextBytes(salt);
-            // Hashing pass
+            // Hashing pass using Argon2
             byte[] passwordHashBytes = new Argon2.Builder(Version.V13)
                     .type(Type.Argon2id)
                     .memoryCostKiB(4 * 1024)
@@ -620,7 +620,7 @@ public class StickProtocol {
                 GroupSessionBuilder groupSessionBuilder = new GroupSessionBuilder(senderKeyStore);
 
                 // Swap identity key if needed
-                if (Preferences.getActiveIdentityKeyId(context) != identityKeyId) {
+                if (identityKeyId != -1 && Preferences.getActiveIdentityKeyId(context) != identityKeyId) {
                     Log.d("SWAPPING IDENTITY KEY", Integer.toString(identityKeyId));
                     IdentityKeyRecord identityKeyRecord = DatabaseFactory.getIdentityKeyDatabase(context).getIdentityKey(identityKeyId);
                     IdentityKeyUtil.save(context, "pref_identity_public", Base64.encodeBytes(identityKeyRecord.getKeyPair().getPublicKey().serialize()));
@@ -630,7 +630,7 @@ public class StickProtocol {
                 String senderKey = decryptTextPairwise(senderId, isSticky ? 1 : 0, true, cipherSenderKey);
 
                 // Reverse identity key back if was swapped
-                if (Preferences.getActiveIdentityKeyId(context) != identityKeyId) {
+                if (identityKeyId != -1 && Preferences.getActiveIdentityKeyId(context) != identityKeyId) {
                     Log.d("SWAPPING BACK IDENTITY KEY", Integer.toString(Preferences.getActiveIdentityKeyId(context)));
                     IdentityKeyRecord identityKeyRecord = DatabaseFactory.getIdentityKeyDatabase(context).getIdentityKey(Preferences.getActiveIdentityKeyId(context));
                     IdentityKeyUtil.save(context, "pref_identity_public", Base64.encodeBytes(identityKeyRecord.getKeyPair().getPublicKey().serialize()));
@@ -835,7 +835,7 @@ public class StickProtocol {
         random.nextBytes(iv);
         IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);
 
-        // Hashing pass
+        // Hashing pass using Argon2
         byte[] hash = new Argon2.Builder(Version.V13)
                 .type(Type.Argon2id)
                 .memoryCostKiB(4 * 1024)
@@ -879,7 +879,7 @@ public class StickProtocol {
         byte[] encryptedBytes = new byte[encryptedSize];
         System.arraycopy(encryptedIvTextBytes, ivSize, encryptedBytes, 0, encryptedSize);
 
-        // Hash pass
+        // Hash pass using Argon2
         byte[] hash = new Argon2.Builder(Version.V13)
                 .type(Type.Argon2id)
                 .memoryCostKiB(4 * 1024)
