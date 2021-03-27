@@ -192,7 +192,9 @@ public class StickProtocol {
                 int identityKeyId = IKJson.getInt("id");
                 IdentityKeyRecord identityKeyRecord = new IdentityKeyRecord(identityKeyId, parseLong(IKJson.getString("timestamp")), ecKeyPair);
                 DatabaseFactory.getIdentityKeyDatabase(context).insertIdentityKey(identityKeyId, identityKeyRecord);
+                Log.d("SUCCESSFULLY INSERTED IK INTO DB", Integer.toString(identityKeyId));
                 if (IKJson.getBoolean("active")) {
+                    Log.d("SETTING ACTIVE IK", Integer.toString(identityKeyId));
                     IdentityKeyUtil.save(context, "pref_identity_public", Base64.encodeBytes(publicKey.serialize()));
                     IdentityKeyUtil.save(context, "pref_identity_private", Base64.encodeBytes(privateKey.serialize()));
                     Preferences.setNextIdentityKeyId(context, identityKeyId + 1);
@@ -284,7 +286,7 @@ public class StickProtocol {
         int identityKeyId = senderKey.getInt("identityKeyId");
         // Swap identity key if needed
         if (Preferences.getActiveIdentityKeyId(context) != identityKeyId) {
-            Log.d("SWAPPING IDENTITY KEY reinit", Integer.toString(identityKeyId));
+            Log.d("SWAPPING IDENTITY KEY reinit", "current: " + Preferences.getActiveIdentityKeyId(context) + " with: " + identityKeyId);
             IdentityKeyRecord identityKeyRecord = DatabaseFactory.getIdentityKeyDatabase(context).getIdentityKey(identityKeyId);
             IdentityKeyUtil.save(context, "pref_identity_public", Base64.encodeBytes(identityKeyRecord.getKeyPair().getPublicKey().serialize()));
             IdentityKeyUtil.save(context, "pref_identity_private", Base64.encodeBytes(identityKeyRecord.getKeyPair().getPrivateKey().serialize()));
@@ -294,6 +296,7 @@ public class StickProtocol {
 
         // Reverse identity key back if was swapped
         if (Preferences.getActiveIdentityKeyId(context) != identityKeyId) {
+            Log.d("SWAPPING back IDENTITY KEY reinit", "current: " + Preferences.getActiveIdentityKeyId(context) + " with: " + identityKeyId);
             IdentityKeyRecord identityKeyRecord = DatabaseFactory.getIdentityKeyDatabase(context).getIdentityKey(Preferences.getActiveIdentityKeyId(context));
             IdentityKeyUtil.save(context, "pref_identity_public", Base64.encodeBytes(identityKeyRecord.getKeyPair().getPublicKey().serialize()));
             IdentityKeyUtil.save(context, "pref_identity_private", Base64.encodeBytes(identityKeyRecord.getKeyPair().getPrivateKey().serialize()));
