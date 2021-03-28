@@ -25,14 +25,14 @@ import org.whispersystems.libsignal.state.SignedPreKeyStore;
 
 import java.util.List;
 
-public class MySignalProtocolStore implements SignalProtocolStore {
+public class MyProtocolStore implements SignalProtocolStore {
 
     private final PreKeyStore       preKeyStore;
     private final SignedPreKeyStore signedPreKeyStore;
     private final IdentityKeyStore  identityKeyStore;
     private final SessionStore      sessionStore;
 
-    public MySignalProtocolStore(Context context) {
+    public MyProtocolStore(Context context) {
         this.preKeyStore       = new MyPreKeyStore(context);
         this.signedPreKeyStore = new MyPreKeyStore(context);
         this.identityKeyStore  = new MyIdentityKeyStore(context);

@@ -39,6 +39,7 @@ FOUNDATION_EXPORT const unsigned char StickProtocolVersionString[];
 #import "SignalStorage.h"
 #import "SignalError.h"
 #import "SPIdentity.h"
+#import "SPIdentityKey.h"
 #import "SPPreKey.h"
 #import "SignedPreKey.h"
 #import "SPSignalSession.h"

@@ -6,18 +6,18 @@
 //  Copyright © 2020 STiiiCK. All rights reserved.
 //
 
-#import "SPObject.h"
+#import "YapDatabaseObject.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface SPPreKey : SPObject
+@interface SPPreKey : YapDatabaseObject
 
 @property (nonatomic) uint32_t keyId;
 @property (nonatomic, strong, nullable) NSData *keyData;
 
-- (nullable instancetype)initWithAccountKey:(NSString *)accountKey keyId:(uint32_t)keyId keyData:(nullable NSData *)keyData;
+- (nullable instancetype)initWithKeyId:(uint32_t)keyId keyData:(nullable NSData *)keyData;
 
-+ (NSString *)uniqueKeyForAccountKey:(NSString *)accountKey keyId:(uint32_t)keyId;
++ (NSString *)uniqueKeyForKeyId:(uint32_t)keyId;
 
 @end
 

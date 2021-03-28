@@ -8,19 +8,33 @@
 
 
 
+//#import "SPIdentity.h"
+//
+//@implementation SPIdentity
+//
+//- (nullable instancetype)initWithKeyId:(uint32_t)keyId timestamp:(int64_t)timestamp identityKeyPair:(IdentityKeyPair *)identityKeyPair
+//{
+//    self.keyId = keyId;
+//    self.timestamp = timestamp;
+//    self.identityKeyPair = identityKeyPair;
+//    return self;
+//}
+//
+//@end
+//
+
+
 #import "SPIdentity.h"
 
 @implementation SPIdentity
 
-- (nullable instancetype)initWithAccountKey:(NSString *)accountKey identityKeyPair:(IdentityKeyPair *)identityKeyPair registrationId:(uint32_t)registrationId
+- (nullable instancetype)initWithUserId:(NSString *)userId identityKeyPair:(IdentityKeyPair *)identityKeyPair
 {
-    if (self = [super initWithUniqueId:accountKey]) {
-        self.accountKey = accountKey;
+    if (self = [super initWithUniqueId:userId]) {
+        self.userId = userId;
         self.identityKeyPair = identityKeyPair;
-        self.registrationId = registrationId;
     }
     return self;
 }
 
 @end
-

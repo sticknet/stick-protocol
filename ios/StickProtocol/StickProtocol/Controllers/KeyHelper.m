@@ -50,7 +50,6 @@
 - (NSArray<PreKey*>*)generatePreKeysWithStartingPreKeyId:(NSUInteger)startingPreKeyId
                                                    count:(NSUInteger)count {
     signal_protocol_key_helper_pre_key_list_node *head = NULL;
-  NSLog(@"STARTINGXXX %lu", (unsigned long)startingPreKeyId);
     int result = signal_protocol_key_helper_generate_pre_keys(&head, (unsigned int)startingPreKeyId, (unsigned int)count, _context.context);
     if (!head || result < 0) {
         return @[];

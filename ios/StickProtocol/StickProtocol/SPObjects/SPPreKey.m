@@ -11,19 +11,18 @@
 
 @implementation SPPreKey
 
-- (nullable instancetype)initWithAccountKey:(NSString *)accountKey keyId:(uint32_t)keyId keyData:(NSData *)keyData {
-    NSString *yapKey = [[self class] uniqueKeyForAccountKey:accountKey keyId:keyId];
+- (nullable instancetype)initWithKeyId:(uint32_t)keyId keyData:(NSData *)keyData {
+    NSString *yapKey = [[self class] uniqueKeyForKeyId:keyId];
     if (self = [super initWithUniqueId:yapKey]) {
-        self.accountKey = accountKey;
         self.keyId = keyId;
         self.keyData = keyData;
     }
     return self;
 }
 
-+ (NSString *)uniqueKeyForAccountKey:(NSString *)accountKey keyId:(uint32_t)keyId
++ (NSString *)uniqueKeyForKeyId:(uint32_t)keyId
 {
-    return [NSString stringWithFormat:@"%@-%d",accountKey,keyId];
+    return [NSString stringWithFormat:@"%d",keyId];
 }
 
 @end

@@ -10,11 +10,10 @@
 
 @implementation SPSignalSession
 
-- (nullable instancetype)initWithAccountKey:(NSString *)accountKey name:(NSString *)name deviceId:(int32_t)deviceId sessionData:(NSData *)sessionData
+- (nullable instancetype)initWithName:(NSString *)name deviceId:(int32_t)deviceId sessionData:(NSData *)sessionData
 {
-    NSString *yapKey = [[self class] uniqueKeyForAccountKey:accountKey name:name deviceId:deviceId];
+    NSString *yapKey = [[self class] uniqueKeyForName:name deviceId:deviceId];
     if (self = [super initWithUniqueId:yapKey] ) {
-        self.accountKey = accountKey;
         self.name = name;
         self.deviceId = deviceId;
         self.sessionData = sessionData;
@@ -22,9 +21,9 @@
     return self;
 }
 
-+ (NSString *)uniqueKeyForAccountKey:(NSString *)accountKey name:(NSString *)name deviceId:(int32_t)deviceId
++ (NSString *)uniqueKeyForName:(NSString *)name deviceId:(int32_t)deviceId
 {
-    return [NSString stringWithFormat:@"%@-%@-%d",accountKey,name,deviceId];
+    return [NSString stringWithFormat:@"%@-%d",name,deviceId];
 }
 
 @end

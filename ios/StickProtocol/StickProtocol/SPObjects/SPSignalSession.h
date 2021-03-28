@@ -6,19 +6,19 @@
 //  Copyright © 2020 STiiiCK. All rights reserved.
 //
 
-#import "SPObject.h"
+#import "YapDatabaseObject.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
-@interface SPSignalSession : SPObject
+@interface SPSignalSession : YapDatabaseObject
 
 @property (nonatomic, strong) NSString * name;
 @property (nonatomic) int32_t deviceId;
 @property (nonatomic, strong) NSData *sessionData;
 
-- (nullable instancetype)initWithAccountKey:(NSString *)accountKey name:(NSString *)name deviceId:(int32_t)deviceId sessionData:(NSData *)sessionData;
+- (nullable instancetype)initWithName:(NSString *)name deviceId:(int32_t)deviceId sessionData:(NSData *)sessionData;
 
-+ (NSString *)uniqueKeyForAccountKey:(NSString *)accountKey name:(NSString *)name deviceId:(int32_t)deviceId;
++ (NSString *)uniqueKeyForName:(NSString *)name deviceId:(int32_t)deviceId;
 
 @end
 

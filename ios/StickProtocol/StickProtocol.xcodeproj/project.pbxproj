@@ -17,7 +17,6 @@
 		071017D7260741D900CD0E47 /* SPSenderKey.h in Headers */ = {isa = PBXBuildFile; fileRef = 07101769260741D900CD0E47 /* SPSenderKey.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		071017D8260741D900CD0E47 /* YapDatabaseObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 0710176A260741D900CD0E47 /* YapDatabaseObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		071017D9260741D900CD0E47 /* SPSignedPreKey.h in Headers */ = {isa = PBXBuildFile; fileRef = 0710176B260741D900CD0E47 /* SPSignedPreKey.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		071017DA260741D900CD0E47 /* SPObject.h in Headers */ = {isa = PBXBuildFile; fileRef = 0710176C260741D900CD0E47 /* SPObject.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		071017DB260741D900CD0E47 /* SPSignalSession.h in Headers */ = {isa = PBXBuildFile; fileRef = 0710176D260741D900CD0E47 /* SPSignalSession.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		071017DC260741D900CD0E47 /* SPIdentity.m in Sources */ = {isa = PBXBuildFile; fileRef = 0710176E260741D900CD0E47 /* SPIdentity.m */; };
 		071017DD260741D900CD0E47 /* SPIdentity.m in Sources */ = {isa = PBXBuildFile; fileRef = 0710176E260741D900CD0E47 /* SPIdentity.m */; };
@@ -26,8 +25,6 @@
 		071017E0260741D900CD0E47 /* YapDatabaseObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 07101770260741D900CD0E47 /* YapDatabaseObject.m */; };
 		071017E1260741D900CD0E47 /* SPSenderKey.m in Sources */ = {isa = PBXBuildFile; fileRef = 07101771260741D900CD0E47 /* SPSenderKey.m */; };
 		071017E2260741D900CD0E47 /* SPSenderKey.m in Sources */ = {isa = PBXBuildFile; fileRef = 07101771260741D900CD0E47 /* SPSenderKey.m */; };
-		071017E3260741D900CD0E47 /* SPObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 07101772260741D900CD0E47 /* SPObject.m */; };
-		071017E4260741D900CD0E47 /* SPObject.m in Sources */ = {isa = PBXBuildFile; fileRef = 07101772260741D900CD0E47 /* SPObject.m */; };
 		071017E5260741D900CD0E47 /* SPSignalSession.m in Sources */ = {isa = PBXBuildFile; fileRef = 07101773260741D900CD0E47 /* SPSignalSession.m */; };
 		071017E6260741D900CD0E47 /* SPSignalSession.m in Sources */ = {isa = PBXBuildFile; fileRef = 07101773260741D900CD0E47 /* SPSignalSession.m */; };
 		071017E7260741D900CD0E47 /* SPSignedPreKey.m in Sources */ = {isa = PBXBuildFile; fileRef = 07101774260741D900CD0E47 /* SPSignedPreKey.m */; };
@@ -144,6 +141,8 @@
 		0710185D260741D900CD0E47 /* SignalError.m in Sources */ = {isa = PBXBuildFile; fileRef = 071017CE260741D900CD0E47 /* SignalError.m */; };
 		0710185E260741D900CD0E47 /* SignalError.h in Headers */ = {isa = PBXBuildFile; fileRef = 071017CF260741D900CD0E47 /* SignalError.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		071018862607452D00CD0E47 /* StickProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 071018852607452D00CD0E47 /* StickProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		07BBB3CE261056C400B14508 /* SPIdentityKey.m in Sources */ = {isa = PBXBuildFile; fileRef = 07BBB3CD261056C400B14508 /* SPIdentityKey.m */; };
+		07BBB3E026105F4D00B14508 /* SPIdentityKey.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BBB3D1261056D400B14508 /* SPIdentityKey.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		2D83A34A2138A63D53634E4C /* libPods-StickProtocol-StickProtocolTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A0FA4D9B910C349B6BB82BE5 /* libPods-StickProtocol-StickProtocolTests.a */; };
 		53ADF596B33CABEA0811CB57 /* libPods-StickProtocol.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 90A6DF9FEE0A5CA3DF96A99B /* libPods-StickProtocol.a */; };
 /* End PBXBuildFile section */
@@ -169,13 +168,11 @@
 		07101769260741D900CD0E47 /* SPSenderKey.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPSenderKey.h; sourceTree = "<group>"; };
 		0710176A260741D900CD0E47 /* YapDatabaseObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YapDatabaseObject.h; sourceTree = "<group>"; };
 		0710176B260741D900CD0E47 /* SPSignedPreKey.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPSignedPreKey.h; sourceTree = "<group>"; };
-		0710176C260741D900CD0E47 /* SPObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPObject.h; sourceTree = "<group>"; };
 		0710176D260741D900CD0E47 /* SPSignalSession.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPSignalSession.h; sourceTree = "<group>"; };
 		0710176E260741D900CD0E47 /* SPIdentity.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SPIdentity.m; sourceTree = "<group>"; };
 		0710176F260741D900CD0E47 /* SPPreKey.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPPreKey.h; sourceTree = "<group>"; };
 		07101770260741D900CD0E47 /* YapDatabaseObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = YapDatabaseObject.m; sourceTree = "<group>"; };
 		07101771260741D900CD0E47 /* SPSenderKey.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SPSenderKey.m; sourceTree = "<group>"; };
-		07101772260741D900CD0E47 /* SPObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SPObject.m; sourceTree = "<group>"; };
 		07101773260741D900CD0E47 /* SPSignalSession.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SPSignalSession.m; sourceTree = "<group>"; };
 		07101774260741D900CD0E47 /* SPSignedPreKey.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SPSignedPreKey.m; sourceTree = "<group>"; };
 		07101776260741D900CD0E47 /* CommonCryptoProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CommonCryptoProvider.m; sourceTree = "<group>"; };
@@ -263,6 +260,8 @@
 		071018A22607465E00CD0E47 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		0710269C2607BCF800CD0E47 /* CocoaLumberjack.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = CocoaLumberjack.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		071026A32607BD2000CD0E47 /* CocoaLumberjack.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = CocoaLumberjack.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		07BBB3CD261056C400B14508 /* SPIdentityKey.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SPIdentityKey.m; sourceTree = "<group>"; };
+		07BBB3D1261056D400B14508 /* SPIdentityKey.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SPIdentityKey.h; sourceTree = "<group>"; };
 		480B013D7D38AF279D597F4E /* Pods-StickProtocol.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StickProtocol.debug.xcconfig"; path = "Target Support Files/Pods-StickProtocol/Pods-StickProtocol.debug.xcconfig"; sourceTree = "<group>"; };
 		52665AA51DCE22BE382488C8 /* Pods-StickProtocol-StickProtocolTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StickProtocol-StickProtocolTests.debug.xcconfig"; path = "Target Support Files/Pods-StickProtocol-StickProtocolTests/Pods-StickProtocol-StickProtocolTests.debug.xcconfig"; sourceTree = "<group>"; };
 		6B35F7AC4594F4E0AADA3578 /* Pods-StickProtocol.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StickProtocol.release.xcconfig"; path = "Target Support Files/Pods-StickProtocol/Pods-StickProtocol.release.xcconfig"; sourceTree = "<group>"; };
@@ -344,19 +343,19 @@
 			isa = PBXGroup;
 			children = (
 				07101768260741D900CD0E47 /* SPIdentity.h */,
+				0710176E260741D900CD0E47 /* SPIdentity.m */,
 				07101769260741D900CD0E47 /* SPSenderKey.h */,
 				0710176A260741D900CD0E47 /* YapDatabaseObject.h */,
-				0710176C260741D900CD0E47 /* SPObject.h */,
 				0710176D260741D900CD0E47 /* SPSignalSession.h */,
-				0710176E260741D900CD0E47 /* SPIdentity.m */,
 				07101770260741D900CD0E47 /* YapDatabaseObject.m */,
 				07101771260741D900CD0E47 /* SPSenderKey.m */,
-				07101772260741D900CD0E47 /* SPObject.m */,
 				07101773260741D900CD0E47 /* SPSignalSession.m */,
 				0710176F260741D900CD0E47 /* SPPreKey.h */,
 				0710176B260741D900CD0E47 /* SPSignedPreKey.h */,
 				07101767260741D900CD0E47 /* SPPreKey.m */,
 				07101774260741D900CD0E47 /* SPSignedPreKey.m */,
+				07BBB3CD261056C400B14508 /* SPIdentityKey.m */,
+				07BBB3D1261056D400B14508 /* SPIdentityKey.h */,
 			);
 			path = SPObjects;
 			sourceTree = "<group>";
@@ -536,7 +535,6 @@
 				071017DE260741D900CD0E47 /* SPPreKey.h in Headers */,
 				0710181F260741D900CD0E47 /* SenderKeyRecord.h in Headers */,
 				07101859260741D900CD0E47 /* SPAsserts.h in Headers */,
-				071017DA260741D900CD0E47 /* SPObject.h in Headers */,
 				071017D9260741D900CD0E47 /* SPSignedPreKey.h in Headers */,
 				07101806260741D900CD0E47 /* SenderKeyName.h in Headers */,
 				07101809260741D900CD0E47 /* SignedPreKey.h in Headers */,
@@ -550,6 +548,7 @@
 				0710182D260741D900CD0E47 /* SignalStorage.h in Headers */,
 				0710181E260741D900CD0E47 /* PreKeyMessage.h in Headers */,
 				07101839260741D900CD0E47 /* SessionCipher.h in Headers */,
+				07BBB3E026105F4D00B14508 /* SPIdentityKey.h in Headers */,
 				071017EB260741D900CD0E47 /* CommonCryptoProvider.h in Headers */,
 				071017F2260741D900CD0E47 /* IdentityKeyPair.h in Headers */,
 				071017F7260741D900CD0E47 /* SenderKeyState.h in Headers */,
@@ -768,10 +767,10 @@
 				071017DF260741D900CD0E47 /* YapDatabaseObject.m in Sources */,
 				0710185C260741D900CD0E47 /* SignalError.m in Sources */,
 				07101852260741D900CD0E47 /* FileCrypto.m in Sources */,
+				07BBB3CE261056C400B14508 /* SPIdentityKey.m in Sources */,
 				071017E7260741D900CD0E47 /* SPSignedPreKey.m in Sources */,
 				0710185A260741D900CD0E47 /* CryptoError.m in Sources */,
 				071017F5260741D900CD0E47 /* SenderKeyMessage.m in Sources */,
-				071017E3260741D900CD0E47 /* SPObject.m in Sources */,
 				0710180C260741D900CD0E47 /* IdentityKeyPair.m in Sources */,
 				07101816260741D900CD0E47 /* KeyPair.m in Sources */,
 				071017E9260741D900CD0E47 /* CommonCryptoProvider.m in Sources */,
@@ -820,7 +819,6 @@
 				0710184D260741D900CD0E47 /* SPLogs.m in Sources */,
 				071017D1260741D900CD0E47 /* StorageManager.swift in Sources */,
 				071017E2260741D900CD0E47 /* SPSenderKey.m in Sources */,
-				071017E4260741D900CD0E47 /* SPObject.m in Sources */,
 				07101817260741D900CD0E47 /* KeyPair.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

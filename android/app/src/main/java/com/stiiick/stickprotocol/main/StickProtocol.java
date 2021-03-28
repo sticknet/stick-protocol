@@ -23,10 +23,9 @@ import com.stiiick.stickprotocol.database.IdentityKeyRecord;
 import com.stiiick.stickprotocol.keychain.Keychain;
 import com.stiiick.stickprotocol.recipient.LiveRecipientCache;
 import com.stiiick.stickprotocol.store.MySenderKeyStore;
-import com.stiiick.stickprotocol.store.MySignalProtocolStore;
+import com.stiiick.stickprotocol.store.MyProtocolStore;
 import com.stiiick.stickprotocol.util.Base64;
 import com.stiiick.stickprotocol.util.IdentityKeyUtil;
-import com.stiiick.stickprotocol.util.Log;
 import com.stiiick.stickprotocol.util.PreKeyUtil;
 import com.stiiick.stickprotocol.util.Preferences;
 import com.stiiick.stickprotocol.util.Util;
@@ -139,7 +138,7 @@ public class StickProtocol {
         long identityKeyAge = TimeUnit.MINUTES.toMillis(1) / 2;
         long activeDuration = System.currentTimeMillis() - Preferences.getActiveIdentityKeyTimestamp(context);
         if (activeDuration > identityKeyAge) {
-            SignalProtocolStore store = new MySignalProtocolStore(context);
+            SignalProtocolStore store = new MyProtocolStore(context);
             IdentityKeyUtil.generateIdentityKeys(context);
             IdentityKeyPair identityKey = store.getIdentityKeyPair();
 
@@ -167,13 +166,15 @@ public class StickProtocol {
     public void reInit(JSONObject bundle, String password, String userId, String oneTimeId, ProgressEvent progressEvent) {
         // ** Regenerate previous keys ** //
         try {
+            PreferenceManager.getDefaultSharedPreferences(context).edit().putString("oneTimeId", oneTimeId).apply();
+            PreferenceManager.getDefaultSharedPreferences(context).edit().putString("userId", userId).apply();
             // Store password in BlockStore/KeyStore
             HashMap<String, String> serviceMap = new HashMap();
             serviceMap.put("service", context.getPackageName());
             keychain.setGenericPassword(userId, userId, password, serviceMap);
 
 
-            SignalProtocolStore store = new MySignalProtocolStore(context);
+            SignalProtocolStore store = new MyProtocolStore(context);
             Preferences.setLocalRegistrationId(context, bundle.getInt("localId"));
             JSONArray preKeys = (JSONArray) bundle.get("preKeys");
             JSONArray senderKeys = (JSONArray) bundle.get("senderKeys");
@@ -268,12 +269,28 @@ public class StickProtocol {
                     progressEvent.execute(event);
                 }
             }
-            PreferenceManager.getDefaultSharedPreferences(context).edit().putString("oneTimeId", oneTimeId).apply();
-            PreferenceManager.getDefaultSharedPreferences(context).edit().putString("userId", userId).apply();
         } catch (Exception e) {
             e.printStackTrace();
         }
         // *** //
+    }
+
+    public String decryptStickyKey(String senderId, String cipher, int identityKeyId) {
+        int activeIdentityKeyId = Preferences.getActiveIdentityKeyId(context);
+        // Swap identity key if needed
+        if (activeIdentityKeyId != identityKeyId) {
+            IdentityKeyRecord identityKeyRecord = DatabaseFactory.getIdentityKeyDatabase(context).getIdentityKey(identityKeyId);
+            IdentityKeyUtil.save(context, "pref_identity_public", Base64.encodeBytes(identityKeyRecord.getKeyPair().getPublicKey().serialize()));
+            IdentityKeyUtil.save(context, "pref_identity_private", Base64.encodeBytes(identityKeyRecord.getKeyPair().getPrivateKey().serialize()));
+        }
+        String key = decryptTextPairwise(senderId, 1, true, cipher);
+        // Reverse identity key back if was swapped
+        if (activeIdentityKeyId != identityKeyId) {
+            IdentityKeyRecord identityKeyRecord = DatabaseFactory.getIdentityKeyDatabase(context).getIdentityKey(Preferences.getActiveIdentityKeyId(context));
+            IdentityKeyUtil.save(context, "pref_identity_public", Base64.encodeBytes(identityKeyRecord.getKeyPair().getPublicKey().serialize()));
+            IdentityKeyUtil.save(context, "pref_identity_private", Base64.encodeBytes(identityKeyRecord.getKeyPair().getPrivateKey().serialize()));
+        }
+        return key;
     }
 
     public void reinitSenderKey(JSONObject senderKey, SignalProtocolAddress signalProtocolAddress, String userId) throws IOException, InvalidKeyException, NoSessionException, JSONException {
@@ -281,24 +298,8 @@ public class StickProtocol {
         SenderKeyStore senderKeyStore = new MySenderKeyStore(context);
         SenderKeyRecord senderKeyRecord = senderKeyStore.loadSenderKey(senderKeyName);
         ECPublicKey senderPubKey = Curve.decodePoint(Base64.decode(senderKey.getString("public")), 0);
-        int identityKeyId = senderKey.getInt("identityKeyId");
-        // Swap identity key if needed
-        if (Preferences.getActiveIdentityKeyId(context) != identityKeyId) {
-            IdentityKeyRecord identityKeyRecord = DatabaseFactory.getIdentityKeyDatabase(context).getIdentityKey(identityKeyId);
-            IdentityKeyUtil.save(context, "pref_identity_public", Base64.encodeBytes(identityKeyRecord.getKeyPair().getPublicKey().serialize()));
-            IdentityKeyUtil.save(context, "pref_identity_private", Base64.encodeBytes(identityKeyRecord.getKeyPair().getPrivateKey().serialize()));
-        }
-
-        String cipher = decryptTextPairwise(userId, 1, true, senderKey.getString("cipher"));
-
-        // Reverse identity key back if was swapped
-        if (Preferences.getActiveIdentityKeyId(context) != identityKeyId) {
-            IdentityKeyRecord identityKeyRecord = DatabaseFactory.getIdentityKeyDatabase(context).getIdentityKey(Preferences.getActiveIdentityKeyId(context));
-            IdentityKeyUtil.save(context, "pref_identity_public", Base64.encodeBytes(identityKeyRecord.getKeyPair().getPublicKey().serialize()));
-            IdentityKeyUtil.save(context, "pref_identity_private", Base64.encodeBytes(identityKeyRecord.getKeyPair().getPrivateKey().serialize()));
-        }
-
-        ECPrivateKey senderPrivKey = Curve.decodePrivatePoint(Base64.decode(cipher));
+        String privateKey = decryptStickyKey(userId, senderKey.getString("cipher"), senderKey.getInt("identityKeyId"));
+        ECPrivateKey senderPrivKey = Curve.decodePrivatePoint(Base64.decode(privateKey));
         ECKeyPair signedSenderKey = new ECKeyPair(senderPubKey, senderPrivKey);
         senderKeyRecord.setSenderKeyState(
                 senderKey.getInt("id"),
@@ -400,7 +401,7 @@ public class StickProtocol {
                     .getHash();
             String passwordHash = Base64.encodeBytes(passwordHashBytes);
 
-            SignalProtocolStore store = new MySignalProtocolStore(context);
+            SignalProtocolStore store = new MyProtocolStore(context);
             IdentityKeyUtil.generateIdentityKeys(context);
             IdentityKeyPair identityKey = store.getIdentityKeyPair();
             SignedPreKeyRecord signedPreKey = PreKeyUtil.generateSignedPreKey(context, identityKey, true);
@@ -479,14 +480,14 @@ public class StickProtocol {
     }
 
     public boolean isInitialized() {
-        SignalProtocolStore store = new MySignalProtocolStore(context);
+        SignalProtocolStore store = new MyProtocolStore(context);
         int localId = store.getLocalRegistrationId();
         return localId != 0;
     }
 
     public void initPairwiseSession(JSONObject bundle) {
         try {
-            SignalProtocolStore store = new MySignalProtocolStore(context);
+            SignalProtocolStore store = new MyProtocolStore(context);
             SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(bundle.getString("userId"), bundle.getInt("deviceId"));
             SessionBuilder sessionBuilder = new SessionBuilder(store, signalProtocolAddress);
             ECPublicKey preKey = Curve.decodePoint(Base64.decode(bundle.getString("preKey")), 0);
@@ -511,14 +512,14 @@ public class StickProtocol {
     }
 
     public boolean pairwiseSessionExists(String oneTimeId) {
-        SignalProtocolStore store = new MySignalProtocolStore(context);
+        SignalProtocolStore store = new MyProtocolStore(context);
         SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(oneTimeId, 0);
         return store.containsSession(signalProtocolAddress);
     }
 
     public String encryptTextPairwise(String userId, int deviceId, String text) {
         try {
-            SignalProtocolStore store = new MySignalProtocolStore(context);
+            SignalProtocolStore store = new MyProtocolStore(context);
             SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(userId, deviceId);
             SessionCipher sessionCipher = new SessionCipher(store, signalProtocolAddress);
             CiphertextMessage cipher = sessionCipher.encrypt(text.getBytes(StandardCharsets.UTF_8));
@@ -620,23 +621,7 @@ public class StickProtocol {
                 SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(senderId, isSticky ? 1 : 0);
                 SenderKeyName senderKeyName = new SenderKeyName(stickId, signalProtocolAddress);
                 GroupSessionBuilder groupSessionBuilder = new GroupSessionBuilder(senderKeyStore);
-
-                // Swap identity key if needed
-                if (identityKeyId != -1 && Preferences.getActiveIdentityKeyId(context) != identityKeyId) {
-                    IdentityKeyRecord identityKeyRecord = DatabaseFactory.getIdentityKeyDatabase(context).getIdentityKey(identityKeyId);
-                    IdentityKeyUtil.save(context, "pref_identity_public", Base64.encodeBytes(identityKeyRecord.getKeyPair().getPublicKey().serialize()));
-                    IdentityKeyUtil.save(context, "pref_identity_private", Base64.encodeBytes(identityKeyRecord.getKeyPair().getPrivateKey().serialize()));
-                }
-
-                String senderKey = decryptTextPairwise(senderId, isSticky ? 1 : 0, true, cipherSenderKey);
-
-                // Reverse identity key back if was swapped
-                if (identityKeyId != -1 && Preferences.getActiveIdentityKeyId(context) != identityKeyId) {
-                    IdentityKeyRecord identityKeyRecord = DatabaseFactory.getIdentityKeyDatabase(context).getIdentityKey(Preferences.getActiveIdentityKeyId(context));
-                    IdentityKeyUtil.save(context, "pref_identity_public", Base64.encodeBytes(identityKeyRecord.getKeyPair().getPublicKey().serialize()));
-                    IdentityKeyUtil.save(context, "pref_identity_private", Base64.encodeBytes(identityKeyRecord.getKeyPair().getPrivateKey().serialize()));
-                }
-
+                String senderKey = decryptStickyKey(senderId, cipherSenderKey, identityKeyId);
                 if (senderKey != null) {
                     SenderKeyDistributionMessage senderKeyDistributionMessage = new SenderKeyDistributionMessage(Base64.decode(senderKey));
                     groupSessionBuilder.process(senderKeyName, senderKeyDistributionMessage);
@@ -679,7 +664,7 @@ public class StickProtocol {
 
     public String decryptTextPairwise(String senderId, int deviceId, boolean isStickyKey, String cipher) {
         try {
-            SignalProtocolStore store = new MySignalProtocolStore(context);
+            SignalProtocolStore store = new MyProtocolStore(context);
             SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(senderId, deviceId);
             SessionCipher sessionCipher = new SessionCipher(store, signalProtocolAddress);
             byte[] bytes;
@@ -693,7 +678,7 @@ public class StickProtocol {
             return new String(bytes, StandardCharsets.UTF_8);
         } catch (InvalidMessageException | DuplicateMessageException | LegacyMessageException | UntrustedIdentityException | InvalidVersionException | InvalidKeyIdException | InvalidKeyException | NoSessionException | IOException e) {
             e.printStackTrace();
-            SignalProtocolStore store = new MySignalProtocolStore(context);
+            SignalProtocolStore store = new MyProtocolStore(context);
             SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(senderId, deviceId);
             SessionCipher sessionCipher = new SessionCipher(store, signalProtocolAddress);
             byte[] bytes = null;
