@@ -107,9 +107,8 @@ public class SP {
         return map
     }
 
-    public func reInit(bundle: Dictionary<String, Any>, password: String, oneTimeId: String, progressEvent: (([String: Any]) -> Void)?) {
+    public func reInit(bundle: Dictionary<String, Any>, password: String, userId: String, oneTimeId: String, progressEvent: (([String: Any]) -> Void)?) {
         //  ** Regenerate previous keys  ** //
-        let userId = bundle["userId"] as! String
         UserDefaults(suiteName: self.accessGroup!)!.set(userId, forKey: "userId")
         let keychain = A0SimpleKeychain(service: self.service!, accessGroup: self.accessGroup!)
         keychain.setString(password, forKey: userId + "-password")
@@ -128,7 +127,7 @@ public class SP {
             let IKPriv = pbDecrypt(encryptedIvText: key["cipher"] as! String, salt: key["salt"] as! String, pass: password)
             let keyPair = try! KeyPair(publicKey: IKPub!, privateKey: IKPriv)
             let identityKeyPair = try! IdentityKeyPair(publicKey: IKPub!, privateKey: IKPriv)
-            encryptionManager!.storage.storeIdentityKey(identityKeyId: key["id"] as! UInt32, timestamp: key["timestamp"] as! Int64, identityKeyPair: identityKeyPair)
+            encryptionManager!.storage.storeIdentityKey(identityKeyId: key["id"] as! UInt32, timestamp: Int64(UInt64(key["timestamp"] as! String)!), identityKeyPair: identityKeyPair)
             if (key["active"] as! Bool == true) {
                 encryptionManager?.storage.saveIdentityKeyPair(keyPair: identityKeyPair)
                 UserDefaults(suiteName: self.accessGroup!)!.set(key["id"], forKey: "activeIdentityKeyId")
@@ -219,6 +218,7 @@ public class SP {
     }
 
     public func refreshIdentityKey(days: Int) -> [String: Any]? {
+        print("CALLING REFRESH IDENITIY KEY")
         let identityKeyAge = 60 * 1000
         let userId = UserDefaults(suiteName: self.accessGroup!)!.string(forKey: "userId")
         let databaseConnection = db!.newConnection()
@@ -226,9 +226,10 @@ public class SP {
         let activeIKTimestamp = Int64(UserDefaults(suiteName: self.accessGroup!)!.integer(forKey: "activeIdentityKeyTimestamp"))
         let activeDuration = currentTime - activeIKTimestamp
         if (activeDuration > identityKeyAge) {
+            print("REFRESHING IDENTITY KEY")
             let activeIKId = Int64(UserDefaults(suiteName: self.accessGroup!)!.integer(forKey: "activeIdentityKeyId"))
             let encryptionManager = try? EncryptionManager(accessGroup: accessGroup!, databaseConnection: databaseConnection)
-            let identityKey = encryptionManager!.keyHelper()?.generateIdentityKeyPair()
+            let identityKey = encryptionManager?.storage.generateIdentityKeyPair().identityKeyPair
 
             let keychain = A0SimpleKeychain(service: self.service!, accessGroup: self.accessGroup!)
             let password: String = keychain.string(forKey: userId! + "-password")!

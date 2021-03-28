@@ -80,7 +80,7 @@ export default class StickProtocolHandlers {
         let users_id = res.data.bundlesToFetch
         if (users_id.length > 0) {
             // upload sender keys to users that do not have them yet
-            this.uploadSenderKeys(stickId, users_id)
+            await this.uploadSenderKeys(stickId, users_id)
         }
 
         // Update the chain step of the corresponding sticky session if needed

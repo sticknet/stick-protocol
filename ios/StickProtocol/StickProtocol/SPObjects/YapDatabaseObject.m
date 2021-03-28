@@ -29,6 +29,7 @@
 - (void)saveWithTransaction:(YapDatabaseReadWriteTransaction *)transaction
 {
     NSString *collection = self.class.collection;
+    NSLog(@"SAVING IN COLELCTION %@", collection);
     [transaction setObject:self forKey:self.uniqueId inCollection:collection withMetadata:[transaction metadataForKey:self.uniqueId inCollection:collection]];
 }
 

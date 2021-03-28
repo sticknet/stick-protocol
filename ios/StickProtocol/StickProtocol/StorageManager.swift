@@ -36,6 +36,7 @@ open class StorageManager: NSObject {
         // Might be a better way to guarantee we have an SPIdentity
         let spIdentity = (self.delegate?.generateIdentityKeyPair())!
         self.databaseConnection.readWrite { (transaction) in
+            print("SAVING IDENTITY KEY PAIR")
             spIdentity.save(with: transaction)
         }
 
@@ -43,6 +44,7 @@ open class StorageManager: NSObject {
         let currentTime = Date().timestamp
         let spIdentityKey: SPIdentityKey = SPIdentityKey(keyId: activeIKId + 1, timestamp: currentTime, identityKeyPair: spIdentity.identityKeyPair)!
         self.databaseConnection.readWrite { (transaction) in
+            print("SAVING NEW IDENTITY KEY RECORD")
             spIdentityKey.save(with: transaction)
         }
         UserDefaults(suiteName: self.accessGroup)!.set(activeIKId + 1, forKey: "activeIdentityKeyId")
