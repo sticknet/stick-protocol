@@ -90,7 +90,10 @@ export default class StickProtocolHandlers {
     }
 
     /**
-     * This function is used to upload sender keys of a sticky session to server
+     * This function is used to upload sender keys of a sticky session to server. StickProtocol.getSenderKey() will return
+     * a DecryptingSenderKey for other members of a party, while StickProtocol.getEncryptingSenderKey() will return a
+     * user's own EncryptingSenderKey for a sticky session.
+     *
      */
     async uploadSenderKeys(stickId, users_id = null, group_id = null) {
         // Fetch preKey bundles of users to create new pairwise sessions and encrypt to them the sender keys

@@ -90,6 +90,9 @@ import javax.crypto.spec.SecretKeySpec;
 import static java.lang.Long.parseLong;
 
 /*
+    This is the main StickProtocol class.
+    Using this class, you have access to all of the StickProtocol methods you would need.
+
     @author Omar Basem
  */
 
@@ -101,6 +104,10 @@ public class StickProtocol {
     private final String service;
     private final String passwordKey;
 
+    /***
+     * The StickProtocol constructor takes 2 arguments, the application context, and the application
+     * package name as a string ("com.myOrg.myApp")
+     */
 
     public StickProtocol(Context context, String service) {
         StickProtocol.context = context;
@@ -110,17 +117,72 @@ public class StickProtocol {
         this.passwordKey = service + ".password";
     }
 
-    public JSONObject refreshSignedPreKey(int days) throws Exception {
-        long signedPreKeyAge = TimeUnit.MINUTES.toMillis(1);
-        long activeDuration = System.currentTimeMillis() - Preferences.getActiveSignedPreKeyTimestamp(context);
-        if (activeDuration > signedPreKeyAge) {
-            IdentityKeyPair identityKey = IdentityKeyUtil.getIdentityKeyPair(context);
-            SignedPreKeyRecord signedPreKey = PreKeyUtil.generateSignedPreKey(context, identityKey, true);
+    /****************************** START OF INITIALIZATION METHODS ******************************/
 
-            String userId = PreferenceManager.getDefaultSharedPreferences(context).getString("userId", "");
+    /***
+     * The StickProtocol initialization method. To be called for every user once at registration time.
+     *
+     * @param userId - String, unique userId
+     * @param password - String, user's plaintext password
+     * @param progressEvent - (optional) A ProgressEvent interface can be implemented to provide progress
+     *                      feedback to the user while the keys are being generated.
+     * @return JSONObject - contains the following:
+     *                          * 1 Identity key
+     *                          * 1 Signed prekey
+     *                          * 10 prekeys
+     *                          * localId
+     *                          * oneTimeId
+     *                          * initial password hash
+     *                          * password salt
+     */
+    public JSONObject initialize(String userId, String password, ProgressEvent progressEvent) {
+        try {
+            // Store the user's password in BlockStore/KeyStore
             HashMap<String, String> serviceMap = new HashMap();
             serviceMap.put("service", passwordKey);
-            String password = keychain.getGenericPassword(userId, serviceMap);
+            keychain.setGenericPassword(userId, userId, password, serviceMap);
+
+            // Generate password salt
+            SecureRandom randomSalt = new SecureRandom();
+            byte[] salt = new byte[32];
+            randomSalt.nextBytes(salt);
+
+            // Hashing pass using Argon2
+            byte[] passwordHashBytes = new Argon2.Builder(Version.V13)
+                    .type(Type.Argon2id)
+                    .memoryCostKiB(4 * 1024)
+                    .parallelism(2)
+                    .iterations(3)
+                    .hashLength(32)
+                    .build()
+                    .hash(password.getBytes(), salt)
+                    .getHash();
+            String passwordHash = Base64.encodeBytes(passwordHashBytes);
+
+            SignalProtocolStore store = new MyProtocolStore(context);
+            IdentityKeyUtil.generateIdentityKeys(context);
+            IdentityKeyPair identityKey = store.getIdentityKeyPair();
+            SignedPreKeyRecord signedPreKey = PreKeyUtil.generateSignedPreKey(context, identityKey, true);
+            List<PreKeyRecord> preKeys = PreKeyUtil.generatePreKeys(context, 0, 10);
+            JSONArray preKeysArray = new JSONArray();
+            for (int i = 1; i < preKeys.size(); i++) {
+                JSONObject preKey = new JSONObject();
+                preKey.put("id", preKeys.get(i).getId());
+                preKey.put("public", Base64.encodeBytes(preKeys.get(i).getKeyPair().getPublicKey().serialize()));
+                HashMap<String, String> cipherMap = pbEncrypt(preKeys.get(i).getKeyPair().getPrivateKey().serialize(), password);
+                preKey.put("cipher", cipherMap.get("cipher"));
+                preKey.put("salt", cipherMap.get("salt"));
+                preKeysArray.put(preKey);
+
+                // PROGRESS
+                if (progressEvent != null) {
+                    JSONObject event = new JSONObject();
+                    event.put("progress", i + 1);
+                    event.put("total", preKeys.size());
+                    progressEvent.execute(event);
+                }
+            }
+
             JSONObject signedPreKeyJson = new JSONObject();
             signedPreKeyJson.put("id", Preferences.getActiveSignedPreKeyId(context));
             signedPreKeyJson.put("public", Base64.encodeBytes(signedPreKey.getKeyPair().getPublicKey().serialize()));
@@ -129,45 +191,74 @@ public class StickProtocol {
             signedPreKeyJson.put("cipher", signedCipherMap.get("cipher"));
             signedPreKeyJson.put("salt", signedCipherMap.get("salt"));
             signedPreKeyJson.put("timestamp", Long.toString(signedPreKey.getTimestamp()));
-            return signedPreKeyJson;
-        }
-        return null;
-    }
 
-    public JSONObject refreshIdentityKey(int days) throws Exception {
-        long identityKeyAge = TimeUnit.MINUTES.toMillis(1) / 2;
-        long activeDuration = System.currentTimeMillis() - Preferences.getActiveIdentityKeyTimestamp(context);
-        if (activeDuration > identityKeyAge) {
-            SignalProtocolStore store = new MyProtocolStore(context);
-            IdentityKeyUtil.generateIdentityKeys(context);
-            IdentityKeyPair identityKey = store.getIdentityKeyPair();
-
-            String userId = PreferenceManager.getDefaultSharedPreferences(context).getString("userId", "");
-            HashMap<String, String> serviceMap = new HashMap();
-            serviceMap.put("service", passwordKey);
-            String password = keychain.getGenericPassword(userId, serviceMap);
             JSONObject identityKeyJson = new JSONObject();
             identityKeyJson.put("id", Preferences.getActiveIdentityKeyId(context));
             identityKeyJson.put("public", Base64.encodeBytes(identityKey.getPublicKey().serialize()));
-            HashMap<String, String> signedCipherMap = pbEncrypt(identityKey.getPrivateKey().serialize(), password);
-            identityKeyJson.put("cipher", signedCipherMap.get("cipher"));
-            identityKeyJson.put("salt", signedCipherMap.get("salt"));
-            identityKeyJson.put("timestamp", Long.toString(Preferences.getActiveIdentityKeyTimestamp(context)));
-            return identityKeyJson;
+            HashMap<String, String> identityCipherMap = pbEncrypt(identityKey.getPrivateKey().serialize(), password);
+            identityKeyJson.put("cipher", identityCipherMap.get("cipher"));
+            identityKeyJson.put("salt", identityCipherMap.get("salt"));
+            identityKeyJson.put("timestamp", Preferences.getActiveIdentityKeyTimestamp(context));
+
+            String oneTimeId = UUID.randomUUID().toString();
+            int localId = KeyHelper.generateRegistrationId(false);
+            Preferences.setLocalRegistrationId(context, localId);
+            JSONObject map = new JSONObject();
+            map.put("identityKey", identityKeyJson);
+            map.put("signedPreKey", signedPreKeyJson);
+            map.put("preKeys", preKeysArray);
+            map.put("passwordHash", passwordHash);
+            map.put("passwordSalt", Base64.encodeBytes(salt));
+            map.put("oneTimeId", oneTimeId);
+            map.put("localId", localId);
+
+            PreferenceManager.getDefaultSharedPreferences(context).edit().putString("oneTimeId", oneTimeId).apply();
+            PreferenceManager.getDefaultSharedPreferences(context).edit().putString("userId", userId).apply();
+
+            SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(userId, 0);
+            SessionBuilder sessionBuilder = new SessionBuilder(store, signalProtocolAddress);
+            ECPublicKey preKey = Curve.decodePoint(preKeys.get(0).getKeyPair().getPublicKey().serialize(), 0);
+
+            PreKeyBundle preKeyBundle = new PreKeyBundle(
+                    store.getLocalRegistrationId(),
+                    1,
+                    preKeys.get(0).getId(),
+                    preKey,
+                    signedPreKey.getId(),
+                    signedPreKey.getKeyPair().getPublicKey(),
+                    signedPreKey.getSignature(),
+                    identityKey.getPublicKey()
+            );
+            sessionBuilder.process(preKeyBundle);
+            return map;
+        } catch (Exception e) {
+            e.printStackTrace();
         }
         return null;
     }
 
-    public void resetDatabase() {
-        DatabaseFactory.getInstance(context).resetDatabase(context);
-    }
-
-
-    public void reInit(JSONObject bundle, String password, String userId, String oneTimeId, ProgressEvent progressEvent) {
-        // ** Regenerate previous keys ** //
+    /***
+     * The StickProtocol Re-Initialize method to decrypt the user's keys and re-establish the sticky
+     * sessions. Needs to be called once, at login time.
+     *
+     * @param bundle - JSONObject that needs to contain the following:
+     *               * An array of identity keys
+     *               * An array of signed prekeys
+     *               * An array of prekeys
+     *               * An array of sender keys (EncryptingSenderKeys)
+     *               * localId
+     * @param password - String, user's plaintext password
+     * @param userId - String, user's unique id
+     * @param oneTimeId - String, a newly generated uuid for the user
+     * @param progressEvent - (optional) A ProgressEvent interface can be implemented to provide progress
+     *                        feedback to the user while the keys are being decrypted and the sessions
+     *                        re-established.
+     */
+    public void reInitialize(JSONObject bundle, String password, String userId, String oneTimeId, ProgressEvent progressEvent) {
         try {
             PreferenceManager.getDefaultSharedPreferences(context).edit().putString("oneTimeId", oneTimeId).apply();
             PreferenceManager.getDefaultSharedPreferences(context).edit().putString("userId", userId).apply();
+
             // Store password in BlockStore/KeyStore
             HashMap<String, String> serviceMap = new HashMap();
             serviceMap.put("service", context.getPackageName());
@@ -272,7 +363,188 @@ public class StickProtocol {
         } catch (Exception e) {
             e.printStackTrace();
         }
-        // *** //
+    }
+
+    /***
+     * This method is used to create the initial password hash using Argon2, from a provided password
+     * and salt, at login.
+     *
+     * @param password - String, plaintext password
+     * @param salt - String, the salt that was used to create the initial password hash at registration time.
+     *
+     * @return initial password hash - String
+     */
+    public String createPasswordHash(String password, String salt) throws IOException, Argon2Exception {
+        byte[] passwordHashBytes = new Argon2.Builder(Version.V13)
+                .type(Type.Argon2id)
+                .memoryCostKiB(4 * 1024)
+                .parallelism(2)
+                .iterations(3)
+                .hashLength(32)
+                .build()
+                .hash(password.getBytes(), Base64.decode(salt))
+                .getHash();
+        return Base64.encodeBytes(passwordHashBytes);
+    }
+
+    /***
+     * An interface with a method "execute" to be implemented to provide progress feedback to the user
+     * during the initialize() and reInitialize() methods.
+     */
+    public interface ProgressEvent {
+        void execute(JSONObject event);
+    }
+
+    /****************************** END OF INITIALIZATION METHODS ******************************/
+
+    /****************************** START OF PAIRWISE SESSION METHODS ******************************/
+
+    /***
+     * This method is used to initialize a Signal pairwise session.
+     *
+     * @param bundle - JSONObject that should contain the following:
+     *               * userId
+     */
+    public void initPairwiseSession(JSONObject bundle) {
+        try {
+            SignalProtocolStore store = new MyProtocolStore(context);
+            SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(bundle.getString("userId"), 0);
+            SessionBuilder sessionBuilder = new SessionBuilder(store, signalProtocolAddress);
+            ECPublicKey preKey = Curve.decodePoint(Base64.decode(bundle.getString("preKey")), 0);
+            ECPublicKey signedPreKey = Curve.decodePoint(Base64.decode(bundle.getString("signedPreKey")), 0);
+            ECPublicKey identityKey = Curve.decodePoint(Base64.decode(bundle.getString("identityKey")), 0);
+            IdentityKey identityPublicKey = new IdentityKey(identityKey);
+
+            PreKeyBundle preKeyBundle = new PreKeyBundle(
+                    bundle.getInt("localId"),
+                    0,
+                    bundle.getInt("preKeyId"),
+                    preKey,
+                    bundle.getInt("signedPreKeyId"),
+                    signedPreKey,
+                    Base64.decode(bundle.getString("signature")),
+                    identityPublicKey
+            );
+            sessionBuilder.process(preKeyBundle);
+        } catch (UntrustedIdentityException | InvalidKeyException | IOException | JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public boolean pairwiseSessionExists(String oneTimeId) {
+        SignalProtocolStore store = new MyProtocolStore(context);
+        SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(oneTimeId, 0);
+        return store.containsSession(signalProtocolAddress);
+    }
+
+
+    public String encryptTextPairwise(String userId, int deviceId, String text) {
+        try {
+            SignalProtocolStore store = new MyProtocolStore(context);
+            SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(userId, 0);
+            SessionCipher sessionCipher = new SessionCipher(store, signalProtocolAddress);
+            CiphertextMessage cipher = sessionCipher.encrypt(text.getBytes(StandardCharsets.UTF_8));
+            return Base64.encodeBytes(cipher.serialize());
+        } catch (UntrustedIdentityException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public String decryptTextPairwise(String senderId, int deviceId, boolean isStickyKey, String cipher) {
+        try {
+            SignalProtocolStore store = new MyProtocolStore(context);
+            SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(senderId, 0);
+            SessionCipher sessionCipher = new SessionCipher(store, signalProtocolAddress);
+            byte[] bytes;
+            if (!store.containsSession(signalProtocolAddress) || isStickyKey) {
+                PreKeySignalMessage preKeySignalMessage = new PreKeySignalMessage(Base64.decode(cipher));
+                bytes = sessionCipher.decrypt(preKeySignalMessage);
+            } else {
+                SignalMessage signalMessage = new SignalMessage(Base64.decode(cipher));
+                bytes = sessionCipher.decrypt(signalMessage);
+            }
+            return new String(bytes, StandardCharsets.UTF_8);
+        } catch (InvalidMessageException | DuplicateMessageException | LegacyMessageException
+                | UntrustedIdentityException | InvalidVersionException | InvalidKeyIdException
+                | InvalidKeyException | NoSessionException | IOException e) {
+            e.printStackTrace();
+            SignalProtocolStore store = new MyProtocolStore(context);
+            SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(senderId, 0);
+            SessionCipher sessionCipher = new SessionCipher(store, signalProtocolAddress);
+            byte[] bytes = null;
+            try {
+                PreKeySignalMessage preKeySignalMessage = new PreKeySignalMessage(Base64.decode(cipher));
+                bytes = sessionCipher.decrypt(preKeySignalMessage);
+            } catch (DuplicateMessageException | LegacyMessageException | InvalidMessageException
+                    | InvalidKeyIdException | InvalidKeyException | UntrustedIdentityException
+                    | InvalidVersionException | IOException ex) {
+                ex.printStackTrace();
+            }
+            if (bytes != null)
+                return new String(bytes, StandardCharsets.UTF_8);
+            else
+                return null;
+        }
+    }
+
+    public JSONObject encryptFilePairwise(String userId, String filePath, String contentMedia) throws JSONException {
+        HashMap<String, String> hashMap = encryptMedia(filePath, contentMedia);
+        String cipherText = encryptTextPairwise(userId, 0, hashMap.get("secret"));
+        JSONObject map = new JSONObject();
+        map.put("uri", hashMap.get("uri"));
+        map.put("cipher", cipherText);
+        return map;
+    }
+
+    public String decryptFilePairwise(String senderId, String filePath, String cipher, int size, String outputPath) {
+        String secret = decryptTextPairwise(senderId, 0, false, cipher);
+        String path = null;
+        if (secret != null)
+            path = decryptMedia(filePath, secret, outputPath);
+        return path;
+    }
+
+    /****************************** END OF PAIRWISE SESSION METHODS ******************************/
+
+    /****************************** START OF STICKY SESSION METHODS ******************************/
+
+    public JSONObject getEncryptingSenderKey(String userId, String stickId, Boolean isSticky) {
+        try {
+            SenderKeyStore senderKeyStore = new MySenderKeyStore(context);
+            SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(userId, isSticky ? 1 : 0);
+            SenderKeyName senderKeyName = new SenderKeyName(stickId, signalProtocolAddress);
+            GroupSessionBuilder groupSessionBuilder = new GroupSessionBuilder(senderKeyStore);
+            SenderKeyDistributionMessage senderKeyDistributionMessage = groupSessionBuilder.create(senderKeyName);
+            DatabaseFactory.getStickyKeyDatabase(context).insertStickyKey(stickId, Base64.encodeBytes(senderKeyDistributionMessage.serialize()));
+            SenderKeyState senderKeyState = senderKeyStore.loadSenderKey(senderKeyName).getSenderKeyState();
+            String cipher = encryptTextPairwise(userId, isSticky ? 1 : 0, Base64.encodeBytes(senderKeyState.getSigningKeyPrivate().serialize()));
+            JSONObject map = new JSONObject();
+            map.put("id", senderKeyState.getKeyId());
+            map.put("chainKey", Base64.encodeBytes(senderKeyState.getSenderChainKey().getSeed()));
+            map.put("public", Base64.encodeBytes(senderKeyState.getSigningKeyPublic().serialize()));
+            map.put("cipher", cipher);
+            return map;
+        } catch (InvalidKeyException | InvalidKeyIdException | JSONException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+
+    public String getSenderKey(String senderId, String targetId, String stickId, Boolean isSticky) throws IOException, InvalidMessageException, LegacyMessageException {
+
+        SenderKeyDistributionMessage senderKeyDistributionMessage = null;
+        if (isSticky)
+            senderKeyDistributionMessage = new SenderKeyDistributionMessage(Base64.decode(DatabaseFactory.getStickyKeyDatabase(context).getStickyKey(stickId)));
+        else {
+            SenderKeyStore senderKeyStore = new MySenderKeyStore(context);
+            SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(senderId, 0);
+            SenderKeyName senderKeyName = new SenderKeyName(stickId, signalProtocolAddress);
+            GroupSessionBuilder groupSessionBuilder = new GroupSessionBuilder(senderKeyStore);
+            senderKeyDistributionMessage = groupSessionBuilder.create(senderKeyName);
+        }
+        return encryptTextPairwise(targetId, isSticky ? 1 : 0, Base64.encodeBytes(senderKeyDistributionMessage.serialize()));
     }
 
     public String decryptStickyKey(String senderId, String cipher, int identityKeyId) {
@@ -328,246 +600,6 @@ public class StickProtocol {
         GroupCipher groupCipher = new GroupCipher(senderKeyStore, senderKeyName);
         groupCipher.ratchetChain(steps);
     }
-
-    public JSONArray generatePreKeys(int nextPreKeyId, int count) {
-        try {
-            String userId = PreferenceManager.getDefaultSharedPreferences(context).getString("userId", "");
-            HashMap<String, String> serviceMap = new HashMap();
-            serviceMap.put("service", passwordKey);
-            String password = keychain.getGenericPassword(userId, serviceMap);
-            List<PreKeyRecord> preKeys = PreKeyUtil.generatePreKeys(context, nextPreKeyId, count);
-            JSONArray preKeysArray = new JSONArray();
-            for (int i = 0; i < preKeys.size(); i++) {
-                JSONObject preKey = new JSONObject();
-                preKey.put("id", preKeys.get(i).getId());
-                preKey.put("public", Base64.encodeBytes(preKeys.get(i).getKeyPair().getPublicKey().serialize()));
-                HashMap<String, String> cipherMap = pbEncrypt(preKeys.get(i).getKeyPair().getPrivateKey().serialize(), password);
-                preKey.put("cipher", cipherMap.get("cipher"));
-                preKey.put("salt", cipherMap.get("salt"));
-                preKeysArray.put(preKey);
-            }
-            return preKeysArray;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public interface ProgressEvent {
-        void execute(JSONObject event);
-    }
-
-    /*
-        This method is used to create the initial password hash using Argon2, from a provided password and salt, at login
-     */
-    public String createPasswordHash(String password, String salt) throws IOException, Argon2Exception {
-        byte[] passwordHashBytes = new Argon2.Builder(Version.V13)
-                .type(Type.Argon2id)
-                .memoryCostKiB(4 * 1024)
-                .parallelism(2)
-                .iterations(3)
-                .hashLength(32)
-                .build()
-                .hash(password.getBytes(), Base64.decode(salt))
-                .getHash();
-        return Base64.encodeBytes(passwordHashBytes);
-    }
-
-    public String recoverPassword(String userId) {
-        HashMap<String, String> serviceMap = new HashMap();
-        serviceMap.put("service", passwordKey);
-        return keychain.getGenericPassword(userId, serviceMap);
-    }
-
-    public JSONObject initialize(String userId, String password, ProgressEvent progressEvent) {
-        try {
-            HashMap<String, String> serviceMap = new HashMap();
-            serviceMap.put("service", passwordKey);
-            keychain.setGenericPassword(userId, userId, password, serviceMap);
-
-            // Generate password salt
-            SecureRandom randomSalt = new SecureRandom();
-            byte[] salt = new byte[32];
-            randomSalt.nextBytes(salt);
-            // Hashing pass using Argon2
-            byte[] passwordHashBytes = new Argon2.Builder(Version.V13)
-                    .type(Type.Argon2id)
-                    .memoryCostKiB(4 * 1024)
-                    .parallelism(2)
-                    .iterations(3)
-                    .hashLength(32)
-                    .build()
-                    .hash(password.getBytes(), salt)
-                    .getHash();
-            String passwordHash = Base64.encodeBytes(passwordHashBytes);
-
-            SignalProtocolStore store = new MyProtocolStore(context);
-            IdentityKeyUtil.generateIdentityKeys(context);
-            IdentityKeyPair identityKey = store.getIdentityKeyPair();
-            SignedPreKeyRecord signedPreKey = PreKeyUtil.generateSignedPreKey(context, identityKey, true);
-            List<PreKeyRecord> preKeys = PreKeyUtil.generatePreKeys(context, 0, 10);
-            JSONArray preKeysArray = new JSONArray();
-            for (int i = 1; i < preKeys.size(); i++) {
-                JSONObject preKey = new JSONObject();
-                preKey.put("id", preKeys.get(i).getId());
-                preKey.put("public", Base64.encodeBytes(preKeys.get(i).getKeyPair().getPublicKey().serialize()));
-                HashMap<String, String> cipherMap = pbEncrypt(preKeys.get(i).getKeyPair().getPrivateKey().serialize(), password);
-                preKey.put("cipher", cipherMap.get("cipher"));
-                preKey.put("salt", cipherMap.get("salt"));
-                preKeysArray.put(preKey);
-
-                // PROGRESS
-                if (progressEvent != null) {
-                    JSONObject event = new JSONObject();
-                    event.put("progress", i + 1);
-                    event.put("total", preKeys.size());
-                    progressEvent.execute(event);
-                }
-            }
-
-            JSONObject signedPreKeyJson = new JSONObject();
-            signedPreKeyJson.put("id", Preferences.getActiveSignedPreKeyId(context));
-            signedPreKeyJson.put("public", Base64.encodeBytes(signedPreKey.getKeyPair().getPublicKey().serialize()));
-            signedPreKeyJson.put("signature", Base64.encodeBytes(signedPreKey.getSignature()));
-            HashMap<String, String> signedCipherMap = pbEncrypt(signedPreKey.getKeyPair().getPrivateKey().serialize(), password);
-            signedPreKeyJson.put("cipher", signedCipherMap.get("cipher"));
-            signedPreKeyJson.put("salt", signedCipherMap.get("salt"));
-            signedPreKeyJson.put("timestamp", Long.toString(signedPreKey.getTimestamp()));
-
-            JSONObject identityKeyJson = new JSONObject();
-            identityKeyJson.put("id", Preferences.getActiveIdentityKeyId(context));
-            identityKeyJson.put("public", Base64.encodeBytes(identityKey.getPublicKey().serialize()));
-            HashMap<String, String> identityCipherMap = pbEncrypt(identityKey.getPrivateKey().serialize(), password);
-            identityKeyJson.put("cipher", identityCipherMap.get("cipher"));
-            identityKeyJson.put("salt", identityCipherMap.get("salt"));
-            identityKeyJson.put("timestamp", Preferences.getActiveIdentityKeyTimestamp(context));
-
-            String oneTimeId = UUID.randomUUID().toString();
-            int localId = KeyHelper.generateRegistrationId(false);
-            Preferences.setLocalRegistrationId(context, localId);
-            JSONObject map = new JSONObject();
-            map.put("identityKey", identityKeyJson);
-            map.put("signedPreKey", signedPreKeyJson);
-            map.put("preKeys", preKeysArray);
-            map.put("passwordHash", passwordHash);
-            map.put("passwordSalt", Base64.encodeBytes(salt));
-            map.put("oneTimeId", oneTimeId);
-            map.put("localId", localId);
-
-            PreferenceManager.getDefaultSharedPreferences(context).edit().putString("oneTimeId", oneTimeId).apply();
-            PreferenceManager.getDefaultSharedPreferences(context).edit().putString("userId", userId).apply();
-
-            SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(userId, 0);
-            SessionBuilder sessionBuilder = new SessionBuilder(store, signalProtocolAddress);
-            ECPublicKey preKey = Curve.decodePoint(preKeys.get(0).getKeyPair().getPublicKey().serialize(), 0);
-
-            PreKeyBundle preKeyBundle = new PreKeyBundle(
-                    store.getLocalRegistrationId(),
-                    1,
-                    preKeys.get(0).getId(),
-                    preKey,
-                    signedPreKey.getId(),
-                    signedPreKey.getKeyPair().getPublicKey(),
-                    signedPreKey.getSignature(),
-                    identityKey.getPublicKey()
-            );
-            sessionBuilder.process(preKeyBundle);
-            return map;
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public boolean isInitialized() {
-        SignalProtocolStore store = new MyProtocolStore(context);
-        int localId = store.getLocalRegistrationId();
-        return localId != 0;
-    }
-
-    public void initPairwiseSession(JSONObject bundle) {
-        try {
-            SignalProtocolStore store = new MyProtocolStore(context);
-            SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(bundle.getString("userId"), bundle.getInt("deviceId"));
-            SessionBuilder sessionBuilder = new SessionBuilder(store, signalProtocolAddress);
-            ECPublicKey preKey = Curve.decodePoint(Base64.decode(bundle.getString("preKey")), 0);
-            ECPublicKey signedPreKey = Curve.decodePoint(Base64.decode(bundle.getString("signedPreKey")), 0);
-            ECPublicKey identityKey = Curve.decodePoint(Base64.decode(bundle.getString("identityKey")), 0);
-            IdentityKey identityPublicKey = new IdentityKey(identityKey);
-
-            PreKeyBundle preKeyBundle = new PreKeyBundle(
-                    bundle.getInt("localId"),
-                    bundle.getInt("deviceId"),
-                    bundle.getInt("preKeyId"),
-                    preKey,
-                    bundle.getInt("signedPreKeyId"),
-                    signedPreKey,
-                    Base64.decode(bundle.getString("signature")),
-                    identityPublicKey
-            );
-            sessionBuilder.process(preKeyBundle);
-        } catch (UntrustedIdentityException | InvalidKeyException | IOException | JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public boolean pairwiseSessionExists(String oneTimeId) {
-        SignalProtocolStore store = new MyProtocolStore(context);
-        SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(oneTimeId, 0);
-        return store.containsSession(signalProtocolAddress);
-    }
-
-    public String encryptTextPairwise(String userId, int deviceId, String text) {
-        try {
-            SignalProtocolStore store = new MyProtocolStore(context);
-            SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(userId, deviceId);
-            SessionCipher sessionCipher = new SessionCipher(store, signalProtocolAddress);
-            CiphertextMessage cipher = sessionCipher.encrypt(text.getBytes(StandardCharsets.UTF_8));
-            return Base64.encodeBytes(cipher.serialize());
-        } catch (UntrustedIdentityException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    public JSONObject getEncryptingSenderKey(String userId, String stickId, Boolean isSticky) {
-        try {
-            SenderKeyStore senderKeyStore = new MySenderKeyStore(context);
-            SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(userId, isSticky ? 1 : 0);
-            SenderKeyName senderKeyName = new SenderKeyName(stickId, signalProtocolAddress);
-            GroupSessionBuilder groupSessionBuilder = new GroupSessionBuilder(senderKeyStore);
-            SenderKeyDistributionMessage senderKeyDistributionMessage = groupSessionBuilder.create(senderKeyName);
-            DatabaseFactory.getStickyKeyDatabase(context).insertStickyKey(stickId, Base64.encodeBytes(senderKeyDistributionMessage.serialize()));
-            SenderKeyState senderKeyState = senderKeyStore.loadSenderKey(senderKeyName).getSenderKeyState();
-            String cipher = encryptTextPairwise(userId, isSticky ? 1 : 0, Base64.encodeBytes(senderKeyState.getSigningKeyPrivate().serialize()));
-            JSONObject map = new JSONObject();
-            map.put("id", senderKeyState.getKeyId());
-            map.put("chainKey", Base64.encodeBytes(senderKeyState.getSenderChainKey().getSeed()));
-            map.put("public", Base64.encodeBytes(senderKeyState.getSigningKeyPublic().serialize()));
-            map.put("cipher", cipher);
-            return map;
-        } catch (InvalidKeyException | InvalidKeyIdException | JSONException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-
-    public String getSenderKey(String senderId, String targetId, String stickId, Boolean isSticky) throws IOException, InvalidMessageException, LegacyMessageException {
-
-        SenderKeyDistributionMessage senderKeyDistributionMessage = null;
-        if (isSticky)
-            senderKeyDistributionMessage = new SenderKeyDistributionMessage(Base64.decode(DatabaseFactory.getStickyKeyDatabase(context).getStickyKey(stickId)));
-        else {
-            SenderKeyStore senderKeyStore = new MySenderKeyStore(context);
-            SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(senderId, 0);
-            SenderKeyName senderKeyName = new SenderKeyName(stickId, signalProtocolAddress);
-            GroupSessionBuilder groupSessionBuilder = new GroupSessionBuilder(senderKeyStore);
-            senderKeyDistributionMessage = groupSessionBuilder.create(senderKeyName);
-        }
-        return encryptTextPairwise(targetId, isSticky ? 1 : 0, Base64.encodeBytes(senderKeyDistributionMessage.serialize()));
-    }
-
 
     public int getChainStep(String userId, String stickId) {
         SenderKeyStore senderKeyStore = new MySenderKeyStore(context);
@@ -644,111 +676,11 @@ public class StickProtocol {
             byte[] decryptedCipher;
             decryptedCipher = groupCipher.decrypt(Base64.decode(cipher), isSticky, isSelf);
             return new String(decryptedCipher, StandardCharsets.UTF_8);
-        } catch (LegacyMessageException | InvalidMessageException | DuplicateMessageException | NoSessionException | IOException e) {
+        } catch (LegacyMessageException | InvalidMessageException | DuplicateMessageException
+                | NoSessionException | IOException e) {
             e.printStackTrace();
         }
         return null;
-    }
-
-    public void deleteSession(String stickId, String senderId) {
-        SenderKeyStore mySenderKeyStore = new MySenderKeyStore(context);
-        SignalProtocolAddress signalProtocolAddress0 = new SignalProtocolAddress(senderId, 0);
-        SignalProtocolAddress signalProtocolAddress1 = new SignalProtocolAddress(senderId, 1);
-        SenderKeyName senderKeyName0 = new SenderKeyName(stickId, signalProtocolAddress0);
-        SenderKeyName senderKeyName1 = new SenderKeyName(stickId, signalProtocolAddress1);
-        SenderKeyRecord senderKeyRecord = new SenderKeyRecord();
-        mySenderKeyStore.storeSenderKey(senderKeyName0, senderKeyRecord);
-        mySenderKeyStore.storeSenderKey(senderKeyName1, senderKeyRecord);
-    }
-
-
-    public String decryptTextPairwise(String senderId, int deviceId, boolean isStickyKey, String cipher) {
-        try {
-            SignalProtocolStore store = new MyProtocolStore(context);
-            SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(senderId, deviceId);
-            SessionCipher sessionCipher = new SessionCipher(store, signalProtocolAddress);
-            byte[] bytes;
-            if (!store.containsSession(signalProtocolAddress) || isStickyKey) {
-                PreKeySignalMessage preKeySignalMessage = new PreKeySignalMessage(Base64.decode(cipher));
-                bytes = sessionCipher.decrypt(preKeySignalMessage);
-            } else {
-                SignalMessage signalMessage = new SignalMessage(Base64.decode(cipher));
-                bytes = sessionCipher.decrypt(signalMessage);
-            }
-            return new String(bytes, StandardCharsets.UTF_8);
-        } catch (InvalidMessageException | DuplicateMessageException | LegacyMessageException | UntrustedIdentityException | InvalidVersionException | InvalidKeyIdException | InvalidKeyException | NoSessionException | IOException e) {
-            e.printStackTrace();
-            SignalProtocolStore store = new MyProtocolStore(context);
-            SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(senderId, deviceId);
-            SessionCipher sessionCipher = new SessionCipher(store, signalProtocolAddress);
-            byte[] bytes = null;
-            try {
-                PreKeySignalMessage preKeySignalMessage = new PreKeySignalMessage(Base64.decode(cipher));
-                bytes = sessionCipher.decrypt(preKeySignalMessage);
-            } catch (DuplicateMessageException | LegacyMessageException | InvalidMessageException | InvalidKeyIdException | InvalidKeyException | UntrustedIdentityException | InvalidVersionException | IOException ex) {
-                ex.printStackTrace();
-            }
-            if (bytes != null)
-                return new String(bytes, StandardCharsets.UTF_8);
-            else
-                return null;
-        }
-    }
-
-    public HashMap<String, String> encryptMedia(String filePath, String contentType) {
-        try {
-            File file = new File(filePath);
-            InputStream is = new FileInputStream(file);
-
-            CipherFileStream cipherFileStream = CipherFile.newStreamBuilder()
-                    .withStream(is)
-                    .withLength(is.available()).build();
-
-            byte[] fileKey = Util.getSecretBytes(64);
-            byte[] fileIV = Util.getSecretBytes(16);
-            InputStream dataStream = new PaddingInputStream(cipherFileStream.getInputStream(), cipherFileStream.getLength());
-
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            String encryptedFilePath = path + "/" + UUID.randomUUID().toString();
-            File encryptedFile = new File(encryptedFilePath);
-            DigestingOutputStream outputStream = new CipherOutputStreamFactory(fileKey, fileIV).createFor(byteArrayOutputStream);
-            byte[] buffer = new byte[4096];
-            int read;
-            while ((read = dataStream.read(buffer, 0, buffer.length)) != -1) {
-                outputStream.write(buffer, 0, read);
-            }
-
-            byteArrayOutputStream.flush();
-            byteArrayOutputStream.close();
-            outputStream.flush();
-            outputStream.close();
-
-
-            FileOutputStream fos = new FileOutputStream(encryptedFile);
-            fos.write(byteArrayOutputStream.toByteArray());
-            fos.flush();
-            fos.close();
-
-            byte[] digest = outputStream.getTransmittedDigest();
-            String secret = Base64.encodeBytes(fileKey) + Base64.encodeBytes(digest);
-            HashMap<String, String> map = new HashMap<>();
-            map.put("uri", "file://" + encryptedFilePath);
-            map.put("secret", secret);
-            return map;
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public JSONObject encryptFilePairwise(String userId, String filePath, String contentMedia) throws JSONException {
-        HashMap<String, String> hashMap = encryptMedia(filePath, contentMedia);
-        String cipherText = encryptTextPairwise(userId, 0, hashMap.get("secret"));
-        JSONObject map = new JSONObject();
-        map.put("uri", hashMap.get("uri"));
-        map.put("cipher", cipherText);
-        return map;
     }
 
 
@@ -759,45 +691,8 @@ public class StickProtocol {
         map.put("uri", hashMap.get("uri"));
         map.put("cipher", cipherText);
         return map;
-
     }
 
-    public String decryptMedia(String filePath, String secret, String outputPath) {
-        File file = new File(filePath);
-        try {
-            String key = secret.substring(0, 88);
-            String digest = secret.substring(88);
-            InputStream inputStream = CipherInputStream.createForFile(file, file.length(), Base64.decode(key), Base64.decode(digest));
-            File outputFile = new File(outputPath);
-            byte[] buffer = new byte[8192];
-            int read;
-            long total = 0;
-            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-            while ((read = inputStream.read(buffer, 0, buffer.length)) != -1) {
-                byteArrayOutputStream.write(buffer, 0, read);
-                total += read;
-            }
-            FileOutputStream fileOutputStream = new FileOutputStream(outputFile);
-            fileOutputStream.write(byteArrayOutputStream.toByteArray());
-            fileOutputStream.flush();
-            fileOutputStream.close();
-            byteArrayOutputStream.flush();
-            byteArrayOutputStream.close();
-            return "file://" + outputPath;
-        } catch (IOException | InvalidMessageException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-
-    public String decryptFilePairwise(String senderId, String filePath, String cipher, int size, String outputPath) {
-        String secret = decryptTextPairwise(senderId, 0, false, cipher);
-        String path = null;
-        if (secret != null)
-            path = decryptMedia(filePath, secret, outputPath);
-        return path;
-    }
 
     public String decryptFile(String senderId, String stickId, String filePath, String cipher, int size, String outputPath, Boolean isSticky) {
         String secret = decryptText(senderId, stickId, cipher, isSticky);
@@ -806,6 +701,88 @@ public class StickProtocol {
             path = decryptMedia(filePath, secret, outputPath);
         return path;
     }
+
+    /****************************** END OF STICKY SESSION METHODS ******************************/
+
+    /****************************** START OF USER KEYS METHODS ******************************/
+
+    public JSONObject refreshIdentityKey(int days) throws Exception {
+        long identityKeyAge = TimeUnit.MINUTES.toMillis(1) / 2;
+        long activeDuration = System.currentTimeMillis() - Preferences.getActiveIdentityKeyTimestamp(context);
+        if (activeDuration > identityKeyAge) {
+            SignalProtocolStore store = new MyProtocolStore(context);
+            IdentityKeyUtil.generateIdentityKeys(context);
+            IdentityKeyPair identityKey = store.getIdentityKeyPair();
+
+            String userId = PreferenceManager.getDefaultSharedPreferences(context).getString("userId", "");
+            HashMap<String, String> serviceMap = new HashMap();
+            serviceMap.put("service", passwordKey);
+            String password = keychain.getGenericPassword(userId, serviceMap);
+            JSONObject identityKeyJson = new JSONObject();
+            identityKeyJson.put("id", Preferences.getActiveIdentityKeyId(context));
+            identityKeyJson.put("public", Base64.encodeBytes(identityKey.getPublicKey().serialize()));
+            HashMap<String, String> signedCipherMap = pbEncrypt(identityKey.getPrivateKey().serialize(), password);
+            identityKeyJson.put("cipher", signedCipherMap.get("cipher"));
+            identityKeyJson.put("salt", signedCipherMap.get("salt"));
+            identityKeyJson.put("timestamp", Long.toString(Preferences.getActiveIdentityKeyTimestamp(context)));
+            return identityKeyJson;
+        }
+        return null;
+    }
+
+    public JSONObject refreshSignedPreKey(int days) throws Exception {
+        long signedPreKeyAge = TimeUnit.MINUTES.toMillis(1);
+        long activeDuration = System.currentTimeMillis() - Preferences.getActiveSignedPreKeyTimestamp(context);
+        if (activeDuration > signedPreKeyAge) {
+            IdentityKeyPair identityKey = IdentityKeyUtil.getIdentityKeyPair(context);
+            SignedPreKeyRecord signedPreKey = PreKeyUtil.generateSignedPreKey(context, identityKey, true);
+
+            String userId = PreferenceManager.getDefaultSharedPreferences(context).getString("userId", "");
+            HashMap<String, String> serviceMap = new HashMap();
+            serviceMap.put("service", passwordKey);
+            String password = keychain.getGenericPassword(userId, serviceMap);
+            JSONObject signedPreKeyJson = new JSONObject();
+            signedPreKeyJson.put("id", Preferences.getActiveSignedPreKeyId(context));
+            signedPreKeyJson.put("public", Base64.encodeBytes(signedPreKey.getKeyPair().getPublicKey().serialize()));
+            signedPreKeyJson.put("signature", Base64.encodeBytes(signedPreKey.getSignature()));
+            HashMap<String, String> signedCipherMap = pbEncrypt(signedPreKey.getKeyPair().getPrivateKey().serialize(), password);
+            signedPreKeyJson.put("cipher", signedCipherMap.get("cipher"));
+            signedPreKeyJson.put("salt", signedCipherMap.get("salt"));
+            signedPreKeyJson.put("timestamp", Long.toString(signedPreKey.getTimestamp()));
+            return signedPreKeyJson;
+        }
+        return null;
+    }
+
+    public JSONArray generatePreKeys(int nextPreKeyId, int count) {
+        try {
+            String userId = PreferenceManager.getDefaultSharedPreferences(context).getString("userId", "");
+            HashMap<String, String> serviceMap = new HashMap();
+            serviceMap.put("service", passwordKey);
+            String password = keychain.getGenericPassword(userId, serviceMap);
+            List<PreKeyRecord> preKeys = PreKeyUtil.generatePreKeys(context, nextPreKeyId, count);
+            JSONArray preKeysArray = new JSONArray();
+            for (int i = 0; i < preKeys.size(); i++) {
+                JSONObject preKey = new JSONObject();
+                preKey.put("id", preKeys.get(i).getId());
+                preKey.put("public", Base64.encodeBytes(preKeys.get(i).getKeyPair().getPublicKey().serialize()));
+                HashMap<String, String> cipherMap = pbEncrypt(preKeys.get(i).getKeyPair().getPrivateKey().serialize(), password);
+                preKey.put("cipher", cipherMap.get("cipher"));
+                preKey.put("salt", cipherMap.get("salt"));
+                preKeysArray.put(preKey);
+            }
+            return preKeysArray;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /****************************** END OF USER KEYS METHODS ******************************/
+
+
+    /****************************** START OF ARGON2 METHODS ******************************/
+
 
     public HashMap<String, String> pbEncrypt(byte[] text, String pass) throws Exception {
         // Generate salt
@@ -884,6 +861,109 @@ public class StickProtocol {
     }
 
 
+    /****************************** END OF ARGON2 METHODS ******************************/
+
+    /****************************** START OF FILE ENCRYPTION METHODS ******************************/
+
+
+
+    public HashMap<String, String> encryptMedia(String filePath, String contentType) {
+        try {
+            File file = new File(filePath);
+            InputStream is = new FileInputStream(file);
+
+            CipherFileStream cipherFileStream = CipherFile.newStreamBuilder()
+                    .withStream(is)
+                    .withLength(is.available()).build();
+
+            byte[] fileKey = Util.getSecretBytes(64);
+            byte[] fileIV = Util.getSecretBytes(16);
+            InputStream dataStream = new PaddingInputStream(cipherFileStream.getInputStream(), cipherFileStream.getLength());
+
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            String encryptedFilePath = path + "/" + UUID.randomUUID().toString();
+            File encryptedFile = new File(encryptedFilePath);
+            DigestingOutputStream outputStream = new CipherOutputStreamFactory(fileKey, fileIV).createFor(byteArrayOutputStream);
+            byte[] buffer = new byte[4096];
+            int read;
+            while ((read = dataStream.read(buffer, 0, buffer.length)) != -1) {
+                outputStream.write(buffer, 0, read);
+            }
+
+            byteArrayOutputStream.flush();
+            byteArrayOutputStream.close();
+            outputStream.flush();
+            outputStream.close();
+
+
+            FileOutputStream fos = new FileOutputStream(encryptedFile);
+            fos.write(byteArrayOutputStream.toByteArray());
+            fos.flush();
+            fos.close();
+
+            byte[] digest = outputStream.getTransmittedDigest();
+            String secret = Base64.encodeBytes(fileKey) + Base64.encodeBytes(digest);
+            HashMap<String, String> map = new HashMap<>();
+            map.put("uri", "file://" + encryptedFilePath);
+            map.put("secret", secret);
+            return map;
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
+    public String decryptMedia(String filePath, String secret, String outputPath) {
+        File file = new File(filePath);
+        try {
+            String key = secret.substring(0, 88);
+            String digest = secret.substring(88);
+            InputStream inputStream = CipherInputStream.createForFile(file, file.length(), Base64.decode(key), Base64.decode(digest));
+            File outputFile = new File(outputPath);
+            byte[] buffer = new byte[8192];
+            int read;
+            long total = 0;
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            while ((read = inputStream.read(buffer, 0, buffer.length)) != -1) {
+                byteArrayOutputStream.write(buffer, 0, read);
+                total += read;
+            }
+            FileOutputStream fileOutputStream = new FileOutputStream(outputFile);
+            fileOutputStream.write(byteArrayOutputStream.toByteArray());
+            fileOutputStream.flush();
+            fileOutputStream.close();
+            byteArrayOutputStream.flush();
+            byteArrayOutputStream.close();
+            return "file://" + outputPath;
+        } catch (IOException | InvalidMessageException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    /****************************** END OF FILE ENCRYPTION METHODS ******************************/
+
+    /****************************** START OF UTILITY METHODS ******************************/
+
+    public String recoverPassword(String userId) {
+        HashMap<String, String> serviceMap = new HashMap();
+        serviceMap.put("service", passwordKey);
+        return keychain.getGenericPassword(userId, serviceMap);
+    }
+
+    public void resetDatabase() {
+        DatabaseFactory.getInstance(context).resetDatabase(context);
+    }
+
+    public boolean isInitialized() {
+        SignalProtocolStore store = new MyProtocolStore(context);
+        int localId = store.getLocalRegistrationId();
+        return localId != 0;
+    }
+
+
     public void cacheUri(String id, String uri) {
         DatabaseFactory.getFileDatabase(context).insertUri(id, uri);
     }
@@ -900,4 +980,7 @@ public class StickProtocol {
         }
         return recipientCache;
     }
+
+    /****************************** END OF UTILITY METHODS ******************************/
+
 }
