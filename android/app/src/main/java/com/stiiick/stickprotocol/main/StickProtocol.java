@@ -9,6 +9,7 @@ package com.stiiick.stickprotocol.main;
 
 import android.content.Context;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -527,6 +528,9 @@ public class StickProtocol {
             SenderKeyDistributionMessage senderKeyDistributionMessage = groupSessionBuilder.create(senderKeyName);
             DatabaseFactory.getStickyKeyDatabase(context).insertStickyKey(stickId, Base64.encodeBytes(senderKeyDistributionMessage.serialize()));
             SenderKeyState senderKeyState = senderKeyStore.loadSenderKey(senderKeyName).getSenderKeyState();
+            Log.d("PRIVATE KEY LENGTHXXX",  Integer.toString(Base64.encodeBytes(senderKeyState.getSigningKeyPrivate().serialize()).length()));
+            Log.d("PUBLIC KEY LENGTHXXX",  Integer.toString(Base64.encodeBytes(senderKeyState.getSigningKeyPublic().serialize()).length()));
+            Log.d("CHAIN KEY LENGTHXXX",  Integer.toString(Base64.encodeBytes(senderKeyState.getSenderChainKey().getSeed()).length()));
             String cipher = encryptTextPairwise(userId, Base64.encodeBytes(senderKeyState.getSigningKeyPrivate().serialize()));
             JSONObject map = new JSONObject();
             map.put("id", senderKeyState.getKeyId());
@@ -579,6 +583,8 @@ public class StickProtocol {
                 SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(senderId, 0);
                 SenderKeyName senderKeyName = new SenderKeyName(stickId, signalProtocolAddress);
                 GroupSessionBuilder groupSessionBuilder = new GroupSessionBuilder(senderKeyStore);
+                if (identityKeyId == -1)
+                    identityKeyId = Preferences.getActiveIdentityKeyId(context);
                 String senderKey = decryptStickyKey(senderId, cipherSenderKey, identityKeyId);
                 if (senderKey != null) {
                     SenderKeyDistributionMessage senderKeyDistributionMessage = new SenderKeyDistributionMessage(Base64.decode(senderKey));
@@ -679,8 +685,7 @@ public class StickProtocol {
      * @param stickId - id of the sticky session
      * @param filePath - path of the file to be encrypted
      * @param contentMedia - type of the file
-     * @param isSticky - boolean indicating whether this encryption is for a sticky sesison
-     *
+     * @param isSticky - boolean indicating whether this encryption is for a sticky session
      * @return JSONObject - contains the following:
      *                          * uri: path of the encrypted file
      *                          * cipher: (fileKey||fileHash) encrypted

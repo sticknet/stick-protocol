@@ -112,10 +112,10 @@ export default class StickProtocolHandlers {
             const preKeyId = bundles[memberId].preKeyId
             const identityKeyId = bundles[memberId].identityKeyId
             if (memberId !== this.userId) {
-                const key = await this.StickProtocol.getSenderKey(memberId, stickId, true);
+                const key = await this.StickProtocol.getSenderKey(this.userId, memberId, stickId, true);
                 keys[memberId] = {identityKeyId, preKeyId, key, stickId, forUser: memberId}
             } else {
-                let encryptingSenderKey = await this.StickProtocol.getEncryptingSenderKey(stickId)
+                let encryptingSenderKey = await this.StickProtocol.getEncryptingSenderKey(this.userId, stickId)
                 encryptingSenderKey['preKeyId'] = preKeyId
                 encryptingSenderKey['identityKeyId'] = identityKeyId
                 encryptingSenderKey['stickId'] = stickId
@@ -156,10 +156,10 @@ export default class StickProtocolHandlers {
                 dispatch({type: 'DOWNLOADED', payload: entityId});
             } else { // otherwise initialize the session
                 if (memberId !== userId)
-                    await this.StickProtocol.initSession(memberId, stickId, response.data.senderKey.key, true, response.data.senderKey.identityKeyId)
+                    await this.StickProtocol.initSession(memberId, stickId, response.data.senderKey.key, response.data.senderKey.identityKeyId)
                 else {
                     response.data.senderKey.stickId = stickId
-                    await this.StickProtocol.reinitMyStickySession(response.data.senderKey)
+                    await this.StickProtocol.reinitMyStickySession(this.userId, response.data.senderKey)
                 }
                 await dispatch({type: 'PENDING_SESSION_DONE', payload: stickId})
             }
@@ -211,7 +211,7 @@ export default class StickProtocolHandlers {
         const phone = pkb.phone
         if (memberId.length === 36 && stickId.length >= 36) {
             // Get the sender key and upload it
-            const key = await this.StickProtocol.getSenderKey(memberId, stickId, true);
+            const key = await this.StickProtocol.getSenderKey(this.userId, memberId, stickId, true);
             const body = {preKeyId, key, stickId, forUser: memberId}
             await axios.post(`${this.URL}/api/upload-sk/`, body, this.httpConfig)
         }
@@ -227,9 +227,9 @@ export default class StickProtocolHandlers {
      */
     async syncChain(step, stickId) {
         if (step) {
-            const currentStep = await this.StickProtocol.getChainStep(stickId)
+            const currentStep = await this.StickProtocol.getChainStep(this.userId, stickId)
             if (step > currentStep) {
-                await this.StickProtocol.ratchetChain(stickId, step - currentStep)
+                await this.StickProtocol.ratchetChain(this.userId, stickId, step - currentStep)
             }
         }
     }
@@ -259,7 +259,7 @@ export default class StickProtocolHandlers {
         }
         const response = await axios.post(`${this.URL}/api/fetch-sk/`, body, this.httpConfig);
         if (response.data.senderKey)
-            await this.StickProtocol.initSession(oneTimeId, stickId, response.data.senderKey, false)
+            await this.StickProtocol.initSession(oneTimeId, stickId, response.data.senderKey)
     }
 
     /**
@@ -279,7 +279,7 @@ export default class StickProtocolHandlers {
             if (member.id !== this.userId) {
                 const oneTimeId = member.oneTimeId;
                 await this.checkPairwiseSession(member.id, oneTimeId); // check pairwise session and create one if needed
-                const exists = await this.StickProtocol.sessionExists(oneTimeId, stickId, false)
+                const exists = await this.StickProtocol.sessionExists(oneTimeId, stickId)
 
                 // if there is no session, add the member's oneTimeId to the list of sessions that the user needs to init
                 if (!exists)
@@ -296,7 +296,7 @@ export default class StickProtocolHandlers {
             }, this.httpConfig)
             for (let i = 0; i < keysToFetch.length; i++) {
                 if (response.data.senderKeys[keysToFetch[i]]) {
-                    await this.StickProtocol.initSession(keysToFetch[i], chatId, response.data.senderKeys[keysToFetch[i]], false)
+                    await this.StickProtocol.initSession(keysToFetch[i], chatId, response.data.senderKeys[keysToFetch[i]])
                 }
             }
         }
@@ -314,7 +314,7 @@ export default class StickProtocolHandlers {
             const member = members[i]
             if (member.id !== this.userId) {
                 if (!res.data.members[member.oneTimeId].exists) {
-                    keysToUpload[member.oneTimeId] = await this.StickProtocol.getSenderKey(member.oneTimeId, stickId, false);
+                    keysToUpload[member.oneTimeId] = await this.StickProtocol.getSenderKey(this.userOneTimeId, member.oneTimeId, stickId, false);
                 }
             }
         }
