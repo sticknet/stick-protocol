@@ -209,8 +209,7 @@ class StickProtocol():
             if memberId != user.id:
                 key = {'key': senderKey.key, 'identityKeyId': senderKey.identityKey.keyId}
             else:
-                key = {'id': senderKey.keyId, 'chainKey': senderKey.chainKey, 'public': senderKey.public,
-                       'cipher': senderKey.cipher, 'step': senderKey.step, 'identityKeyId': senderKey.identityKey.keyId}
+                key = {'id': senderKey.keyId, 'key': senderKey.key, 'step': senderKey.step, 'identityKeyId': senderKey.identityKey.keyId}
         # SenderKey does not exist, send a `PendingKey` request to the target user to upload their key,
         # through a realtime database.
         else:
@@ -404,9 +403,7 @@ class StickProtocol():
                 chainId = senderKey['stickId'][36:]
                 EncryptingSenderKey.objects.create(keyId=senderKey['id'], preKey=preKey, identityKey=identityKey,
                                                    partyId=partyId, chainId=chainId,
-                                                   user=user, chainKey=senderKey['chainKey'],
-                                                   public=senderKey['public'],
-                                                   cipher=senderKey['cipher'])
+                                                   user=user, key=['key'])
         if "group_id" in data:  # TODO: REMOVE FROM HERE MAYBE?
             user.just_added_groups.remove(data["group_id"])
 
@@ -482,8 +479,7 @@ class StickProtocol():
             senderKeys = []
             for senderKey in senderKeysList:
                 stickId = senderKey.partyId + senderKey.chainId
-                key = {'id': senderKey.keyId, 'chainKey': senderKey.chainKey, 'public': senderKey.public,
-                       'cipher': senderKey.cipher, 'stickId': stickId, 'step': senderKey.step,
+                key = {'id': senderKey.keyId, 'key': senderKey.key, 'stickId': stickId, 'step': senderKey.step,
                        'identityKeyId': senderKey.identityKey.keyId}
                 senderKeys.append(key)
             bundle['senderKeys'] = senderKeys

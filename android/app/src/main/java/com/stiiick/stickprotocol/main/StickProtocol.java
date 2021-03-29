@@ -515,9 +515,7 @@ public class StickProtocol {
      * @param stickId - String, the stickId of the sticky session
      * @return JSONObject - contains the following:
      *                          * id - int, the sender key id
-     *                          * chainKey - String
-     *                          * public - String, signature key public key
-     *                          * cipher - String, signature key encrypted private key
+     *                          * key - encrypted sender key (chainKey || private signature key || public signature key)
      */
     public JSONObject getEncryptingSenderKey(String userId, String stickId) {
         try {
@@ -528,15 +526,11 @@ public class StickProtocol {
             SenderKeyDistributionMessage senderKeyDistributionMessage = groupSessionBuilder.create(senderKeyName);
             DatabaseFactory.getStickyKeyDatabase(context).insertStickyKey(stickId, Base64.encodeBytes(senderKeyDistributionMessage.serialize()));
             SenderKeyState senderKeyState = senderKeyStore.loadSenderKey(senderKeyName).getSenderKeyState();
-            Log.d("PRIVATE KEY LENGTHXXX",  Integer.toString(Base64.encodeBytes(senderKeyState.getSigningKeyPrivate().serialize()).length()));
-            Log.d("PUBLIC KEY LENGTHXXX",  Integer.toString(Base64.encodeBytes(senderKeyState.getSigningKeyPublic().serialize()).length()));
-            Log.d("CHAIN KEY LENGTHXXX",  Integer.toString(Base64.encodeBytes(senderKeyState.getSenderChainKey().getSeed()).length()));
-            String cipher = encryptTextPairwise(userId, Base64.encodeBytes(senderKeyState.getSigningKeyPrivate().serialize()));
+            String key =  Base64.encodeBytes(senderKeyState.getSenderChainKey().getSeed()) + Base64.encodeBytes(senderKeyState.getSigningKeyPrivate().serialize()) + Base64.encodeBytes(senderKeyState.getSigningKeyPublic().serialize());
+            String encryptKey = encryptTextPairwise(userId, key);
             JSONObject map = new JSONObject();
             map.put("id", senderKeyState.getKeyId());
-            map.put("chainKey", Base64.encodeBytes(senderKeyState.getSenderChainKey().getSeed()));
-            map.put("public", Base64.encodeBytes(senderKeyState.getSigningKeyPublic().serialize()));
-            map.put("cipher", cipher);
+            map.put("key", encryptKey);
             return map;
         } catch (InvalidKeyException | InvalidKeyIdException | JSONException e) {
             e.printStackTrace();
@@ -786,15 +780,21 @@ public class StickProtocol {
         SenderKeyName senderKeyName = new SenderKeyName(senderKey.getString("stickId"), signalProtocolAddress);
         SenderKeyStore senderKeyStore = new MySenderKeyStore(context);
         SenderKeyRecord senderKeyRecord = senderKeyStore.loadSenderKey(senderKeyName);
-        ECPublicKey senderPubKey = Curve.decodePoint(Base64.decode(senderKey.getString("public")), 0);
-        String privateKey = decryptStickyKey(userId, senderKey.getString("cipher"), senderKey.getInt("identityKeyId"));
-        ECPrivateKey senderPrivKey = Curve.decodePrivatePoint(Base64.decode(privateKey));
-        ECKeyPair signedSenderKey = new ECKeyPair(senderPubKey, senderPrivKey);
+
+        String key = decryptStickyKey(userId, senderKey.getString("key"), senderKey.getInt("identityKeyId"));
+        String chainKey = key.substring(0, 44);
+        String signaturePrivateKey = key.substring(44, 88);
+        String signaturePublicKey = key.substring(88, 132);
+
+        ECPublicKey senderPubKey = Curve.decodePoint(Base64.decode(signaturePublicKey), 0);
+        ECPrivateKey senderPrivKey = Curve.decodePrivatePoint(Base64.decode(signaturePrivateKey));
+        ECKeyPair signatureKey = new ECKeyPair(senderPubKey, senderPrivKey);
+
         senderKeyRecord.setSenderKeyState(
                 senderKey.getInt("id"),
                 0,
-                Base64.decode(senderKey.getString("chainKey")),
-                signedSenderKey
+                Base64.decode(chainKey),
+                signatureKey
         );
         senderKeyStore.storeSenderKey(senderKeyName, senderKeyRecord);
 
