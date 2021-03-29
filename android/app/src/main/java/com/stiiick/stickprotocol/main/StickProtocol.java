@@ -778,14 +778,14 @@ public class StickProtocol {
     }
 
     /***
-     * A private method used to decrypt a sticky key (sender key). Before attempting to decrypt the ciphertext,
+     * This method is used to decrypt a sticky key (sender key). Before attempting to decrypt the ciphertext,
      * it will check and swap the current active identity key if needed.
      *
      * @param senderId - userId of the sender
      * @param cipher - the encrypted key
      * @param identityKeyId - the identity key id of the target user that was used to encrypt the sender key
      */
-    private String decryptStickyKey(String senderId, String cipher, int identityKeyId) {
+    public String decryptStickyKey(String senderId, String cipher, int identityKeyId) {
         int activeIdentityKeyId = Preferences.getActiveIdentityKeyId(context);
         // Swap identity key if needed
         if (activeIdentityKeyId != identityKeyId) {
@@ -919,13 +919,13 @@ public class StickProtocol {
     /****************************** START OF ARGON2 METHODS ******************************/
 
     /***
-     * A private method used to encrypt private keys using a hash of the password derived using Argon2.
+     * This method is used to encrypt private keys using a hash of the password derived using Argon2.
      *
      * @param text - a byte array of the plaintext (key) to be encrypted
      * @param pass - String, plaintext password
      * @return A hashmap containing the salt used and the produced cipher
      */
-    private HashMap<String, String> pbEncrypt(byte[] text, String pass) throws Exception {
+    public HashMap<String, String> pbEncrypt(byte[] text, String pass) throws Exception {
         // Generate salt
         SecureRandom randomSalt = new SecureRandom();
         byte[] salt = new byte[32];
@@ -969,14 +969,14 @@ public class StickProtocol {
     }
 
     /***
-     * A private method used to decrypt the encrypted private keys using a hash of the password derived using Argon2.
+     * This method is used to decrypt the encrypted private keys using a hash of the password derived using Argon2.
      *
      * @param encryptedIvText, String - ciphertext
      * @param salt - String, the salt that was used
      * @param pass - String, plaintext password
      * @return plaintext as a byte array
      */
-    private byte[] pbDecrypt(String encryptedIvText, String salt, String pass) throws Exception {
+    public byte[] pbDecrypt(String encryptedIvText, String salt, String pass) throws Exception {
         int ivSize = 16;
         byte[] encryptedIvTextBytes = Base64.decode(encryptedIvText);
 
@@ -1015,14 +1015,14 @@ public class StickProtocol {
     /****************************** START OF FILE ENCRYPTION METHODS ******************************/
 
     /**
-     * A private method used to encrypt blob files.
+     * This method is used to encrypt blob files.
      *
      * @param filePath - file to be encrypted
      * @return HashMap - contains the following:
      *                          * uri: path of the encrypted file
      *                          * blob secret: (fileKey||fileHash)
      */
-    private HashMap<String, String> encryptBlob(String filePath) {
+    public HashMap<String, String> encryptBlob(String filePath) {
         try {
             File file = new File(filePath);
             InputStream is = new FileInputStream(file);
@@ -1070,14 +1070,14 @@ public class StickProtocol {
     }
 
     /***
-     * A private method used to decrypt blob files
+     * This method is used to decrypt blob files
      *
      * @param filePath - path of the file to be decrypted
      * @param secret - (fileKey||fileHash)
      * @param outputPath - path to decrypt the file at
      * @return absolute path of the decrypted file
      */
-    private String decryptBlob(String filePath, String secret, String outputPath) {
+    public String decryptBlob(String filePath, String secret, String outputPath) {
         File file = new File(filePath);
         try {
             String key = secret.substring(0, 88);
