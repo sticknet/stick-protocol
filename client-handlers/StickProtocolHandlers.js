@@ -5,7 +5,7 @@
  *  LICENSE file in the root directory of this source tree.
  */
 
-import axios from "axios";
+import axios from "axios"; // To make HTTP requests
 
 /**
  *  This class contains common handler methods needed for the StickProtocol client-side. These handlers may differ
@@ -176,7 +176,7 @@ export default class StickProtocolHandlers {
     async checkPairwiseSession(userId, oneTimeId) {
         const exists = await this.StickProtocol.pairwiseSessionExists(oneTimeId)
         if (!exists) {
-            const {data: pkb} = await axios.get(`${this.URL}/api/fetch-pkb/?id=${userId}&deviceId=0&isSticky=false`, this.httpConfig)
+            const {data: pkb} = await axios.get(`${this.URL}/api/fetch-pkb/?id=${userId}&isSticky=false`, this.httpConfig)
             pkb.userId = oneTimeId
             await this.StickProtocol.initPairwiseSession(pkb)
         }
@@ -204,7 +204,7 @@ export default class StickProtocolHandlers {
      */
     async uploadPendingKey(memberId, stickId) {
         // Fetch preKeyBundle to create a new pairwise session to encrypt the sender key
-        const {data: pkb} = await axios.get(`${this.URL}/api/fetch-pkb/?id=${memberId}&deviceId=1`, this.httpConfig)
+        const {data: pkb} = await axios.get(`${this.URL}/api/fetch-pkb/?id=${memberId}`, this.httpConfig)
         // Init the session
         await this.StickProtocol.initPairwiseSession(pkb)
         const preKeyId = pkb.preKeyId

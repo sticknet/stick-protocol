@@ -26,7 +26,6 @@ import java.util.List;
 import static org.whispersystems.libsignal.state.StorageProtos.SenderKeyStateStructure;
 
 /**
- * Represents the state of an individual SenderKey ratchet.
  *
  * @author Omar Basem
  */

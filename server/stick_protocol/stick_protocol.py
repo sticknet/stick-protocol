@@ -73,7 +73,6 @@ class StickProtocol():
         communicate a SenderKey, then the PreKey must be marked as used, otherwise the PreKey is deleted from the server.
         """
         userId = data['userId']
-        deviceId = data['deviceId']
         isSticky = data['isSticky']
         user = self.User.objects.get(id=userId)
         identityKey = IdentityKey.objects.get(user=user, active=True)
@@ -84,7 +83,6 @@ class StickProtocol():
             "identityKeyId": identityKey.keyId,
             "userId": userId,
             "localId": user.localId,
-            "deviceId": deviceId,
             "signedPreKey": signedPreKey.public,
             "signedPreKeyId": signedPreKey.keyId,
             "signature": signedPreKey.signature,
@@ -129,7 +127,6 @@ class StickProtocol():
                 "localId": user.localId,
                 "userId": id,
                 "oneTimeId": user.oneTimeId,
-                "deviceId": 1,
                 "signedPreKey": signedPreKey.public,
                 "signedPreKeyId": signedPreKey.keyId,
                 "signature": signedPreKey.signature,
