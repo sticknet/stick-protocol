@@ -512,13 +512,13 @@ public class StickProtocol {
     public JSONObject getEncryptingSenderKey(String userId, String stickId, Boolean isSticky) {
         try {
             SenderKeyStore senderKeyStore = new MySenderKeyStore(context);
-            SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(userId, isSticky ? 1 : 0);
+            SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(userId, 0);
             SenderKeyName senderKeyName = new SenderKeyName(stickId, signalProtocolAddress);
             GroupSessionBuilder groupSessionBuilder = new GroupSessionBuilder(senderKeyStore);
             SenderKeyDistributionMessage senderKeyDistributionMessage = groupSessionBuilder.create(senderKeyName);
             DatabaseFactory.getStickyKeyDatabase(context).insertStickyKey(stickId, Base64.encodeBytes(senderKeyDistributionMessage.serialize()));
             SenderKeyState senderKeyState = senderKeyStore.loadSenderKey(senderKeyName).getSenderKeyState();
-            String cipher = encryptTextPairwise(userId, isSticky ? 1 : 0, Base64.encodeBytes(senderKeyState.getSigningKeyPrivate().serialize()));
+            String cipher = encryptTextPairwise(userId, 0, Base64.encodeBytes(senderKeyState.getSigningKeyPrivate().serialize()));
             JSONObject map = new JSONObject();
             map.put("id", senderKeyState.getKeyId());
             map.put("chainKey", Base64.encodeBytes(senderKeyState.getSenderChainKey().getSeed()));
@@ -544,7 +544,7 @@ public class StickProtocol {
             GroupSessionBuilder groupSessionBuilder = new GroupSessionBuilder(senderKeyStore);
             senderKeyDistributionMessage = groupSessionBuilder.create(senderKeyName);
         }
-        return encryptTextPairwise(targetId, isSticky ? 1 : 0, Base64.encodeBytes(senderKeyDistributionMessage.serialize()));
+        return encryptTextPairwise(targetId, 0, Base64.encodeBytes(senderKeyDistributionMessage.serialize()));
     }
 
     public String decryptStickyKey(String senderId, String cipher, int identityKeyId) {
@@ -617,7 +617,7 @@ public class StickProtocol {
     public String encryptText(String userId, String stickId, String text, Boolean isSticky) {
         try {
             SenderKeyStore senderKeyStore = new MySenderKeyStore(context);
-            SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(userId, isSticky ? 1 : 0);
+            SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(userId, 0);
             SenderKeyName senderKeyName = new SenderKeyName(stickId, signalProtocolAddress);
             GroupCipher groupCipher = new GroupCipher(senderKeyStore, senderKeyName);
             byte[] cipherText;
@@ -632,7 +632,7 @@ public class StickProtocol {
 
     public Boolean sessionExists(String senderId, String stickId, Boolean isSticky) {
         SenderKeyStore mySenderKeyStore = new MySenderKeyStore(context);
-        SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(senderId, isSticky ? 1 : 0);
+        SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(senderId, 0);
         SenderKeyName senderKeyName = new SenderKeyName(stickId, signalProtocolAddress);
         SenderKeyRecord record = mySenderKeyStore.loadSenderKey(senderKeyName);
         return !record.isEmpty();
@@ -650,7 +650,7 @@ public class StickProtocol {
         try {
             if (cipherSenderKey != null) {
                 SenderKeyStore senderKeyStore = new MySenderKeyStore(context);
-                SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(senderId, isSticky ? 1 : 0);
+                SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(senderId, 0);
                 SenderKeyName senderKeyName = new SenderKeyName(stickId, signalProtocolAddress);
                 GroupSessionBuilder groupSessionBuilder = new GroupSessionBuilder(senderKeyStore);
                 String senderKey = decryptStickyKey(senderId, cipherSenderKey, identityKeyId);
@@ -670,7 +670,7 @@ public class StickProtocol {
         try {
             Boolean isSelf = senderId.equals(PreferenceManager.getDefaultSharedPreferences(context).getString("userId", ""));
             SenderKeyStore mySenderKeyStore = new MySenderKeyStore(context);
-            SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(senderId, isSticky ? 1 : 0);
+            SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(senderId, 0);
             SenderKeyName senderKeyName = new SenderKeyName(stickId, signalProtocolAddress);
             GroupCipher groupCipher = new GroupCipher(mySenderKeyStore, senderKeyName);
             byte[] decryptedCipher;
