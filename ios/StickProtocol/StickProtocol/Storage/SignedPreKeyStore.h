@@ -5,7 +5,6 @@
 //  Created by Chris Ballinger on 6/27/16.
 //
 //
-
 @import Foundation;
 
 NS_ASSUME_NONNULL_BEGIN

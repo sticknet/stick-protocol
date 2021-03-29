@@ -143,6 +143,11 @@
 		071018862607452D00CD0E47 /* StickProtocol.h in Headers */ = {isa = PBXBuildFile; fileRef = 071018852607452D00CD0E47 /* StickProtocol.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		07BBB3CE261056C400B14508 /* SPIdentityKey.m in Sources */ = {isa = PBXBuildFile; fileRef = 07BBB3CD261056C400B14508 /* SPIdentityKey.m */; };
 		07BBB3E026105F4D00B14508 /* SPIdentityKey.h in Headers */ = {isa = PBXBuildFile; fileRef = 07BBB3D1261056D400B14508 /* SPIdentityKey.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		07DB3D5B261197A700237665 /* sender_key_state.h in Headers */ = {isa = PBXBuildFile; fileRef = 07DB3D57261197A700237665 /* sender_key_state.h */; };
+		07DB3D5C261197A700237665 /* sender_key_state.c in Sources */ = {isa = PBXBuildFile; fileRef = 07DB3D58261197A700237665 /* sender_key_state.c */; };
+		07DB3D5D261197A700237665 /* group_cipher.c in Sources */ = {isa = PBXBuildFile; fileRef = 07DB3D59261197A700237665 /* group_cipher.c */; };
+		07DB3D5E261197A700237665 /* group_cipher.h in Headers */ = {isa = PBXBuildFile; fileRef = 07DB3D5A261197A700237665 /* group_cipher.h */; };
+		07DB3DA42611A33300237665 /* README.txt in Resources */ = {isa = PBXBuildFile; fileRef = 07DB3DA32611A33300237665 /* README.txt */; };
 		2D83A34A2138A63D53634E4C /* libPods-StickProtocol-StickProtocolTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A0FA4D9B910C349B6BB82BE5 /* libPods-StickProtocol-StickProtocolTests.a */; };
 		53ADF596B33CABEA0811CB57 /* libPods-StickProtocol.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 90A6DF9FEE0A5CA3DF96A99B /* libPods-StickProtocol.a */; };
 /* End PBXBuildFile section */
@@ -262,6 +267,11 @@
 		071026A32607BD2000CD0E47 /* CocoaLumberjack.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = CocoaLumberjack.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		07BBB3CD261056C400B14508 /* SPIdentityKey.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SPIdentityKey.m; sourceTree = "<group>"; };
 		07BBB3D1261056D400B14508 /* SPIdentityKey.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SPIdentityKey.h; sourceTree = "<group>"; };
+		07DB3D57261197A700237665 /* sender_key_state.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sender_key_state.h; sourceTree = "<group>"; };
+		07DB3D58261197A700237665 /* sender_key_state.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = sender_key_state.c; sourceTree = "<group>"; };
+		07DB3D59261197A700237665 /* group_cipher.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = group_cipher.c; sourceTree = "<group>"; };
+		07DB3D5A261197A700237665 /* group_cipher.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = group_cipher.h; sourceTree = "<group>"; };
+		07DB3DA32611A33300237665 /* README.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = README.txt; sourceTree = "<group>"; };
 		480B013D7D38AF279D597F4E /* Pods-StickProtocol.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StickProtocol.debug.xcconfig"; path = "Target Support Files/Pods-StickProtocol/Pods-StickProtocol.debug.xcconfig"; sourceTree = "<group>"; };
 		52665AA51DCE22BE382488C8 /* Pods-StickProtocol-StickProtocolTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StickProtocol-StickProtocolTests.debug.xcconfig"; path = "Target Support Files/Pods-StickProtocol-StickProtocolTests/Pods-StickProtocol-StickProtocolTests.debug.xcconfig"; sourceTree = "<group>"; };
 		6B35F7AC4594F4E0AADA3578 /* Pods-StickProtocol.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StickProtocol.release.xcconfig"; path = "Target Support Files/Pods-StickProtocol/Pods-StickProtocol.release.xcconfig"; sourceTree = "<group>"; };
@@ -323,7 +333,7 @@
 		07101763260741D900CD0E47 /* StickProtocol */ = {
 			isa = PBXGroup;
 			children = (
-				071018A22607465E00CD0E47 /* Info.plist */,
+				07DB3D562611975700237665 /* Internal */,
 				07101775260741D900CD0E47 /* CryptoProvider */,
 				071017C1260741D900CD0E47 /* FileCrypto */,
 				071017CD260741D900CD0E47 /* Utility */,
@@ -335,6 +345,7 @@
 				071017B1260741D900CD0E47 /* EncryptionManager.swift */,
 				071017AE260741D900CD0E47 /* StickProtocol.swift */,
 				071018852607452D00CD0E47 /* StickProtocol.h */,
+				071018A22607465E00CD0E47 /* Info.plist */,
 			);
 			path = StickProtocol;
 			sourceTree = "<group>";
@@ -481,6 +492,18 @@
 			path = Utility;
 			sourceTree = "<group>";
 		};
+		07DB3D562611975700237665 /* Internal */ = {
+			isa = PBXGroup;
+			children = (
+				07DB3D59261197A700237665 /* group_cipher.c */,
+				07DB3D5A261197A700237665 /* group_cipher.h */,
+				07DB3D58261197A700237665 /* sender_key_state.c */,
+				07DB3D57261197A700237665 /* sender_key_state.h */,
+				07DB3DA32611A33300237665 /* README.txt */,
+			);
+			path = Internal;
+			sourceTree = "<group>";
+		};
 		17DB993732A2C09AFF2B5521 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -515,6 +538,7 @@
 				0710182F260741D900CD0E47 /* IdentityKeyStore.h in Headers */,
 				07101858260741D900CD0E47 /* FileCrypto.h in Headers */,
 				0710185E260741D900CD0E47 /* SignalError.h in Headers */,
+				07DB3D5B261197A700237665 /* sender_key_state.h in Headers */,
 				071017FD260741D900CD0E47 /* Serializable.h in Headers */,
 				071017F8260741D900CD0E47 /* SignalAddress.h in Headers */,
 				071017D7260741D900CD0E47 /* SPSenderKey.h in Headers */,
@@ -542,6 +566,7 @@
 				07101854260741D900CD0E47 /* CryptoError.h in Headers */,
 				0710182B260741D900CD0E47 /* SignedPreKeyStore.h in Headers */,
 				0710182C260741D900CD0E47 /* SenderKeyStore.h in Headers */,
+				07DB3D5E261197A700237665 /* group_cipher.h in Headers */,
 				07101840260741D900CD0E47 /* GroupSessionBuilder.h in Headers */,
 				071017D6260741D900CD0E47 /* SPIdentity.h in Headers */,
 				07101855260741D900CD0E47 /* NSData+SP.h in Headers */,
@@ -656,6 +681,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				07DB3DA42611A33300237665 /* README.txt in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -759,6 +785,7 @@
 				07101841260741D900CD0E47 /* SessionCipher.m in Sources */,
 				071017D0260741D900CD0E47 /* StorageManager.swift in Sources */,
 				07101804260741D900CD0E47 /* SenderKeyDistributionMessage.m in Sources */,
+				07DB3D5D261197A700237665 /* group_cipher.c in Sources */,
 				07101818260741D900CD0E47 /* SignalMessage.m in Sources */,
 				0710184C260741D900CD0E47 /* SPLogs.m in Sources */,
 				0710184E260741D900CD0E47 /* NSData+SP.m in Sources */,
@@ -774,6 +801,7 @@
 				0710180C260741D900CD0E47 /* IdentityKeyPair.m in Sources */,
 				07101816260741D900CD0E47 /* KeyPair.m in Sources */,
 				071017E9260741D900CD0E47 /* CommonCryptoProvider.m in Sources */,
+				07DB3D5C261197A700237665 /* sender_key_state.c in Sources */,
 				071017D4260741D900CD0E47 /* SPPreKey.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -972,6 +1000,7 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				"EXCLUDED_SOURCE_FILE_NAMES[arch=*]" = "StickProtocol/Internal/*";
 				INFOPLIST_FILE = StickProtocol/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -979,6 +1008,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
+				NEW_SETTING = "";
 				ONLY_ACTIVE_ARCH = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = com.stiiick.StickProtocol;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
@@ -1002,6 +1032,7 @@
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				"EXCLUDED_SOURCE_FILE_NAMES[arch=*]" = "StickProtocol/Internal/*";
 				INFOPLIST_FILE = StickProtocol/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -1009,6 +1040,7 @@
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
+				NEW_SETTING = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.stiiick.StickProtocol;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;

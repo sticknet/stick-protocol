@@ -4,6 +4,6 @@ logic external to the Signal protocol. However, a few files had to be changed in
 protocol. These files are listed in this directory "internal". In the Stick protocol implementation,
 these modified files are actually imported from a customized Signal protocol repo:
 
-https://github.com/STiiiCK/sticky-signal-protocol-java
+https://github.com/STiiiCK/sticky-signal-protocol-c
 
 These files are listed here just for reference.
