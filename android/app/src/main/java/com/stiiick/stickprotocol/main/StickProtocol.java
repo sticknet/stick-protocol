@@ -591,34 +591,6 @@ public class StickProtocol {
     }
 
     /***
-     * This method is used to decrypt a sticky key (sender key). Before attempting to decrypt the ciphertext,
-     * it will check and swap the current active identity key if needed.
-     *
-     * @param senderId - userId of the sender
-     * @param cipher - the encrypted key
-     * @param identityKeyId - the identity key id of the target user that was used to encrypt the sender key
-     */
-    public String decryptStickyKey(String senderId, String cipher, int identityKeyId) {
-        int activeIdentityKeyId = Preferences.getActiveIdentityKeyId(context);
-        // Swap identity key if needed
-        if (activeIdentityKeyId != identityKeyId) {
-            IdentityKeyRecord identityKeyRecord = DatabaseFactory.getIdentityKeyDatabase(context).getIdentityKey(identityKeyId);
-            IdentityKeyUtil.save(context, "pref_identity_public", Base64.encodeBytes(identityKeyRecord.getKeyPair().getPublicKey().serialize()));
-            IdentityKeyUtil.save(context, "pref_identity_private", Base64.encodeBytes(identityKeyRecord.getKeyPair().getPrivateKey().serialize()));
-        }
-
-        String key = decryptTextPairwise(senderId, true, cipher);
-
-        // Reverse identity key back if was swapped
-        if (activeIdentityKeyId != identityKeyId) {
-            IdentityKeyRecord identityKeyRecord = DatabaseFactory.getIdentityKeyDatabase(context).getIdentityKey(Preferences.getActiveIdentityKeyId(context));
-            IdentityKeyUtil.save(context, "pref_identity_public", Base64.encodeBytes(identityKeyRecord.getKeyPair().getPublicKey().serialize()));
-            IdentityKeyUtil.save(context, "pref_identity_private", Base64.encodeBytes(identityKeyRecord.getKeyPair().getPrivateKey().serialize()));
-        }
-        return key;
-    }
-
-    /***
      * This method is used to make an encryption in a sticky session.
      *
      * @param senderId - userId (or oneTimeId)
@@ -678,14 +650,13 @@ public class StickProtocol {
      * @param senderId - userId
      * @param stickId - id of the sticky session
      * @param filePath - path of the file to be encrypted
-     * @param contentMedia - type of the file
      * @param isSticky - boolean indicating whether this encryption is for a sticky session
      * @return JSONObject - contains the following:
      *                          * uri: path of the encrypted file
      *                          * cipher: (fileKey||fileHash) encrypted
      */
-    public JSONObject encryptFile(String senderId, String stickId, String filePath, String contentMedia, Boolean isSticky) throws JSONException {
-        HashMap<String, String> hashMap = encryptMedia(filePath, contentMedia);
+    public JSONObject encryptFile(String senderId, String stickId, String filePath, Boolean isSticky) throws JSONException {
+        HashMap<String, String> hashMap = encryptBlob(filePath);
         String cipherText = encryptText(senderId, stickId, hashMap.get("secret"), isSticky);
         JSONObject map = new JSONObject();
         map.put("uri", hashMap.get("uri"));
@@ -709,7 +680,7 @@ public class StickProtocol {
         String secret = decryptText(senderId, stickId, cipher, isSticky);
         String path = null;
         if (secret != null)
-            path = decryptMedia(filePath, secret, outputPath);
+            path = decryptBlob(filePath, secret, outputPath);
         return path;
     }
 
@@ -769,9 +740,7 @@ public class StickProtocol {
      * @param userId
      * @param senderKey - JSONObject, contains the following:
      *                      * id - int, id of the key
-     *                      * chainKey - String
-     *                      * public - String, public signature key
-     *                      * cipher - String, encrypted private signature key
+     *                      * key - encrypted sender key (chainKey || signaturePrivateKey || signaturePublicKey)
      *                      * stickId - String, id of the sticky session
      *                      * identityKeyId - int, id of the identity key used to encrypt the private signature key
      */
@@ -808,13 +777,52 @@ public class StickProtocol {
         groupCipher.ratchetChain(senderKey.getInt("step"));
     }
 
+    /***
+     * A private method used to decrypt a sticky key (sender key). Before attempting to decrypt the ciphertext,
+     * it will check and swap the current active identity key if needed.
+     *
+     * @param senderId - userId of the sender
+     * @param cipher - the encrypted key
+     * @param identityKeyId - the identity key id of the target user that was used to encrypt the sender key
+     */
+    private String decryptStickyKey(String senderId, String cipher, int identityKeyId) {
+        int activeIdentityKeyId = Preferences.getActiveIdentityKeyId(context);
+        // Swap identity key if needed
+        if (activeIdentityKeyId != identityKeyId) {
+            IdentityKeyRecord identityKeyRecord = DatabaseFactory.getIdentityKeyDatabase(context).getIdentityKey(identityKeyId);
+            IdentityKeyUtil.save(context, "pref_identity_public", Base64.encodeBytes(identityKeyRecord.getKeyPair().getPublicKey().serialize()));
+            IdentityKeyUtil.save(context, "pref_identity_private", Base64.encodeBytes(identityKeyRecord.getKeyPair().getPrivateKey().serialize()));
+        }
+
+        String key = decryptTextPairwise(senderId, true, cipher);
+
+        // Reverse identity key back if was swapped
+        if (activeIdentityKeyId != identityKeyId) {
+            IdentityKeyRecord identityKeyRecord = DatabaseFactory.getIdentityKeyDatabase(context).getIdentityKey(Preferences.getActiveIdentityKeyId(context));
+            IdentityKeyUtil.save(context, "pref_identity_public", Base64.encodeBytes(identityKeyRecord.getKeyPair().getPublicKey().serialize()));
+            IdentityKeyUtil.save(context, "pref_identity_private", Base64.encodeBytes(identityKeyRecord.getKeyPair().getPrivateKey().serialize()));
+        }
+        return key;
+    }
+
 
     /****************************** END OF STICKY SESSION METHODS ******************************/
 
     /****************************** START OF USER KEYS METHODS ******************************/
 
-    public JSONObject refreshIdentityKey(int days) throws Exception {
-        long identityKeyAge = TimeUnit.MINUTES.toDays(days);
+    /**
+     * This method is used to refresh the identity key creating a new identity key and setting it as
+     * active.
+     *
+     * @param identityKeyAge - lifetime of an identity key in millis (ex.: TimeUnit.DAYS.toMillis(7))
+     * @return identity key as a JSONObject containing the following:
+     *            * id - int, id of the identity key
+     *            * public - String, public part of the key
+     *            * cipher - String, private part encrypted
+     *            * salt - String, salt used to encrypt the private part
+     *            * timestamp - Long, unix timestamp
+     */
+    public JSONObject refreshIdentityKey(long identityKeyAge) throws Exception {
         long activeDuration = System.currentTimeMillis() - Preferences.getActiveIdentityKeyTimestamp(context);
         if (activeDuration > identityKeyAge) {
             SignalProtocolStore store = new MyProtocolStore(context);
@@ -837,8 +845,20 @@ public class StickProtocol {
         return null;
     }
 
-    public JSONObject refreshSignedPreKey(int days) throws Exception {
-        long signedPreKeyAge = TimeUnit.MINUTES.toDays(days);
+    /**
+     * This method is used to refresh the signed prekey creating a new signed key and setting it as
+     * active.
+     *
+     * @param signedPreKeyAge - lifetime of a signed prekey in millis (ex.: TimeUnit.DAYS.toMillis(7))
+     * @return signed prekey as a JSONObject containing the following:
+     *            * id - int, id of the identity key
+     *            * public - String, public part of the key
+     *            * cipher - String, private part encrypted
+     *            * salt - String, salt used to encrypt the private part
+     *            * signature - String
+     *            * timestamp - Long, unix timestamp
+     */
+    public JSONObject refreshSignedPreKey(long signedPreKeyAge) throws Exception {
         long activeDuration = System.currentTimeMillis() - Preferences.getActiveSignedPreKeyTimestamp(context);
         if (activeDuration > signedPreKeyAge) {
             IdentityKeyPair identityKey = IdentityKeyUtil.getIdentityKeyPair(context);
@@ -861,6 +881,14 @@ public class StickProtocol {
         return null;
     }
 
+    /***
+     * This method is used to generate prekeys to be uploaded to the server whenever the available prekeys
+     * go below a certain threshold.
+     *
+     * @param nextPreKeyId - int, id of the next prekey
+     * @param count - int, number of prekeys to generate
+     * @return Array of prekeys
+     */
     public JSONArray generatePreKeys(int nextPreKeyId, int count) {
         try {
             String userId = PreferenceManager.getDefaultSharedPreferences(context).getString("userId", "");
@@ -890,8 +918,14 @@ public class StickProtocol {
 
     /****************************** START OF ARGON2 METHODS ******************************/
 
-
-    public HashMap<String, String> pbEncrypt(byte[] text, String pass) throws Exception {
+    /***
+     * A private method used to encrypt private keys using a hash of the password derived using Argon2.
+     *
+     * @param text - a byte array of the plaintext (key) to be encrypted
+     * @param pass - String, plaintext password
+     * @return A hashmap containing the salt used and the produced cipher
+     */
+    private HashMap<String, String> pbEncrypt(byte[] text, String pass) throws Exception {
         // Generate salt
         SecureRandom randomSalt = new SecureRandom();
         byte[] salt = new byte[32];
@@ -934,7 +968,15 @@ public class StickProtocol {
         return map;
     }
 
-    public byte[] pbDecrypt(String encryptedIvText, String salt, String pass) throws Exception {
+    /***
+     * A private method used to decrypt the encrypted private keys using a hash of the password derived using Argon2.
+     *
+     * @param encryptedIvText, String - ciphertext
+     * @param salt - String, the salt that was used
+     * @param pass - String, plaintext password
+     * @return plaintext as a byte array
+     */
+    private byte[] pbDecrypt(String encryptedIvText, String salt, String pass) throws Exception {
         int ivSize = 16;
         byte[] encryptedIvTextBytes = Base64.decode(encryptedIvText);
 
@@ -972,8 +1014,15 @@ public class StickProtocol {
 
     /****************************** START OF FILE ENCRYPTION METHODS ******************************/
 
-
-    public HashMap<String, String> encryptMedia(String filePath, String contentType) {
+    /**
+     * A private method used to encrypt blob files.
+     *
+     * @param filePath - file to be encrypted
+     * @return HashMap - contains the following:
+     *                          * uri: path of the encrypted file
+     *                          * blob secret: (fileKey||fileHash)
+     */
+    private HashMap<String, String> encryptBlob(String filePath) {
         try {
             File file = new File(filePath);
             InputStream is = new FileInputStream(file);
@@ -1020,8 +1069,15 @@ public class StickProtocol {
         return null;
     }
 
-
-    public String decryptMedia(String filePath, String secret, String outputPath) {
+    /***
+     * A private method used to decrypt blob files
+     *
+     * @param filePath - path of the file to be decrypted
+     * @param secret - (fileKey||fileHash)
+     * @param outputPath - path to decrypt the file at
+     * @return absolute path of the decrypted file
+     */
+    private String decryptBlob(String filePath, String secret, String outputPath) {
         File file = new File(filePath);
         try {
             String key = secret.substring(0, 88);
@@ -1054,10 +1110,16 @@ public class StickProtocol {
     /************************** START OF PAIRWISE SESSION SPECIFIC METHODS ***************************/
 
     /***
+     * This method is used to encrypt files in a pairwise session
      *
+     * @param  userId
+     * @param filePath - path of the file to be encrypted
+     * @return JSONObject - contains the following:
+     *                          * uri: path of the encrypted file
+     *                          * cipher: (fileKey||fileHash) encrypted
      */
-    public JSONObject encryptFilePairwise(String userId, String filePath, String contentMedia) throws JSONException {
-        HashMap<String, String> hashMap = encryptMedia(filePath, contentMedia);
+    public JSONObject encryptFilePairwise(String userId, String filePath) throws JSONException {
+        HashMap<String, String> hashMap = encryptBlob(filePath);
         String cipherText = encryptTextPairwise(userId, hashMap.get("secret"));
         JSONObject map = new JSONObject();
         map.put("uri", hashMap.get("uri"));
@@ -1065,19 +1127,27 @@ public class StickProtocol {
         return map;
     }
 
+    /***
+     * This method is used to decrypt files in a sticky session
+     *
+     * @param senderId - id of the sender
+     * @param filePath - path of the encrypted file
+     * @param cipher - (fileKey||fileHash) encrypted
+     * @param outputPath - path to decrypt the file at
+     * @return absolute path of the decrypted file
+     */
     public String decryptFilePairwise(String senderId, String filePath, String cipher, String outputPath) {
         String secret = decryptTextPairwise(senderId, false, cipher);
         String path = null;
         if (secret != null)
-            path = decryptMedia(filePath, secret, outputPath);
+            path = decryptBlob(filePath, secret, outputPath);
         return path;
     }
 
     /***
-     * This method is used to check if a pairwise session exists. Usually would be needed to check the
-     * pairwise session for a oneTimeId.
+     * This method is used to check if a pairwise session exists.
      *
-     * @param oneTimeId - String
+     * @param oneTimeId - String, a uuid
      * @return boolean
      */
     public boolean pairwiseSessionExists(String oneTimeId) {
@@ -1090,32 +1160,61 @@ public class StickProtocol {
 
     /****************************** START OF UTILITY METHODS ******************************/
 
+    /***
+     * This method is used to get the password from BlockStore/KeyStore
+     *
+     * @param userId
+     * @return password, String
+     */
     public String recoverPassword(String userId) {
         HashMap<String, String> serviceMap = new HashMap();
         serviceMap.put("service", passwordKey);
         return keychain.getGenericPassword(userId, serviceMap);
     }
 
+    /**
+     * This method is used to reset the database on a user's device wiping all keys data.
+     */
     public void resetDatabase() {
         DatabaseFactory.getInstance(context).resetDatabase(context);
     }
 
+    /**
+     * This method is used to check if the user has successfully completed the initialization method
+     * at registration time.
+     *
+     * @return boolean
+     */
     public boolean isInitialized() {
         SignalProtocolStore store = new MyProtocolStore(context);
         int localId = store.getLocalRegistrationId();
         return localId != 0;
     }
 
-
+    /***
+     * A helper method to store the uri of a file
+     *
+     * @param id, file id
+     * @param uri, String path
+     */
     public void cacheUri(String id, String uri) {
         DatabaseFactory.getFileDatabase(context).insertUri(id, uri);
     }
 
+    /**
+     * A helper method to retrieve the uri of a file
+     *
+     * @param id of file to be retrieved
+     * @param
+     */
     public String getUri(String id) {
         String uri = DatabaseFactory.getFileDatabase(context).getUri(id);
         return uri;
     }
 
+    /***
+     * A helper method needed by Recipient.java class
+     */
     public static synchronized @NonNull
     LiveRecipientCache getRecipientCache() {
         if (recipientCache == null) {

@@ -10,6 +10,8 @@ package com.stiiick.stickprotocol.database;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.util.Log;
+
 import net.sqlcipher.database.SQLiteDatabase;
 
 import androidx.annotation.Nullable;
@@ -29,9 +31,11 @@ public class FileDatabase extends Database {
 
     FileDatabase(Context context, SQLCipherOpenHelper databaseHelper) {
         super(context, databaseHelper);
+        Log.d("XXX", "CALLING FILEDATABASE CONSTRUCTOR");
     }
 
     public @Nullable String getUri(String id) {
+        Log.d("XXX", "CALLING DATABASE GET URI");
         SQLiteDatabase database = databaseHelper.fetchReadableDatabase();
 
         try (Cursor cursor = database.query(TABLE_NAME, null, ID + " = ?",
@@ -47,6 +51,7 @@ public class FileDatabase extends Database {
     }
 
     public void insertUri(String id, String uri) {
+        Log.d("XXX", "CALLING DATABASE INSERT URI");
         SQLiteDatabase database = databaseHelper.fetchWritableDatabase();
 
         ContentValues contentValues = new ContentValues();

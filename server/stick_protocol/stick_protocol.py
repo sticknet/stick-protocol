@@ -403,7 +403,7 @@ class StickProtocol():
                 chainId = senderKey['stickId'][36:]
                 EncryptingSenderKey.objects.create(keyId=senderKey['id'], preKey=preKey, identityKey=identityKey,
                                                    partyId=partyId, chainId=chainId,
-                                                   user=user, key=['key'])
+                                                   user=user, key=senderKey['key'])
         if "group_id" in data:  # TODO: REMOVE FROM HERE MAYBE?
             user.just_added_groups.remove(data["group_id"])
 

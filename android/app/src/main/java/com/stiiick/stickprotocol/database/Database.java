@@ -7,6 +7,7 @@
 package com.stiiick.stickprotocol.database;
 
 import android.content.Context;
+import android.util.Log;
 
 public abstract class Database {
 
@@ -16,6 +17,7 @@ public abstract class Database {
     public Database(Context context, SQLCipherOpenHelper databaseHelper) {
         this.context        = context;
         this.databaseHelper = databaseHelper;
+        Log.d("XXX", "CALLING DATABASE ABSTRACT CONSTRUCTOR");
     }
 
 }

@@ -37,14 +37,19 @@ public class DatabaseFactory {
 
     public static DatabaseFactory getInstance(Context context) {
         synchronized (lock) {
-            if (instance == null)
+            Log.d("XXX", "CALLING DATABASE FACTORY GET INSTANCE");
+            if (instance == null) {
+                Log.d("XXX", "INSTANCE == NULL");
                 instance = new DatabaseFactory(context.getApplicationContext());
-
+            } else {
+                Log.d("XXX", "INSTANCE NOT NULL");
+            }
             return instance;
         }
     }
 
     public static FileDatabase getFileDatabase(Context context) {
+        Log.d("XXX", "CALLING GET FILE DATABASE");
         return getInstance(context).fileDatabase;
     }
 
@@ -91,6 +96,7 @@ public class DatabaseFactory {
 
 
     private DatabaseFactory(@NonNull Context context) {
+        Log.d("XXX", "CALLING DATABASE FACTORY CONSTRUCTOR");
         SQLiteDatabase.loadLibs(context);
         DatabaseSecret databaseSecret   = new DatabaseSecretProvider(context).getOrCreateDatabaseSecret();
         this.databaseHelper       = new SQLCipherOpenHelper(context, databaseSecret);
