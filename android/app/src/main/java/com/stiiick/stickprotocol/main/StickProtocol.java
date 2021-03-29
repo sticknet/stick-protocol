@@ -254,7 +254,7 @@ public class StickProtocol {
                 }
             }
 
-            // KEYS FOR SENDING SELF
+            // OWN SENDER KEYS
             SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(userId, 1);
             for (int i = 0; i < senderKeys.length(); i++) {
                 JSONObject senderKeyJson = senderKeys.getJSONObject(i);
