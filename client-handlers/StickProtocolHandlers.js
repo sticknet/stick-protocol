@@ -112,10 +112,10 @@ export default class StickProtocolHandlers {
             const preKeyId = bundles[memberId].preKeyId
             const identityKeyId = bundles[memberId].identityKeyId
             if (memberId !== this.userId) {
-                const key = await this.StickProtocol.getSenderKey(this.userId, memberId, stickId, true);
+                const key = await this.StickProtocol.getSenderKey(memberId, stickId, true);
                 keys[memberId] = {identityKeyId, preKeyId, key, stickId, forUser: memberId}
             } else {
-                let encryptingSenderKey = await this.StickProtocol.getEncryptingSenderKey(this.userId, stickId, true)
+                let encryptingSenderKey = await this.StickProtocol.getEncryptingSenderKey(stickId)
                 encryptingSenderKey['preKeyId'] = preKeyId
                 encryptingSenderKey['identityKeyId'] = identityKeyId
                 encryptingSenderKey['stickId'] = stickId
@@ -211,7 +211,7 @@ export default class StickProtocolHandlers {
         const phone = pkb.phone
         if (memberId.length === 36 && stickId.length >= 36) {
             // Get the sender key and upload it
-            const key = await this.StickProtocol.getSenderKey(this.userId, memberId, stickId, true);
+            const key = await this.StickProtocol.getSenderKey(memberId, stickId, true);
             const body = {preKeyId, key, stickId, forUser: memberId}
             await axios.post(`${this.URL}/api/upload-sk/`, body, this.httpConfig)
         }
@@ -227,7 +227,7 @@ export default class StickProtocolHandlers {
      */
     async syncChain(step, stickId) {
         if (step) {
-            const currentStep = await this.StickProtocol.getChainStep(this.userId, stickId)
+            const currentStep = await this.StickProtocol.getChainStep(stickId)
             if (step > currentStep) {
                 await this.StickProtocol.ratchetChain(stickId, step - currentStep)
             }
@@ -314,7 +314,7 @@ export default class StickProtocolHandlers {
             const member = members[i]
             if (member.id !== this.userId) {
                 if (!res.data.members[member.oneTimeId].exists) {
-                    keysToUpload[member.oneTimeId] = await this.StickProtocol.getSenderKey(this.userOneTimeId, member.oneTimeId, stickId, false);
+                    keysToUpload[member.oneTimeId] = await this.StickProtocol.getSenderKey(member.oneTimeId, stickId, false);
                 }
             }
         }

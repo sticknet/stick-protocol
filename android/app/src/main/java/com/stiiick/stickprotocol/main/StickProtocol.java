@@ -348,7 +348,7 @@ public class StickProtocol {
             // OWN SENDER KEYS
             for (int i = 0; i < senderKeys.length(); i++) {
                 JSONObject senderKeyJson = senderKeys.getJSONObject(i);
-                reinitMyStickySession(senderKeyJson);
+                reinitMyStickySession(userId, senderKeyJson);
 
                 // PROGRESS
                 progress += 1;
@@ -510,6 +510,7 @@ public class StickProtocol {
     /***
      * This method is used to create a sticky session and get the EncryptingSenderKey of a user for a party.
      *
+     * @param userId
      * @param stickId - String, the stickId of the sticky session
      * @return JSONObject - contains the following:
      *                          * id - int, the sender key id
@@ -517,9 +518,8 @@ public class StickProtocol {
      *                          * public - String, signature key public key
      *                          * cipher - String, signature key encrypted private key
      */
-    public JSONObject getEncryptingSenderKey(String stickId) {
+    public JSONObject getEncryptingSenderKey(String userId, String stickId) {
         try {
-            String userId = PreferenceManager.getDefaultSharedPreferences(context).getString("userId", "");
             SenderKeyStore senderKeyStore = new MySenderKeyStore(context);
             SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(userId, 0);
             SenderKeyName senderKeyName = new SenderKeyName(stickId, signalProtocolAddress);
@@ -544,14 +544,13 @@ public class StickProtocol {
      * This method is used to get a user's sender key (DecryptingSenderKey) of a sticky session (or a standard group session)
      * in order to share it with other members of a party.
      *
+     * @param senderId - userId (or oneTimeId)
      * @param targetId - target userId (or oneTimeId)
      * @param stickId - the id of the sticky session (or standard session)
      * @param isSticky - boolean, indicates whether the sender key is for a sticky session or a standard group session
      * @return encrypted sender key to the target - String
      */
-    public String getSenderKey(String targetId, String stickId, Boolean isSticky) throws IOException, InvalidMessageException, LegacyMessageException {
-        String senderId = isSticky ? PreferenceManager.getDefaultSharedPreferences(context).getString("userId", "")
-                : PreferenceManager.getDefaultSharedPreferences(context).getString("oneTimeId", "");
+    public String getSenderKey(String senderId, String targetId, String stickId, Boolean isSticky) throws IOException, InvalidMessageException, LegacyMessageException {
         SenderKeyDistributionMessage senderKeyDistributionMessage = null;
         if (isSticky)
             senderKeyDistributionMessage = new SenderKeyDistributionMessage(Base64.decode(DatabaseFactory.getStickyKeyDatabase(context).getStickyKey(stickId)));
@@ -622,15 +621,14 @@ public class StickProtocol {
     /***
      * This method is used to make an encryption in a sticky session.
      *
+     * @param senderId - userId (or oneTimeId)
      * @param stickId - id of the sticky session
      * @param text - plaintext to be encrypted
      * @param isSticky - boolean indicating whether this encryption is for a sticky session
      * @return ciphertext
      */
-    public String encryptText(String stickId, String text, Boolean isSticky) {
+    public String encryptText(String senderId, String stickId, String text, Boolean isSticky) {
         try {
-            String senderId = isSticky ? PreferenceManager.getDefaultSharedPreferences(context).getString("userId", "")
-                    : PreferenceManager.getDefaultSharedPreferences(context).getString("oneTimeId", "");
             SenderKeyStore senderKeyStore = new MySenderKeyStore(context);
             SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(senderId, 0);
             SenderKeyName senderKeyName = new SenderKeyName(stickId, signalProtocolAddress);
@@ -677,6 +675,7 @@ public class StickProtocol {
     /***
      * This method is used to encrypt files in a sticky session
      *
+     * @param senderId - userId
      * @param stickId - id of the sticky session
      * @param filePath - path of the file to be encrypted
      * @param contentMedia - type of the file
@@ -686,9 +685,9 @@ public class StickProtocol {
      *                          * uri: path of the encrypted file
      *                          * cipher: (fileKey||fileHash) encrypted
      */
-    public JSONObject encryptFile(String stickId, String filePath, String contentMedia, Boolean isSticky) throws JSONException {
+    public JSONObject encryptFile(String senderId, String stickId, String filePath, String contentMedia, Boolean isSticky) throws JSONException {
         HashMap<String, String> hashMap = encryptMedia(filePath, contentMedia);
-        String cipherText = encryptText(stickId, hashMap.get("secret"), isSticky);
+        String cipherText = encryptText(senderId, stickId, hashMap.get("secret"), isSticky);
         JSONObject map = new JSONObject();
         map.put("uri", hashMap.get("uri"));
         map.put("cipher", cipherText);
@@ -733,11 +732,11 @@ public class StickProtocol {
     /***
      * This method is used to get the current chain step of a sticky session.
      *
+     * @param userId
      * @param stickId - id of the sticky session
      * @return the chain step - int
      */
-    public int getChainStep(String stickId) {
-        String userId = PreferenceManager.getDefaultSharedPreferences(context).getString("userId", "");
+    public int getChainStep(String userId, String stickId) {
         SenderKeyStore senderKeyStore = new MySenderKeyStore(context);
         SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(userId, 0);
         SenderKeyName senderKeyName = new SenderKeyName(stickId, signalProtocolAddress);
@@ -753,11 +752,11 @@ public class StickProtocol {
     /***
      * This method is used to ratchet the chain of a sticky session, in order to be matching across all devices.
      *
+     * @param userId
      * @param stickId - id of the sticky sesison
      * @param steps - number of steps
      */
-    public void ratchetChain(String stickId, int steps) throws NoSessionException {
-        String userId = PreferenceManager.getDefaultSharedPreferences(context).getString("userId", "");
+    public void ratchetChain(String userId, String stickId, int steps) throws NoSessionException {
         SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(userId, 0);
         SenderKeyName senderKeyName = new SenderKeyName(stickId, signalProtocolAddress);
         SenderKeyStore senderKeyStore = new MySenderKeyStore(context);
@@ -768,6 +767,7 @@ public class StickProtocol {
     /**
      * This method is used to re-establish a user's own sticky session.
      *
+     * @param userId
      * @param senderKey - JSONObject, contains the following:
      *                      * id - int, id of the key
      *                      * chainKey - String
@@ -776,8 +776,7 @@ public class StickProtocol {
      *                      * stickId - String, id of the sticky session
      *                      * identityKeyId - int, id of the identity key used to encrypt the private signature key
      */
-    public void reinitMyStickySession(JSONObject senderKey) throws IOException, InvalidKeyException, NoSessionException, JSONException {
-        String userId = PreferenceManager.getDefaultSharedPreferences(context).getString("userId", "");
+    public void reinitMyStickySession(String userId, JSONObject senderKey) throws IOException, InvalidKeyException, NoSessionException, JSONException {
         SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(userId, 0);
         SenderKeyName senderKeyName = new SenderKeyName(senderKey.getString("stickId"), signalProtocolAddress);
         SenderKeyStore senderKeyStore = new MySenderKeyStore(context);
