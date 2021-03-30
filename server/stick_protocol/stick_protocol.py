@@ -141,7 +141,7 @@ class StickProtocol():
         dict = {"bundles": bundles, "users_id": users_id}
         return dict
 
-    def get_sender_key(self, data, user):
+    def get_sender_key(self, data, user): # todo if this method only sticky session, then remove isSticky
         """
         This method is used to fetch the SenderKey of a stickySession.
         The body should contain the following fields:
@@ -166,8 +166,7 @@ class StickProtocol():
             group = self.Group.objects.get(id=stickId[:36])
             if group in user.invited_groups.all():
                 authorized = True
-        elif stickId.startswith(
-                user.party.id):  # A user is authorized to fetch SenderKeys of their own profile (user.party.id)
+        elif stickId.startswith(user.party.id):  # A user is authorized to fetch SenderKeys of their own profile (user.party.id)
             authorized = True
         else:
             groupId = stickId[:36] if isSticky else data['groupId']

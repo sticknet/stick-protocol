@@ -622,6 +622,10 @@ public class StickProtocol {
      * @return ciphertext
      */
     public String encryptText(String senderId, String stickId, String text, Boolean isSticky) {
+        Log.d("ZZZ SENDERID", senderId);
+        Log.d("zzz senderId", stickId);
+        Log.d("ZZZ TEXT", text);
+        Log.d("zzz issticky", Boolean.toString(isSticky));
         try {
             SenderKeyStore senderKeyStore = new MySenderKeyStore(context);
             SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(senderId, 0);
