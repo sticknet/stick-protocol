@@ -9,7 +9,6 @@ package com.stiiick.stickprotocol.main;
 
 import android.content.Context;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -20,6 +19,7 @@ import com.stiiick.stickprotocol.cipherstream.CipherOutputStreamFactory;
 import com.stiiick.stickprotocol.cipherstream.DigestingOutputStream;
 import com.stiiick.stickprotocol.cipherstream.PaddingInputStream;
 import com.stiiick.stickprotocol.database.DatabaseFactory;
+import com.stiiick.stickprotocol.database.IdentityKeyDatabase;
 import com.stiiick.stickprotocol.database.IdentityKeyRecord;
 import com.stiiick.stickprotocol.keychain.Keychain;
 import com.stiiick.stickprotocol.recipient.LiveRecipientCache;
@@ -109,7 +109,6 @@ public class StickProtocol {
      * The StickProtocol constructor takes 2 arguments, the application context, and the application
      * package name as a string ("com.myOrg.myApp")
      */
-
     public StickProtocol(Context context, String service) {
         StickProtocol.context = context;
         path = context.getFilesDir().getPath();
@@ -285,8 +284,8 @@ public class StickProtocol {
                 IdentityKeyRecord identityKeyRecord = new IdentityKeyRecord(identityKeyId, parseLong(IKJson.getString("timestamp")), ecKeyPair);
                 DatabaseFactory.getIdentityKeyDatabase(context).insertIdentityKey(identityKeyId, identityKeyRecord);
                 if (IKJson.getBoolean("active")) {
-                    IdentityKeyUtil.save(context, "pref_identity_public", Base64.encodeBytes(publicKey.serialize()));
-                    IdentityKeyUtil.save(context, "pref_identity_private", Base64.encodeBytes(privateKey.serialize()));
+                    IdentityKeyUtil.setActive(context, "pref_identity_public", Base64.encodeBytes(publicKey.serialize()));
+                    IdentityKeyUtil.setActive(context, "pref_identity_private", Base64.encodeBytes(privateKey.serialize()));
                     Preferences.setNextIdentityKeyId(context, identityKeyId + 1);
                     Preferences.setActiveIdentityKeyId(context, identityKeyId);
                     Preferences.setActiveIdentityKeyTimestamp(context, parseLong(IKJson.getString("timestamp")));
@@ -608,7 +607,6 @@ public class StickProtocol {
             byte[] cipherText;
             cipherText = groupCipher.encrypt(text.getBytes(StandardCharsets.UTF_8), isSticky);
             return Base64.encodeBytes(cipherText);
-
         } catch (NoSessionException | InvalidMessageException | DuplicateMessageException e) {
             e.printStackTrace();
         }
@@ -743,6 +741,7 @@ public class StickProtocol {
      *                      * key - encrypted sender key (chainKey || signaturePrivateKey || signaturePublicKey)
      *                      * stickId - String, id of the sticky session
      *                      * identityKeyId - int, id of the identity key used to encrypt the private signature key
+     *                      * step - represents the age of the sticky session
      */
     public void reinitMyStickySession(String userId, JSONObject senderKey) throws IOException, InvalidKeyException, NoSessionException, JSONException {
         SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(userId, 0);
@@ -788,21 +787,27 @@ public class StickProtocol {
     public String decryptStickyKey(String senderId, String cipher, int identityKeyId) {
         int activeIdentityKeyId = Preferences.getActiveIdentityKeyId(context);
         // Swap identity key if needed
-        if (activeIdentityKeyId != identityKeyId) {
-            IdentityKeyRecord identityKeyRecord = DatabaseFactory.getIdentityKeyDatabase(context).getIdentityKey(identityKeyId);
-            IdentityKeyUtil.save(context, "pref_identity_public", Base64.encodeBytes(identityKeyRecord.getKeyPair().getPublicKey().serialize()));
-            IdentityKeyUtil.save(context, "pref_identity_private", Base64.encodeBytes(identityKeyRecord.getKeyPair().getPrivateKey().serialize()));
-        }
-
+        if (activeIdentityKeyId != identityKeyId)
+           swapIdentityKey(identityKeyId);
         String key = decryptTextPairwise(senderId, true, cipher);
-
         // Reverse identity key back if was swapped
-        if (activeIdentityKeyId != identityKeyId) {
-            IdentityKeyRecord identityKeyRecord = DatabaseFactory.getIdentityKeyDatabase(context).getIdentityKey(Preferences.getActiveIdentityKeyId(context));
-            IdentityKeyUtil.save(context, "pref_identity_public", Base64.encodeBytes(identityKeyRecord.getKeyPair().getPublicKey().serialize()));
-            IdentityKeyUtil.save(context, "pref_identity_private", Base64.encodeBytes(identityKeyRecord.getKeyPair().getPrivateKey().serialize()));
-        }
+        if (activeIdentityKeyId != identityKeyId)
+            swapIdentityKey(activeIdentityKeyId);
         return key;
+    }
+
+    /***
+     * This method is used to swap the identity key, setting the provided keyId as being active.
+     *
+     * @param keyId - int
+     */
+    public void swapIdentityKey(int keyId) {
+        IdentityKeyDatabase identityKeyDatabase = DatabaseFactory.getIdentityKeyDatabase(context);
+        IdentityKeyRecord identityKeyRecord = identityKeyDatabase.getIdentityKey(keyId);
+        String publicKey = Base64.encodeBytes(identityKeyRecord.getKeyPair().getPublicKey().serialize());
+        String privateKey = Base64.encodeBytes(identityKeyRecord.getKeyPair().getPrivateKey().serialize());
+        IdentityKeyUtil.setActive(context, "pref_identity_public", publicKey);
+        IdentityKeyUtil.setActive(context, "pref_identity_private", privateKey);
     }
 
 
@@ -938,7 +943,7 @@ public class StickProtocol {
         random.nextBytes(iv);
         IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);
 
-        // Hashing pass using Argon2
+        // Hashing password using Argon2
         byte[] hash = new Argon2.Builder(Version.V13)
                 .type(Type.Argon2id)
                 .memoryCostKiB(4 * 1024)
@@ -948,7 +953,6 @@ public class StickProtocol {
                 .build()
                 .hash(pass.getBytes(), salt)
                 .getHash();
-
         SecretKeySpec secretKeySpec = new SecretKeySpec(hash, "AES");
 
         // Encrypt
@@ -964,7 +968,6 @@ public class StickProtocol {
         HashMap<String, String> map = new HashMap<>();
         map.put("salt", Base64.encodeBytes(salt));
         map.put("cipher", Base64.encodeBytes(encryptedIVAndText));
-
         return map;
     }
 
@@ -1128,7 +1131,7 @@ public class StickProtocol {
     }
 
     /***
-     * This method is used to decrypt files in a sticky session
+     * This method is used to decrypt files in a pairwise session
      *
      * @param senderId - id of the sender
      * @param filePath - path of the encrypted file
@@ -1190,27 +1193,6 @@ public class StickProtocol {
         int localId = store.getLocalRegistrationId();
         return localId != 0;
     }
-
-    /***
-     * A helper method to store the uri of a file
-     *
-     * @param id, file id
-     * @param uri, String path
-     */
-//    public void cacheUri(String id, String uri) {
-//        DatabaseFactory.getFileDatabase(context).insertUri(id, uri);
-//    }
-
-    /**
-     * A helper method to retrieve the uri of a file
-     *
-     * @param id of file to be retrieved
-     * @param
-     */
-//    public String getUri(String id) {
-//        String uri = DatabaseFactory.getFileDatabase(context).getUri(id);
-//        return uri;
-//    }
 
     /***
      * A helper method needed by Recipient.java class

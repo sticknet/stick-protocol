@@ -2,7 +2,7 @@ import UIKit
 
 public protocol StorageManagerDelegate: class {
     func generateIdentityKeyPair() -> SPIdentity
-    func saveIdentityKeyPair(keyPair: IdentityKeyPair) -> SPIdentity
+    func setActiveIdentityKeyPair(keyPair: IdentityKeyPair) -> SPIdentity
 }
 
 /**
@@ -54,9 +54,9 @@ open class StorageManager: NSObject {
 
     }
 
-    public func saveIdentityKeyPair(keyPair: IdentityKeyPair) -> SPIdentity {
+    public func setActiveIdentityKeyPair(keyPair: IdentityKeyPair) -> SPIdentity {
         // Might be a better way to guarantee we have an OTRIdentity
-        let identityKeyPair = (self.delegate?.saveIdentityKeyPair(keyPair: keyPair))!
+        let identityKeyPair = (self.delegate?.setActiveIdentityKeyPair(keyPair: keyPair))!
 
         self.databaseConnection.readWrite { (transaction) in
             identityKeyPair.save(with: transaction)

@@ -341,10 +341,7 @@
 				07101779260741D900CD0E47 /* Models */,
 				071017B2260741D900CD0E47 /* Controllers */,
 				07101766260741D900CD0E47 /* SPObjects */,
-				07101764260741D900CD0E47 /* StorageManager.swift */,
-				071017B1260741D900CD0E47 /* EncryptionManager.swift */,
-				071017AE260741D900CD0E47 /* StickProtocol.swift */,
-				071018852607452D00CD0E47 /* StickProtocol.h */,
+				07FEE4EA261325D100BD32FD /* Main */,
 				071018A22607465E00CD0E47 /* Info.plist */,
 			);
 			path = StickProtocol;
@@ -440,6 +437,8 @@
 				071017AB260741D900CD0E47 /* SignalStorage.h */,
 				071017AC260741D900CD0E47 /* SessionStore.h */,
 				071017AD260741D900CD0E47 /* IdentityKeyStore.h */,
+				07101764260741D900CD0E47 /* StorageManager.swift */,
+				071017B1260741D900CD0E47 /* EncryptionManager.swift */,
 			);
 			path = Storage;
 			sourceTree = "<group>";
@@ -502,6 +501,15 @@
 				07DB3DA32611A33300237665 /* README.txt */,
 			);
 			path = Internal;
+			sourceTree = "<group>";
+		};
+		07FEE4EA261325D100BD32FD /* Main */ = {
+			isa = PBXGroup;
+			children = (
+				071017AE260741D900CD0E47 /* StickProtocol.swift */,
+				071018852607452D00CD0E47 /* StickProtocol.h */,
+			);
+			path = Main;
 			sourceTree = "<group>";
 		};
 		17DB993732A2C09AFF2B5521 /* Frameworks */ = {

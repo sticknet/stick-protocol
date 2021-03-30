@@ -86,7 +86,7 @@ extension EncryptionManager: StorageManagerDelegate {
         return SPIdentity(userId: userId, identityKeyPair: keyPair)!
     }
 
-    public func saveIdentityKeyPair(keyPair: IdentityKeyPair) -> SPIdentity {
+    public func setActiveIdentityKeyPair(keyPair: IdentityKeyPair) -> SPIdentity {
         return SPIdentity(userId: userId, identityKeyPair: keyPair)!
     }
 }

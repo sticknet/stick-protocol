@@ -13,9 +13,7 @@ FOUNDATION_EXPORT double StickProtocolVersionNumber;
 //! Project version string for StickProtocol.
 FOUNDATION_EXPORT const unsigned char StickProtocolVersionString[];
 
-// In this header, you should import all the public headers of your framework using statements like #import <StickProtocol/PublicHeader.h>
-
-
+// All the public headers
 #import "CommonCryptoProvider.h"
 #import "SignalAddress.h"
 #import "SignalCiphertext.h"

@@ -69,8 +69,8 @@ public class IdentityKeyUtil {
         IdentityKey djbIdentityKey = new IdentityKey(djbKeyPair.getPublicKey());
         ECPrivateKey djbPrivateKey = djbKeyPair.getPrivateKey();
 
-        save(context, IDENTITY_PUBLIC_KEY_PREF, Base64.encodeBytes(djbIdentityKey.serialize()));
-        save(context, IDENTITY_PRIVATE_KEY_PREF, Base64.encodeBytes(djbPrivateKey.serialize()));
+        setActive(context, IDENTITY_PUBLIC_KEY_PREF, Base64.encodeBytes(djbIdentityKey.serialize()));
+        setActive(context, IDENTITY_PRIVATE_KEY_PREF, Base64.encodeBytes(djbPrivateKey.serialize()));
 
         int identityKeyId = Preferences.getNextIdentityKeyId(context);
         IdentityKeyRecord identityKeyRecord = new IdentityKeyRecord(identityKeyId, System.currentTimeMillis(), djbKeyPair);
@@ -86,7 +86,7 @@ public class IdentityKeyUtil {
         return preferences.getString(key, null);
     }
 
-    public static void save(Context context, String key, String value) {
+    public static void setActive(Context context, String key, String value) {
         SharedPreferences preferences = context.getSharedPreferences("StickProtocol-Preferences", 0);
         Editor preferencesEditor = preferences.edit();
         preferencesEditor.putString(key, value);
