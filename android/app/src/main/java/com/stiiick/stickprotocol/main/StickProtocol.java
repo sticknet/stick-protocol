@@ -9,6 +9,7 @@ package com.stiiick.stickprotocol.main;
 
 import android.content.Context;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 
@@ -548,6 +549,10 @@ public class StickProtocol {
      * @return encrypted sender key to the target - String
      */
     public String getSenderKey(String senderId, String targetId, String stickId, Boolean isSticky) throws IOException, InvalidMessageException, LegacyMessageException {
+        Log.d("YYY SENDERID", senderId);
+        Log.d("YYY TARGETID", targetId);
+        Log.d("YYY STICKID", stickId);
+        Log.d("YYY ISSTICKY", Boolean.toString(isSticky));
         SenderKeyDistributionMessage senderKeyDistributionMessage = null;
         if (isSticky)
             senderKeyDistributionMessage = new SenderKeyDistributionMessage(Base64.decode(DatabaseFactory.getStickyKeyDatabase(context).getStickyKey(stickId)));
@@ -558,6 +563,7 @@ public class StickProtocol {
             GroupSessionBuilder groupSessionBuilder = new GroupSessionBuilder(senderKeyStore);
             senderKeyDistributionMessage = groupSessionBuilder.create(senderKeyName);
         }
+        Log.d("YYY REACHED HERE111", "ASEF");
         return encryptTextPairwise(targetId, Base64.encodeBytes(senderKeyDistributionMessage.serialize()));
     }
 
@@ -576,8 +582,6 @@ public class StickProtocol {
                 SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(senderId, 0);
                 SenderKeyName senderKeyName = new SenderKeyName(stickId, signalProtocolAddress);
                 GroupSessionBuilder groupSessionBuilder = new GroupSessionBuilder(senderKeyStore);
-                if (identityKeyId == -1)
-                    identityKeyId = Preferences.getActiveIdentityKeyId(context);
                 String senderKey = decryptStickyKey(senderId, cipherSenderKey, identityKeyId);
                 if (senderKey != null) {
                     SenderKeyDistributionMessage senderKeyDistributionMessage = new SenderKeyDistributionMessage(Base64.decode(senderKey));
@@ -645,13 +649,20 @@ public class StickProtocol {
         if (cipher.length() < 4)
             return null;
         try {
+            Log.d("XXX SENDERID", senderId);
+            Log.d("XXX STICKID", stickId);
+            Log.d("XXX CIPHER", cipher);
+            Log.d("XXX ISSTICKY", Boolean.toString(isSticky));
             Boolean isSelf = senderId.equals(PreferenceManager.getDefaultSharedPreferences(context).getString("userId", ""));
+            Log.d("XXX ISSELF", Boolean.toString(isSelf));
             SenderKeyStore mySenderKeyStore = new MySenderKeyStore(context);
             SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(senderId, 0);
             SenderKeyName senderKeyName = new SenderKeyName(stickId, signalProtocolAddress);
             GroupCipher groupCipher = new GroupCipher(mySenderKeyStore, senderKeyName);
             byte[] decryptedCipher;
+            Log.d("XXX HAVE SUCCESSFULLY", "REACHED HERE0");
             decryptedCipher = groupCipher.decrypt(Base64.decode(cipher), isSticky, isSelf);
+            Log.d("XXX HAVE SUCCESSFULLY", "REACHED HERE1");
             return new String(decryptedCipher, StandardCharsets.UTF_8);
         } catch (LegacyMessageException | InvalidMessageException | DuplicateMessageException
                 | NoSessionException | IOException e) {

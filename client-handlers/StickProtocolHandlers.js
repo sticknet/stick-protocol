@@ -156,7 +156,7 @@ export default class StickProtocolHandlers {
                 dispatch({type: 'DOWNLOADED', payload: entityId});
             } else { // otherwise initialize the session
                 if (memberId !== userId)
-                    await this.StickProtocol.initSession(memberId, stickId, response.data.senderKey.key, response.data.senderKey.identityKeyId)
+                    await this.StickProtocol.initStickySession(memberId, stickId, response.data.senderKey.key, response.data.senderKey.identityKeyId)
                 else {
                     response.data.senderKey.stickId = stickId
                     await this.StickProtocol.reinitMyStickySession(this.userId, response.data.senderKey)
@@ -257,6 +257,7 @@ export default class StickProtocolHandlers {
             isSticky: false,
             isDev: this.isDev
         }
+        console.log('FETCH STANDARD SENDER KEY', body)
         const response = await axios.post(`${this.URL}/api/fetch-sk/`, body, this.httpConfig);
         if (response.data.senderKey)
             await this.StickProtocol.initStandardGroupSession(oneTimeId, stickId, response.data.senderKey)
