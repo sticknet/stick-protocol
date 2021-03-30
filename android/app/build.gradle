@@ -42,8 +42,8 @@ dependencies {
 
     api 'com.github.STiiiCK:sticky-signal-protocol-java:2.8.7'
     api 'org.signal:argon2:13.1@aar'
+    api 'net.zetetic:android-database-sqlcipher:4.3.0'
     implementation 'com.stiiick:encoding:1.0.1'
-    implementation 'net.zetetic:android-database-sqlcipher:4.3.0'
     implementation 'org.greenrobot:eventbus:3.2.0'
     implementation 'com.fasterxml.jackson.core:jackson-core:2.10.3'
     implementation 'com.fasterxml.jackson.core:jackson-databind:2.10.3'

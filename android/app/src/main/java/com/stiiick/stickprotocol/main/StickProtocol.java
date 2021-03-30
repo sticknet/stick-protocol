@@ -1197,9 +1197,9 @@ public class StickProtocol {
      * @param id, file id
      * @param uri, String path
      */
-    public void cacheUri(String id, String uri) {
-        DatabaseFactory.getFileDatabase(context).insertUri(id, uri);
-    }
+//    public void cacheUri(String id, String uri) {
+//        DatabaseFactory.getFileDatabase(context).insertUri(id, uri);
+//    }
 
     /**
      * A helper method to retrieve the uri of a file
@@ -1207,10 +1207,10 @@ public class StickProtocol {
      * @param id of file to be retrieved
      * @param
      */
-    public String getUri(String id) {
-        String uri = DatabaseFactory.getFileDatabase(context).getUri(id);
-        return uri;
-    }
+//    public String getUri(String id) {
+//        String uri = DatabaseFactory.getFileDatabase(context).getUri(id);
+//        return uri;
+//    }
 
     /***
      * A helper method needed by Recipient.java class

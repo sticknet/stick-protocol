@@ -30,7 +30,7 @@ public class DatabaseFactory {
     private final SessionDatabase sessionDatabase;
     private final RecipientDatabase recipientDatabase;
     private final SenderKeyDatabase senderKeyDatabse;
-    private final FileDatabase fileDatabase;
+//    private final FileDatabase fileDatabase;
     private final StickyKeyDatabase stickyKeyDatabase;
 
 
@@ -48,10 +48,10 @@ public class DatabaseFactory {
         }
     }
 
-    public static FileDatabase getFileDatabase(Context context) {
-        Log.d("XXX", "CALLING GET FILE DATABASE");
-        return getInstance(context).fileDatabase;
-    }
+//    public static FileDatabase getFileDatabase(Context context) {
+//        Log.d("XXX", "CALLING GET FILE DATABASE");
+//        return getInstance(context).fileDatabase;
+//    }
 
     public static StickyKeyDatabase getStickyKeyDatabase(Context context) {
         return getInstance(context).stickyKeyDatabase;
@@ -107,7 +107,7 @@ public class DatabaseFactory {
         this.sessionDatabase      = new SessionDatabase(context, databaseHelper);
         this.recipientDatabase     = new RecipientDatabase(context, databaseHelper);
         this.senderKeyDatabse      = new SenderKeyDatabase(context, databaseHelper);
-        this.fileDatabase = new FileDatabase(context, databaseHelper);
+//        this.fileDatabase = new FileDatabase(context, databaseHelper);
         this.stickyKeyDatabase = new StickyKeyDatabase(context, databaseHelper);
     }
 }
