@@ -248,13 +248,13 @@ public class SP {
         do {
             let databaseConnection = db!.newConnection()
             let encryptionManager = try? EncryptionManager(accessGroup: accessGroup!, databaseConnection: databaseConnection)
-            let signalProtocolAddress = SignalAddress(name: bundle["userId"] as! String, deviceId: bundle["deviceId"] as! Int32)
+            let signalProtocolAddress = SignalAddress(name: bundle["userId"] as! String, deviceId: 0)
             let sessionBuilder = SessionBuilder(address: signalProtocolAddress, context: encryptionManager!.signalContext)
             let preKey = Data(base64Encoded: bundle["preKey"] as! String)
             let signedPreKey = Data(base64Encoded: bundle["signedPreKey"] as! String)
             let identityKey = Data(base64Encoded: bundle["identityKey"] as! String)
             let signature = Data(base64Encoded: bundle["signature"] as! String)
-            let preKeyBundle = try PreKeyBundle(registrationId: bundle["localId"] as! UInt32, deviceId: bundle["deviceId"] as! UInt32, preKeyId: bundle["preKeyId"] as! UInt32, preKeyPublic: preKey!, signedPreKeyId: bundle["signedPreKeyId"] as! UInt32, signedPreKeyPublic: signedPreKey!, signature: signature!, identityKey: identityKey!)
+            let preKeyBundle = try PreKeyBundle(registrationId: bundle["localId"] as! UInt32, deviceId: 0, preKeyId: bundle["preKeyId"] as! UInt32, preKeyPublic: preKey!, signedPreKeyId: bundle["signedPreKeyId"] as! UInt32, signedPreKeyPublic: signedPreKey!, signature: signature!, identityKey: identityKey!)
             try sessionBuilder.processPreKeyBundle(preKeyBundle)
         } catch {
             print("ERROR IN INIT SESSION: \(error)")
@@ -510,7 +510,7 @@ public class SP {
             let senderKeyName = SenderKeyName(groupId: stickId, address: signalProtocolAddress)
             let senderKeyData = encryptionManager?.storage.loadSenderKey(for: senderKeyName)
             let senderKey = try SenderKeyRecord(data: senderKeyData!, context: encryptionManager!.signalContext)
-            return senderKey.isEmpty()
+            return !senderKey.isEmpty()
         } catch {
             print("ERROR IN IS SESSION EMPTY: \(error)")
             return false
@@ -580,7 +580,7 @@ public class SP {
             let signatureKey = try! KeyPair(publicKey: Data(base64Encoded: signaturePublicKey)!, privateKey: Data(base64Encoded: signaturePrivateKey)!)
             let senderKeyRecord = try! SenderKeyRecord(context: encryptionManager!.signalContext)
      
-            senderKeyRecord.setSenderKeyStateWithKeyId(senderKey["id"] as! UInt32, chainKey: Data(base64Encoded: chainKey as! String)!, sigKeyPair: signatureKey)
+            senderKeyRecord.setSenderKeyStateWithKeyId(senderKey["id"] as! UInt32, chainKey: Data(base64Encoded: chainKey )!, sigKeyPair: signatureKey)
 
             
             encryptionManager!.storage.storeSenderKey(senderKeyRecord.serializedData()!, senderKeyName: senderKeyName)

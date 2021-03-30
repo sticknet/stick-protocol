@@ -569,7 +569,7 @@ public class StickProtocol {
      * @param cipherSenderKey - encrypted sender key
      * @param identityKeyId   - the identity key id of the target user that was used to encrypt the sender key
      */
-    public void initSession(String senderId, String stickId, String cipherSenderKey, int identityKeyId) {
+    public void initStickySession(String senderId, String stickId, String cipherSenderKey, int identityKeyId) {
         try {
             if (cipherSenderKey != null) {
                 SenderKeyStore senderKeyStore = new MySenderKeyStore(context);
@@ -588,6 +588,25 @@ public class StickProtocol {
             e.printStackTrace();
         }
     }
+
+    public void initStandardGroupSession(String senderId, String stickId, String cipherSenderKey) {
+        try {
+            if (cipherSenderKey != null) {
+                SenderKeyStore senderKeyStore = new MySenderKeyStore(context);
+                SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(senderId, 0);
+                SenderKeyName senderKeyName = new SenderKeyName(stickId, signalProtocolAddress);
+                GroupSessionBuilder groupSessionBuilder = new GroupSessionBuilder(senderKeyStore);
+                String senderKey = decryptTextPairwise(senderId, false, cipherSenderKey);
+                if (senderKey != null) {
+                    SenderKeyDistributionMessage senderKeyDistributionMessage = new SenderKeyDistributionMessage(Base64.decode(senderKey));
+                    groupSessionBuilder.process(senderKeyName, senderKeyDistributionMessage);
+                }
+            }
+        } catch (InvalidMessageException | LegacyMessageException | IOException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     /***
      * This method is used to make an encryption in a sticky session.

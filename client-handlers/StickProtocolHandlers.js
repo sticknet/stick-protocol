@@ -259,7 +259,7 @@ export default class StickProtocolHandlers {
         }
         const response = await axios.post(`${this.URL}/api/fetch-sk/`, body, this.httpConfig);
         if (response.data.senderKey)
-            await this.StickProtocol.initSession(oneTimeId, stickId, response.data.senderKey)
+            await this.StickProtocol.initStandardGroupSession(oneTimeId, stickId, response.data.senderKey)
     }
 
     /**
@@ -296,7 +296,7 @@ export default class StickProtocolHandlers {
             }, this.httpConfig)
             for (let i = 0; i < keysToFetch.length; i++) {
                 if (response.data.senderKeys[keysToFetch[i]]) {
-                    await this.StickProtocol.initSession(keysToFetch[i], chatId, response.data.senderKeys[keysToFetch[i]])
+                    await this.StickProtocol.initStandardGroupSession(keysToFetch[i], chatId, response.data.senderKeys[keysToFetch[i]])
                 }
             }
         }
