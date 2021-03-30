@@ -37,7 +37,7 @@ public class SQLCipherOpenHelper extends SQLiteOpenHelper {
         db.execSQL(SessionDatabase.CREATE_TABLE);
         db.execSQL(RecipientDatabase.CREATE_TABLE);
         db.execSQL(SenderKeyDatabase.CREATE_TABLE);
-        db.execSQL(FileDatabase.CREATE_TABLE);
+//        db.execSQL(FileDatabase.CREATE_TABLE);
         db.execSQL(StickyKeyDatabase.CREATE_TABLE);
 
     }
@@ -52,7 +52,7 @@ public class SQLCipherOpenHelper extends SQLiteOpenHelper {
         db.execSQL(SessionDatabase.DROP_TABLE);
         db.execSQL(RecipientDatabase.DROP_TABLE);
         db.execSQL(SenderKeyDatabase.DROP_TABLE);
-        db.execSQL(FileDatabase.DROP_TABLE);
+//        db.execSQL(FileDatabase.DROP_TABLE);
         db.execSQL(StickyKeyDatabase.DROP_TABLE);
 
         db.execSQL(IdentityDatabase.CREATE_TABLE);
@@ -62,7 +62,7 @@ public class SQLCipherOpenHelper extends SQLiteOpenHelper {
         db.execSQL(SessionDatabase.CREATE_TABLE);
         db.execSQL(RecipientDatabase.CREATE_TABLE);
         db.execSQL(SenderKeyDatabase.CREATE_TABLE);
-        db.execSQL(FileDatabase.CREATE_TABLE);
+//        db.execSQL(FileDatabase.CREATE_TABLE);
         db.execSQL(StickyKeyDatabase.CREATE_TABLE);
     }
 
