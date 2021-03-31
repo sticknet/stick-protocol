@@ -595,12 +595,16 @@ public class StickProtocol {
 
     public void initStandardGroupSession(String senderId, String stickId, String cipherSenderKey) {
         try {
+            Log.d("PPP INIT STANDARDGS", senderId);
+            Log.d("PPP INIT STANDARDGS", stickId);
+            Log.d("PPP INIT STANDARDGS", cipherSenderKey);
             if (cipherSenderKey != null) {
                 SenderKeyStore senderKeyStore = new MySenderKeyStore(context);
                 SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(senderId, 0);
                 SenderKeyName senderKeyName = new SenderKeyName(stickId, signalProtocolAddress);
                 GroupSessionBuilder groupSessionBuilder = new GroupSessionBuilder(senderKeyStore);
                 String senderKey = decryptTextPairwise(senderId, false, cipherSenderKey);
+                Log.d("PPP INIT SGS", senderKey);
                 if (senderKey != null) {
                     SenderKeyDistributionMessage senderKeyDistributionMessage = new SenderKeyDistributionMessage(Base64.decode(senderKey));
                     groupSessionBuilder.process(senderKeyName, senderKeyDistributionMessage);
