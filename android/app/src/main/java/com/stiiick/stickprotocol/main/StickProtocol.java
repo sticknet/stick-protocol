@@ -250,14 +250,12 @@ public class StickProtocol {
      *               * localId
      * @param password - String, user's plaintext password
      * @param userId - String, user's unique id
-     * @param oneTimeId - String, a newly generated uuid for the user
      * @param progressEvent - (optional) A ProgressEvent interface can be implemented to provide progress
      *                        feedback to the user while the keys are being decrypted and the sessions
      *                        re-established.
      */
-    public void reInitialize(JSONObject bundle, String password, String userId, String oneTimeId, ProgressEvent progressEvent) {
+    public void reInitialize(JSONObject bundle, String password, String userId, ProgressEvent progressEvent) {
         try {
-            PreferenceManager.getDefaultSharedPreferences(context).edit().putString("oneTimeId", oneTimeId).apply();
             PreferenceManager.getDefaultSharedPreferences(context).edit().putString("userId", userId).apply();
 
             // Store password in BlockStore/KeyStore
@@ -549,10 +547,6 @@ public class StickProtocol {
      * @return encrypted sender key to the target - String
      */
     public String getSenderKey(String senderId, String targetId, String stickId, Boolean isSticky) throws IOException, InvalidMessageException, LegacyMessageException {
-        Log.d("YYY SENDERID", senderId);
-        Log.d("YYY TARGETID", targetId);
-        Log.d("YYY STICKID", stickId);
-        Log.d("YYY ISSTICKY", Boolean.toString(isSticky));
         SenderKeyDistributionMessage senderKeyDistributionMessage = null;
         if (isSticky)
             senderKeyDistributionMessage = new SenderKeyDistributionMessage(Base64.decode(DatabaseFactory.getStickyKeyDatabase(context).getStickyKey(stickId)));
@@ -563,7 +557,6 @@ public class StickProtocol {
             GroupSessionBuilder groupSessionBuilder = new GroupSessionBuilder(senderKeyStore);
             senderKeyDistributionMessage = groupSessionBuilder.create(senderKeyName);
         }
-        Log.d("YYY REACHED HERE111", "ASEF");
         return encryptTextPairwise(targetId, Base64.encodeBytes(senderKeyDistributionMessage.serialize()));
     }
 
@@ -593,28 +586,6 @@ public class StickProtocol {
         }
     }
 
-    public void initStandardGroupSession(String senderId, String stickId, String cipherSenderKey) {
-        try {
-            Log.d("PPP INIT STANDARDGS", senderId);
-            Log.d("PPP INIT STANDARDGS", stickId);
-            Log.d("PPP INIT STANDARDGS", cipherSenderKey);
-            if (cipherSenderKey != null) {
-                SenderKeyStore senderKeyStore = new MySenderKeyStore(context);
-                SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(senderId, 0);
-                SenderKeyName senderKeyName = new SenderKeyName(stickId, signalProtocolAddress);
-                GroupSessionBuilder groupSessionBuilder = new GroupSessionBuilder(senderKeyStore);
-                String senderKey = decryptTextPairwise(senderId, false, cipherSenderKey);
-                Log.d("PPP INIT SGS", senderKey);
-                if (senderKey != null) {
-                    SenderKeyDistributionMessage senderKeyDistributionMessage = new SenderKeyDistributionMessage(Base64.decode(senderKey));
-                    groupSessionBuilder.process(senderKeyName, senderKeyDistributionMessage);
-                }
-            }
-        } catch (InvalidMessageException | LegacyMessageException | IOException e) {
-            e.printStackTrace();
-        }
-    }
-
 
     /***
      * This method is used to make an encryption in a sticky session.
@@ -626,10 +597,6 @@ public class StickProtocol {
      * @return ciphertext
      */
     public String encryptText(String senderId, String stickId, String text, Boolean isSticky) {
-        Log.d("ZZZ SENDERID", senderId);
-        Log.d("zzz senderId", stickId);
-        Log.d("ZZZ TEXT", text);
-        Log.d("zzz issticky", Boolean.toString(isSticky));
         try {
             SenderKeyStore senderKeyStore = new MySenderKeyStore(context);
             SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(senderId, 0);
@@ -657,20 +624,13 @@ public class StickProtocol {
         if (cipher.length() < 4)
             return null;
         try {
-            Log.d("XXX SENDERID", senderId);
-            Log.d("XXX STICKID", stickId);
-            Log.d("XXX CIPHER", cipher);
-            Log.d("XXX ISSTICKY", Boolean.toString(isSticky));
             Boolean isSelf = senderId.equals(PreferenceManager.getDefaultSharedPreferences(context).getString("userId", ""));
-            Log.d("XXX ISSELF", Boolean.toString(isSelf));
             SenderKeyStore mySenderKeyStore = new MySenderKeyStore(context);
             SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(senderId, 0);
             SenderKeyName senderKeyName = new SenderKeyName(stickId, signalProtocolAddress);
             GroupCipher groupCipher = new GroupCipher(mySenderKeyStore, senderKeyName);
             byte[] decryptedCipher;
-            Log.d("XXX HAVE SUCCESSFULLY", "REACHED HERE0");
             decryptedCipher = groupCipher.decrypt(Base64.decode(cipher), isSticky, isSelf);
-            Log.d("XXX HAVE SUCCESSFULLY", "REACHED HERE1");
             return new String(decryptedCipher, StandardCharsets.UTF_8);
         } catch (LegacyMessageException | InvalidMessageException | DuplicateMessageException
                 | NoSessionException | IOException e) {
@@ -1148,7 +1108,7 @@ public class StickProtocol {
 
     /****************************** END OF FILE ENCRYPTION METHODS ******************************/
 
-    /************************** START OF PAIRWISE SESSION SPECIFIC METHODS ***************************/
+    /************************** START OF SIGNAL SESSION METHODS ***************************/
 
     /***
      * This method is used to encrypt files in a pairwise session
@@ -1197,7 +1157,32 @@ public class StickProtocol {
         return store.containsSession(signalProtocolAddress);
     }
 
-    /************************** END OF PAIRWISE SESSION SPECIFIC METHODS ***************************/
+    /**
+     * This method is used to create a standard group session from a sender key that was encrypted to the user.
+     *
+     * @param senderId        - userId of the sender
+     * @param stickId         - id of the sticky session
+     * @param cipherSenderKey - encrypted sender key
+     */
+    public void initStandardGroupSession(String senderId, String stickId, String cipherSenderKey) {
+        try {
+            if (cipherSenderKey != null) {
+                SenderKeyStore senderKeyStore = new MySenderKeyStore(context);
+                SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(senderId, 0);
+                SenderKeyName senderKeyName = new SenderKeyName(stickId, signalProtocolAddress);
+                GroupSessionBuilder groupSessionBuilder = new GroupSessionBuilder(senderKeyStore);
+                String senderKey = decryptTextPairwise(senderId, false, cipherSenderKey);
+                if (senderKey != null) {
+                    SenderKeyDistributionMessage senderKeyDistributionMessage = new SenderKeyDistributionMessage(Base64.decode(senderKey));
+                    groupSessionBuilder.process(senderKeyName, senderKeyDistributionMessage);
+                }
+            }
+        } catch (InvalidMessageException | LegacyMessageException | IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /************************** END OF SIGNAL SESSION METHODS ***************************/
 
     /****************************** START OF UTILITY METHODS ******************************/
 

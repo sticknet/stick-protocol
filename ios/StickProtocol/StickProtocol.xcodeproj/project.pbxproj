@@ -337,7 +337,7 @@
 				07101775260741D900CD0E47 /* CryptoProvider */,
 				071017C1260741D900CD0E47 /* FileCrypto */,
 				071017CD260741D900CD0E47 /* Utility */,
-				071017A5260741D900CD0E47 /* Storage */,
+				071017A5260741D900CD0E47 /* Store */,
 				07101779260741D900CD0E47 /* Models */,
 				071017B2260741D900CD0E47 /* Controllers */,
 				07101766260741D900CD0E47 /* SPObjects */,
@@ -426,7 +426,7 @@
 			path = Models;
 			sourceTree = "<group>";
 		};
-		071017A5260741D900CD0E47 /* Storage */ = {
+		071017A5260741D900CD0E47 /* Store */ = {
 			isa = PBXGroup;
 			children = (
 				071017A6260741D900CD0E47 /* PreKeyStore.h */,
@@ -440,7 +440,7 @@
 				07101764260741D900CD0E47 /* StorageManager.swift */,
 				071017B1260741D900CD0E47 /* EncryptionManager.swift */,
 			);
-			path = Storage;
+			path = Store;
 			sourceTree = "<group>";
 		};
 		071017B2260741D900CD0E47 /* Controllers */ = {

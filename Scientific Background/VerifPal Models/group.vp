@@ -1,0 +1,68 @@
+attacker[active]
+
+principal Bob[]
+
+principal Alice[
+	knows private aChainKey // Alice's Chain key for a sticky session
+	knows private aSigPriv // Alice's private signature key for a sticky session
+	aSigPub = G^aSigPriv // Alice's public signature key for a sticky sesison
+]
+
+principal Alice[
+	generates photo // Alice wants to share this photo
+	generates ephAES, ephMAC // A blob key is (AES256 || HMAC-SHA256)
+	photoEnc = ENC(ephAES, photo) // Encrypt photo
+	photoMac = MAC(ephMAC, photoEnc) // Create MAC (hash) of photo
+	blobSec = CONCAT(ephAES, ephMAC, photoMac) // Concatenate the blob key with photo hash
+]
+
+principal Alice[
+	chainKey2, messageKey = HKDF(MAC(aChainKey, nil), nil, nil) // Derive new message key
+	blobSecEnc = ENC(messageKey, blobSec) // Encrypt the blob secret
+	blobSecSigned = SIGN(aSigPriv, blobSecEnc) // Sign the encrypted msg
+]
+
+// Alice shares with Bob and Charlie the encrypted blob secret and photo
+Alice -> Bob: [aSigPub], blobSecEnc, blobSecSigned, photoEnc
+Alice -> Charlie: [aSigPub], blobSecEnc, blobSecSigned, photoEnc
+
+principal Bob[
+	knows private aChainKey // Alice's chain key which is part of her sender key 
+	chainKey2B, messageKeyB = HKDF(MAC(aChainKey, nil), nil, nil) // derives message key
+	_ = SIGNVERIF(aSigPub, blobSecEnc, blobSecSigned)? // Verify signature
+	blobSecDec = DEC(messageKeyB, blobSecEnc) // Decrypt the blob secret
+]
+
+principal Bob[
+	ephAESb, ephMACb, photoMacb = SPLIT(blobSecDec) // Split the blob secret
+	_ = ASSERT(MAC(ephMACb, photoEnc), photoMacb)? // Verify the photo MAC
+	photoDecB = DEC(ephAESb, photoEnc) // Decrypt the photo
+]
+
+// Charlie will do the exact same process as Bob
+principal Charlie[
+	knows private aChainKey 
+	chainKey2C, messageKeyC = HKDF(MAC(aChainKey, nil), nil, nil)
+	_ = SIGNVERIF(aSigPub, blobSecEnc, blobSecSigned)?
+	blobSecDec2 = DEC(messageKeyC, blobSecEnc)
+]
+
+principal Charlie[
+	ephAESc, ephMACc, photoMacc = SPLIT(blobSecDec2)
+	_ = ASSERT(MAC(ephMACc, photoEnc), photoMacc)?
+	photoDecC = DEC(ephAESc, photoEnc)
+]
+
+phase[1]
+
+principal Alice[leaks chainKey2]
+
+
+queries[
+	authentication? Alice -> Bob: blobSecEnc
+	authentication? Alice -> Bob: photoEnc
+	authentication? Alice -> Charlie: blobSecEnc
+	authentication? Alice -> Charlie: photoEnc
+	confidentiality? blobSec
+	confidentiality? photo
+]

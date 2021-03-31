@@ -1,0 +1,78 @@
+attacker[active] // Declare an active attacker
+
+principal Bob[
+	knows private bIkPriv, bSpkPriv // Bob's private keys
+	generates bOpkPriv
+	bIkPub = G^bIkPriv
+	bSpkPub = G^bSpkPriv
+	bOpkPub = G^bOpkPriv
+	bSig = SIGN(bIkPriv, bSpkPub) // Bob's signature
+]
+
+principal Alice[
+	knows private aIkPriv // Alice private IK
+	aIkPub = G^aIkPriv // Alice public IK
+]
+
+// Alice fetches Bob's pre key bundle
+Bob -> Alice: [bIkPub], bSig, bSpkPub, bOpkPub
+
+principal Alice[
+	generates aEk1Priv // ephemeral key
+	aEk1Pub = G^aEk1Priv
+	aMasterSec = HASH(bSpkPub^aIkPriv, bIkPub^aEk1Priv,
+	 bSpkPub^aEk1Priv, bOpkPub^aEk1Priv) // HASH/KDF
+
+	// The master secret goes into a HKDF to make the initial Root Key aRK1,
+	// in addition to the initial receiving chain key aCkBA1
+	aRK1, aCkBA1 = HKDF(aMasterSec, nil, nil)
+]
+
+principal Alice[
+	generates msg1, aEk2Priv // Ephemeral key
+	aEk2Pub = G^aEk2Priv
+
+	// verify Bob's signature
+	valid = SIGNVERIF(bIkPub, bSpkPub, bSig)?
+
+	// new shared DH output for the DH ratchet
+	aDH1 = bSpkPub^aEk2Priv
+
+	// Derive new root and sending chain keys
+	aRK2, aCkAB1 = HKDF(aDH1, aRK1, nil)
+
+	// derive the message key
+	aCkAB2, aMk1 = HKDF(MAC(aCkAB1, nil), nil, nil)
+
+	// encrypt message
+	msg1Enc = AEAD_ENC(aMk1, msg1, HASH(aIkPub, bIkPub, aEk2Pub))
+]
+
+// Alice sends to bob the encrypted message, which includes the public keys that she used, brackets indicates pre-authentication
+
+Alice -> Bob: [aIkPub], aEk1Pub, aEk2Pub, msg1Enc 
+
+
+principal Bob[
+	bMaster = HASH(aIkPub^bSpkPriv, aEk1Pub^bIkPriv, aEk1Pub^bSpkPriv, aEk1Pub^bOpkPriv)
+	brkba1, bckba1 = HKDF(bmaster, nil, nil) // Root key and sending chain key
+]
+
+principal Bob[
+	bDH1 = aEk2Pub^bSpkPriv // new shared DH output for the DH ratchet
+	bRkAB1, bCkAB1 = HKDF(bDH1, brkba1, nil) // derive new root and chain keys
+	bCkAB2, bMk1 = HKDF(MAC(bCkAB1, nil), nil, nil) // derive the message key
+	msg1Dec = AEAD_DEC(bMk1, msg1Enc, HASH(aIkPub, bIkPub, aEk2Pub)) // decrypted the message
+]
+
+
+phase[1]
+
+principal Alice[leaks aIkPriv]
+principal Bob[leaks bIkPriv, bSpkPriv]
+
+// Here we ask our queries
+queries[
+    authentication? Alice -> Bob: msg1Enc // Was the encrypted msg successfully authenticated from Alice to Bob?
+	confidentiality? msg1 // Was msg1 confidential?
+]

@@ -17,6 +17,7 @@ public class SP {
     var db: YapDatabase?
     var service: String?
     var accessGroup: String?
+
     public init(service: String, accessGroup: String, db: YapDatabase) {
         self.db = db
         self.service = service
@@ -124,7 +125,7 @@ public class SP {
         }
         return map
     }
-    
+
 
     /***
      * The StickProtocol Re-Initialize method to decrypt the user's keys and re-establish the sticky
@@ -138,43 +139,47 @@ public class SP {
      *               * localId
      * @param password - String, user's plaintext password
      * @param userId - String, user's unique id
-     * @param oneTimeId - String, a newly generated uuid for the user
      * @param progressEvent - an optional callback function to provide progress
      *                        feedback to the user while the keys are being decrypted and the sessions
      *                        re-established.
      */
-    public func reInitialize(bundle: Dictionary<String, Any>, password: String, userId: String, oneTimeId: String, progressEvent: (([String: Any]) -> Void)?) {
+    public func reInitialize(bundle: Dictionary<String, Any>, password: String, userId: String,
+                             progressEvent: (([String: Any]) -> Void)?) {
         UserDefaults(suiteName: self.accessGroup!)!.set(userId, forKey: "userId")
         let keychain = A0SimpleKeychain(service: self.service!, accessGroup: self.accessGroup!)
         keychain.setString(password, forKey: userId + "-password")
         let databaseConnection = db!.newConnection()
         let encryptionManager = try? EncryptionManager(accessGroup: accessGroup!, databaseConnection: databaseConnection)
         encryptionManager?.storage.setLocalRegistrationId(localId: bundle["localId"] as! UInt32)
+
         let identityKeys = bundle["identityKeys"] as! [Dictionary<String, Any>]
         let signedPreKeys = bundle["signedPreKeys"] as! [Dictionary<String, Any>]
         let preKeys = bundle["preKeys"] as! [Dictionary<String, Any>]
         let senderKeys = bundle["senderKeys"] as! [Dictionary<String, Any>]
-        var count = 0
         let totalKeys = identityKeys.count + signedPreKeys.count + preKeys.count + senderKeys.count
+        var count = 0
 
         for key in identityKeys {
+            let keyId = key["id"] as! UInt32
+            let timestamp = Int64(UInt64(key["timestamp"] as! String)!)
             let IKPub = Data(base64Encoded: key["public"] as! String)
             let IKPriv = pbDecrypt(encryptedIvText: key["cipher"] as! String, salt: key["salt"] as! String, pass: password)
-            let keyPair = try! KeyPair(publicKey: IKPub!, privateKey: IKPriv)
             let identityKeyPair = try! IdentityKeyPair(publicKey: IKPub!, privateKey: IKPriv)
-            encryptionManager!.storage.storeIdentityKey(identityKeyId: key["id"] as! UInt32, timestamp: Int64(UInt64(key["timestamp"] as! String)!), identityKeyPair: identityKeyPair)
+            _ = encryptionManager!.storage.storeIdentityKey(identityKeyId: keyId, timestamp: timestamp,
+                    identityKeyPair: identityKeyPair)
             if (key["active"] as! Bool == true) {
-                encryptionManager?.storage.setActiveIdentityKeyPair(keyPair: identityKeyPair)
-                UserDefaults(suiteName: self.accessGroup!)!.set(key["id"], forKey: "activeIdentityKeyId")
-                UserDefaults(suiteName: self.accessGroup!)!.set(UInt64(key["timestamp"] as! String), forKey: "activeIdentityKeyTimestamp")
+                _ = encryptionManager?.storage.setActiveIdentityKeyPair(keyPair: identityKeyPair)
+                UserDefaults(suiteName: self.accessGroup!)!.set(keyId, forKey: "activeIdentityKeyId")
+                UserDefaults(suiteName: self.accessGroup!)!.set(timestamp, forKey: "activeIdentityKeyTimestamp")
             }
             count += 1
             if (progressEvent != nil) {
                 progressEvent!(["progress": count, "total": totalKeys])
-            } else {
-                print("Printing progress because progress event is null", count)
             }
         }
+        
+        // loop over the signedPreKeys, preKeys and senderKeys
+        // ...
 
         for key in signedPreKeys {
             let SPKPub = Data(base64Encoded: key["public"] as! String)
@@ -334,13 +339,13 @@ public class SP {
             let senderKey = try SenderKeyRecord(data: senderKeyData!, context: encryptionManager!.signalContext)
             let key = senderKey.getSKSChainKey().base64EncodedString() + senderKey.getSKSPrivateKey().base64EncodedString() + senderKey.getSKSPublicKey().base64EncodedString()
             let encryptedKey = encryptTextPairwise(userId: userId, text: key)
-            
+
             var map = [String: Any]()
             map["id"] = senderKey.getSKSId()
             map["key"] = encryptedKey
             return map
         } catch {
-            print("ERROR IN GET ENCRYPTING SENDER KEYEXEC: \(error)")
+            print("ERROR IN GET ENCRYPTING SENDER KEY: \(error)")
         }
         return nil
     }
@@ -382,7 +387,7 @@ public class SP {
      * @param cipherSenderKey - encrypted sender key
      * @param identityKeyId   - the identity key id of the target user that was used to encrypt the sender key
      */
-    public func initSession(senderId: String, stickId: String, cipherSenderKey: String?, identityKeyId: Int) {
+    public func initStickySession(senderId: String, stickId: String, cipherSenderKey: String?, identityKeyId: Int) {
         if (cipherSenderKey != nil) {
             do {
                 let databaseConnection = db!.newConnection()
@@ -579,10 +584,10 @@ public class SP {
             let signaturePublicKey = key![88...131]
             let signatureKey = try! KeyPair(publicKey: Data(base64Encoded: signaturePublicKey)!, privateKey: Data(base64Encoded: signaturePrivateKey)!)
             let senderKeyRecord = try! SenderKeyRecord(context: encryptionManager!.signalContext)
-     
-            senderKeyRecord.setSenderKeyStateWithKeyId(senderKey["id"] as! UInt32, chainKey: Data(base64Encoded: chainKey )!, sigKeyPair: signatureKey)
 
-            
+            senderKeyRecord.setSenderKeyStateWithKeyId(senderKey["id"] as! UInt32, chainKey: Data(base64Encoded: chainKey)!, sigKeyPair: signatureKey)
+
+
             encryptionManager!.storage.storeSenderKey(senderKeyRecord.serializedData()!, senderKeyName: senderKeyName)
 
             // STORE INITIAL SENDER KEY
@@ -610,7 +615,7 @@ public class SP {
         let activeIdentityKeyId = UserDefaults(suiteName: self.accessGroup!)!.integer(forKey: "activeIdentityKeyId")
         // Swap identity key if needed
         if (activeIdentityKeyId != identityKeyId) {
-           swapIdentityKey(keyId: UInt32(identityKeyId))
+            swapIdentityKey(keyId: UInt32(identityKeyId))
         }
         let key = decryptTextPairwise(senderId: senderId, isStickyKey: true, cipher: cipher)
         if (activeIdentityKeyId != identityKeyId) {
@@ -776,7 +781,7 @@ public class SP {
         // Combine IV and encrypted part.
         let encryptedIVAndTextData = Data(count: ivSize + encrypted.count)
         var encryptedIVAndText = [UInt8](encryptedIVAndTextData as Data)
-        encryptedIVAndText[0...ivSize-1] = ivBytes[0...ivSize-1]
+        encryptedIVAndText[0...ivSize - 1] = ivBytes[0...ivSize - 1]
         encryptedIVAndText[ivSize...(ivSize + encrypted.count - 1)] = encrypted[0...encrypted.count - 1]
 
         let map: [String: String?] = ["salt": salt?.base64EncodedString(), "cipher": Data(encryptedIVAndText).base64EncodedString()]
@@ -799,14 +804,14 @@ public class SP {
         let encyptedIvTextBytes = [UInt8](encyptedIvTextData! as Data)
         let ivData = Data(count: ivSize)
         var ivBytes = [UInt8](ivData as Data)
-        ivBytes[0...ivSize-1] = encyptedIvTextBytes[0...ivSize-1]
+        ivBytes[0...ivSize - 1] = encyptedIvTextBytes[0...ivSize - 1]
 
 
         // Extract encrypted part.
         let encryptedSize = encyptedIvTextBytes.count - ivSize
         let encyptedData = Data(count: encryptedSize)
         var encryptedBytes = [UInt8](encyptedData as Data)
-        encryptedBytes[0...encryptedSize-1] = encyptedIvTextBytes[ivSize...encyptedIvTextBytes.count - 1]
+        encryptedBytes[0...encryptedSize - 1] = encyptedIvTextBytes[ivSize...encyptedIvTextBytes.count - 1]
 
 
         // Hash key.
@@ -888,7 +893,7 @@ public class SP {
 
     /****************************** END OF FILE ENCRYPTION METHODS ******************************/
 
-    /************************** START OF PAIRWISE SESSION SPECIFIC METHODS ***************************/
+    /************************** START OF SIGNAL SESSION METHODS ***************************/
 
     /***
      * This method is used to encrypt files in a pairwise session
@@ -941,7 +946,33 @@ public class SP {
         return exists
     }
 
-    /************************** END OF PAIRWISE SESSION SPECIFIC METHODS ***************************/
+    /**
+     * This method is used to create a standard group session from a sender key that was encrypted to the user.
+     *
+     * @param senderId        - userId of the sender
+     * @param stickId         - id of the sticky session
+     * @param cipherSenderKey - encrypted sender key
+     */
+    public func initStandardGroupSession(senderId: String, stickId: String, cipherSenderKey: String?) {
+        if (cipherSenderKey != nil) {
+            do {
+                let databaseConnection = db!.newConnection()
+                let encryptionManager = try? EncryptionManager(accessGroup: accessGroup!, databaseConnection: databaseConnection)
+                let signalProtocolAddress = SignalAddress(name: senderId, deviceId: 0)
+                let senderKeyName = SenderKeyName(groupId: stickId, address: signalProtocolAddress)
+                let groupSesisonBuilder = GroupSessionBuilder(context: encryptionManager!.signalContext)
+                let senderKey = decryptTextPairwise(senderId: senderId, isStickyKey: false, cipher: cipherSenderKey!)
+                if (senderKey != nil) {
+                    let senderKeyDistributionMessage = try SenderKeyDistributionMessage(data: Data(base64Encoded: senderKey!)!, context: encryptionManager!.signalContext)
+                    try groupSesisonBuilder.processSession(with: senderKeyName, senderKeyDistributionMessage: senderKeyDistributionMessage)
+                }
+            } catch {
+                print("ERROR IN INTI GROUP SENDER SESSION: \(error)")
+            }
+        }
+    }
+
+    /************************** END OF SIGNAL SESSION METHODS ***************************/
 
     /****************************** START OF UTILITY METHODS ******************************/
 
@@ -1017,13 +1048,13 @@ extension String {
         return String(self[idx1..<idx2])
     }
 
-    subscript (r: Range<Int>) -> String {
+    subscript(r: Range<Int>) -> String {
         let start = index(startIndex, offsetBy: r.lowerBound)
         let end = index(startIndex, offsetBy: r.upperBound)
-        return String(self[start ..< end])
+        return String(self[start..<end])
     }
 
-    subscript (r: CountableClosedRange<Int>) -> String {
+    subscript(r: CountableClosedRange<Int>) -> String {
         let startIndex = self.index(self.startIndex, offsetBy: r.lowerBound)
         let endIndex = self.index(startIndex, offsetBy: r.upperBound - r.lowerBound)
         return String(self[startIndex...endIndex])

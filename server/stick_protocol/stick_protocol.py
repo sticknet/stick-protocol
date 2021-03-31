@@ -22,10 +22,11 @@ FIREBASE_REF_DEV = settings.FIREBASE_REF_DEV
 
 class StickProtocol():
 
-    def __init__(self, UserModel, DeviceModel, GroupModel):
+    def __init__(self, UserModel, DeviceModel, GroupModel, sessionAge):
         self.User = UserModel
         self.Device = DeviceModel
         self.Group = GroupModel
+        self.sessionAge = sessionAge
 
     def process_pre_key_bundle(self, data, user):
         """
@@ -240,17 +241,8 @@ class StickProtocol():
             senderKeys[id] = key
         return {'authorized': True, 'senderKeys': senderKeys}
 
-    def get_uploaded_sender_keys(self, data, user):
-        """
-        Before a user makes an upload they need to know which stickId to use (whether the current sticky session has expired).
-        Also, they need to know which members of the target party does not have their SenderKey for that sticky session.
-        This following method expects these arguments in the request body:
-        * groups_ids - a list of groups ids
-        * connections_ids - a list of users ids
-        * isSticky - boolean, indicates whether the user is intending to use a sticky session
-        * isProfile - boolean, indicates whether the user is sharing to their profile (includes all their connections)
-        * partyId (optional) - the partyId of a user
-        """
+
+    def get_stick_id(self, data, user):
         groups_ids = data['groups_ids']
         connections_ids = data['connections_ids']
         isSticky = data['isSticky']
@@ -289,7 +281,7 @@ class StickProtocol():
                 if user.id not in membersIds:
                     membersIds.append(user.id)
                 partyId = party.id
-        elif 'partyId' in data:  # Sharing to the party of a user
+        elif 'partyId' in data:  # Sharing to the party of a another user
             membersIds = [user.id]
             if not (len(groups_ids) == 1 and len(connections_ids) == 0):
                 party = Party.objects.get(id=data['partyId'])
@@ -310,7 +302,7 @@ class StickProtocol():
             activeSenderKey = senderKeys[0]
             if not isSticky:  # A standard session is valid
                 dict[user.id] = {'exists': True}
-            elif activeSenderKey.step < 100:  # Check whether is sticky session has not expired
+            elif activeSenderKey.step < self.sessionAge:  # Check whether is sticky session has not expired
                 chainId = activeSenderKey.chainId
                 dict[user.id] = {'exists': True}
                 responseDict["step"] = activeSenderKey.step
@@ -321,6 +313,8 @@ class StickProtocol():
         else:
             dict[user.id] = {'exists': False}
         stickId = str(partyId) + str(chainId)
+
+
         if not isSticky:
             stickId = partyId
 
@@ -359,7 +353,7 @@ class StickProtocol():
         senderKeys = EncryptingSenderKey.objects.filter(partyId=partyId, user=currentUser).reverse()
         activeSenderKey = senderKeys[0]
         responseDict = {}
-        if activeSenderKey.step < 100:
+        if activeSenderKey.step < self.sessionAge:
             chainId = activeSenderKey.chainId
             responseDict['step'] = activeSenderKey.step
         else:

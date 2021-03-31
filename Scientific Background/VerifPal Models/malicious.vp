@@ -1,0 +1,33 @@
+attacker[active]
+
+principal Alice[
+	knows private aChainKey // Alice's Chain key for a sticky session
+	knows private aSigPriv // Alice's private signature key for a sticky session
+	aSigPub = G^aSigPriv  // Alice's public signature key for a sticky sesison
+]
+
+principal Alice[
+    generates post
+	chainKey2, messageKey = HKDF(MAC(aChainKey, nil), nil, nil) // Derive new message key
+	postEnc = ENC(messageKey, post) // Encrypt the blob secret
+	postSigned = SIGN(aSigPriv, postEnc) // Sign the encrypted post
+]
+
+Alice -> Server: [aChainKey], [aSigPub], postEnc, postSigned
+
+principal Server[
+    generates malPart
+    malpost = CONCAT(postEnc, malPart)
+]
+
+Server -> Bob: [aChainKey], [aSigPub], malpost, postSigned
+
+principal Bob[
+    _ = SIGNVERIF(aSigPub, malpost, postSigned)? // Verify signature
+	chainKey2B, messageKeyB = HKDF(MAC(aChainKey, nil), nil, nil) // derives message key
+	postDec = DEC(messageKeyB, malpost) // Decrypt the blob secret
+]
+
+queries[
+	confidentiality? post
+]

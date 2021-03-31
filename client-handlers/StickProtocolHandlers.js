@@ -130,36 +130,31 @@ export default class StickProtocolHandlers {
 
     /**
      * The following method is called before trying to decrypt a piece of data to check if there is an initialized sticky
-     * session corresponding that data's stickId. If there is no sticky session, it will try to fetch the sender key
+     * session corresponding to that data's stickId. If there is no sticky session, it will try to fetch the sender key
      * from the server, and if it succeeds it will initialize the sticky session. This method returns a boolean indicating
      * whether the decryption process can proceed or not.
      */
-    async fetchSenderKey(entityId, stickId, memberId, dispatch) {
+    async canDecrypt(entityId, stickId, memberId, dispatch) {
         let canDecrypt = true
-        const userId = this.userId
-
-        // Check if the sticky session exists
-        const exists = await this.StickProtocol.sessionExists(memberId, stickId)
+        const exists = await this.StickProtocol.sessionExists(memberId, stickId) // Check if the sticky session exists
         if (!exists) { // if the sticky session does not exists, then try to create it
             const body = {
-                stickId,
-                memberId,
-                isDev: this.isDev,
-                isSticky: true,
+                stickId, memberId, isDev: this.isDev, isSticky: true,
                 isInvitation: `${entityId}`.includes('invitation')
             }
             // try to fetch the sender key from the server
-            const response = await axios.post(`${this.URL}/api/fetch-sk/`, body, this.httpConfig)
-            if (!response.data.senderKey) { // If there is no sender key yet, mark the session as pending
+            const {data} = await axios.post(`${this.URL}/api/fetch-sk/`, body, this.httpConfig)
+            const senderKey = data.senderKey;
+            if (!senderKey) { // If there is no sender key yet, mark the session as pending
                 canDecrypt = false
                 await dispatch({type: 'PENDING_SESSION', payload: stickId})
-                dispatch({type: 'DOWNLOADED', payload: entityId});
+                await dispatch({type: 'DOWNLOADED', payload: entityId});
             } else { // otherwise initialize the session
-                if (memberId !== userId)
-                    await this.StickProtocol.initStickySession(memberId, stickId, response.data.senderKey.key, response.data.senderKey.identityKeyId)
+                if (memberId !== this.userId)
+                    await this.StickProtocol.initStickySession(memberId, stickId, senderKey.key, senderKey.identityKeyId)
                 else {
-                    response.data.senderKey.stickId = stickId
-                    await this.StickProtocol.reinitMyStickySession(this.userId, response.data.senderKey)
+                    senderKey.stickId = stickId
+                    await this.StickProtocol.reinitMyStickySession(this.userId, senderKey)
                 }
                 await dispatch({type: 'PENDING_SESSION_DONE', payload: stickId})
             }
@@ -257,7 +252,6 @@ export default class StickProtocolHandlers {
             isSticky: false,
             isDev: this.isDev
         }
-        console.log('FETCH STANDARD SENDER KEY', body)
         const response = await axios.post(`${this.URL}/api/fetch-sk/`, body, this.httpConfig);
         if (response.data.senderKey)
             await this.StickProtocol.initStandardGroupSession(oneTimeId, stickId, response.data.senderKey)
@@ -297,7 +291,7 @@ export default class StickProtocolHandlers {
             }, this.httpConfig)
             for (let i = 0; i < keysToFetch.length; i++) {
                 if (response.data.senderKeys[keysToFetch[i]]) {
-                    await this.StickProtocol.initStandardGroupSession(keysToFetch[i], chatId, response.data.senderKeys[keysToFetch[i]])
+                    await this.StickProtocol.initStandardGroupSession(keysToFetch[i], stickId, response.data.senderKeys[keysToFetch[i]])
                 }
             }
         }

@@ -1,0 +1,40 @@
+attacker[active]
+
+
+principal Alice[
+	knows private aChainKeyX // Alice's Chain key for a sticky session
+	knows private aSigPrivX // Alice's private signature key for a sticky session
+	aSigPubX = G^aSigPrivX // Alice's public signature key for a sticky sesison
+]
+
+phase[1]
+
+principal Alice[leaks aChainKeyX]
+
+principal Alice[
+	knows private aChainKeyY // Alice's Chain key for a sticky session
+	knows private aSigPrivY // Alice's private signature key for a sticky session
+	aSigPubY = G^aSigPrivY // Alice's public signature key for a sticky sesison
+]
+
+principal Alice[
+    generates postY
+	aChainKeyY2, messageKeyY = HKDF(MAC(aChainKeyY, nil), nil, nil) // Derive new message key
+	postYEnc = ENC(messageKeyY, postY) // Encrypt the blob secret
+	postYSigned = SIGN(aSigPrivY, postYEnc) // Sign the encrypted msg
+]
+
+// Alice shares with Bob and Charlie the encrypted blob secret and photo
+Alice -> Bob: [aSigPubY], postYEnc, postYSigned
+
+principal Bob[
+	knows private aChainKeyY // Alice's chain key which is part of her sender key 
+	aChainKeyY2B, messageKeyYB = HKDF(MAC(aChainKeyY, nil), nil, nil) // derives message key
+	_ = SIGNVERIF(aSigPubY, postYEnc, postYSigned)? // Verify signature
+	postYDec = DEC(messageKeyYB, postYEnc) // Decrypt the blob secret
+]
+
+queries[
+	authentication? Alice -> Bob: postYEnc
+	confidentiality? postY
+]
