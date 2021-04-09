@@ -569,6 +569,10 @@ public class StickProtocol {
      * @param identityKeyId   - the identity key id of the target user that was used to encrypt the sender key
      */
     public void initStickySession(String senderId, String stickId, String cipherSenderKey, int identityKeyId) {
+        Log.d("XXX ISS SENDERID", senderId);
+        Log.d("XXX ISS STICKID", stickId);
+        Log.d("XXX ISS CIPHERSENDERKEY", cipherSenderKey);
+        Log.d("XXX ISS IKID", Integer.toString(identityKeyId));
         try {
             if (cipherSenderKey != null) {
                 SenderKeyStore senderKeyStore = new MySenderKeyStore(context);
@@ -621,6 +625,10 @@ public class StickProtocol {
      * @param isSticky - boolean indicating whether this decryption is for a sticky session
      */
     public String decryptText(String senderId, String stickId, String cipher, Boolean isSticky) {
+        Log.d("XXX DT SENDERID", senderId);
+        Log.d("XXX DT STICKID", stickId);
+        Log.d("XXX DT CIPHER", cipher);
+        Log.d("XXX DT ISSTICKY", Boolean.toString(isSticky));
         if (cipher.length() < 4)
             return null;
         try {
@@ -783,6 +791,9 @@ public class StickProtocol {
      * @param identityKeyId - the identity key id of the target user that was used to encrypt the sender key
      */
     public String decryptStickyKey(String senderId, String cipher, int identityKeyId) {
+        Log.d("XXX DSS SENDERID", senderId);
+        Log.d("XXX DSS CIPHER", cipher);
+        Log.d("XXX DSS IKID", Integer.toString(identityKeyId));
         int activeIdentityKeyId = Preferences.getActiveIdentityKeyId(context);
         // Swap identity key if needed
         if (activeIdentityKeyId != identityKeyId)
