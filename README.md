@@ -58,3 +58,9 @@ from one application to another. A developer is free to write their own handlers
 ```
 npm install stick-protocol-handlers
 ```
+
+# License
+
+Copyright 2020-2021 STiiiCK
+
+Licensed under the GPLv3: http://www.gnu.org/licenses/gpl-3.0.html
