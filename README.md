@@ -13,7 +13,7 @@ End-to-end encryption has become a de facto standard in messengers, especially a
 The Stick protocol was implemented to be a superset to the Signal protocol making the Stick protocol logic external to the Signal protocol. This allows the Signal protocol to be used in parallel with the Stick protocol, from just the Stick protocol library. The stick protocol was implemented to be a fully comprehensive Android and iOS library (rather than just a Java and C library) which can be simply dropped into a social network application, and provide E2EE using re-establishable sticky sessions, with as low development overhead as possible. The Stick protocol implementation is composed of 4 libraries:
 
 
-• Androidlibrary(Gradlepackage)
-• iOSlibrary(CocoaPodframework)
-• Serverlibrary(PIPpackage)
-• Clienthandlerslibrary(NPMpackage)
+- Androidlibrary(Gradlepackage)
+- iOSlibrary(CocoaPodframework)
+- Serverlibrary(PIPpackage)
+- Clienthandlerslibrary(NPMpackage)
