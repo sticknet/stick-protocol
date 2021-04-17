@@ -1,3 +1,3 @@
-# stick-protocol
+# Stick Protocol
 
-!UNDER DEVELOPMENT!
+An End-to-End Encryption Protocol Tailored for Social Network Platforms.
