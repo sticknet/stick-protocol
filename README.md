@@ -30,4 +30,31 @@ dependencies {
 }
 ```
 
-The <a href="https://github.com/STiiiCK/stick-protocol/blob/main/android/app/src/main/java/com/stiiick/stickprotocol/main/StickProtocol.java">main java class file</a> has full usage documentation.
+The <a href="https://github.com/STiiiCK/stick-protocol/blob/main/android/app/src/main/java/com/stiiick/stickprotocol/main/StickProtocol.java">main StickProtocol java class file</a> has full usage documentation. It includes all the methods that you would need.
+
+
+## iOS
+
+CocoaPods:
+```
+pod 'StickProtocol', '1.1.62'
+```
+The <a href="https://github.com/STiiiCK/stick-protocol/blob/main/ios/StickProtocol/StickProtocol/Main/StickProtocol.swift">main StickProtocol Swift class file</a> has full usage documentation. It includes all the methods that you would need.
+
+## Server
+
+This is a server library for the Stick protocol in Python for Django. If you have a Django server you can use this library. If not, you can easily implement your own. The <a href="https://github.com/STiiiCK/stick-protocol/blob/main/server/stick_protocol/stick_protocol.py">main StickProtocol python class<a/> includes full usage documentation needed on the server.
+  
+```
+pip3 install stick-protocol-server
+```
+
+## Client Handlers
+
+The Stick protocol implementation features a client handlers library in JavaScript. It contains
+common handler methods needed for the Stick protocol client-side. These handlers may differ
+from one application to another. A developer is free to write their own handlers.  They can be implemented in any programming language. The <a href="https://github.com/STiiiCK/stick-protocol/blob/main/client-handlers/StickProtocolHandlers.js">main javascript class</a> contains full usage documentation.
+
+```
+npm install stick-protocol-handlers
+```
