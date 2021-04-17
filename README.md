@@ -17,3 +17,14 @@ The Stick protocol was implemented to be a superset to the Signal protocol makin
 - iOS Library (CocoaPod Framework)
 - Server Library (PIP Package)
 - Client Handlers Library (NPM Package)
+
+The Android library and the iOS library are the 2 main libraries of the Stick protocol. They have most of the logic needed on the client-side. There is also a server library for the Stick protocol in Python. In addition, there is a client handlers library in JavaScript which contains
+common handler methods needed for the Stick protocol client-side.
+
+## Android
+
+Gradle:
+```gradle
+dependencies {
+  implementation 'com.github.STiiiCK:stick-protocol:1.1.79'
+}
