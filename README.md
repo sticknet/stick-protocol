@@ -30,4 +30,4 @@ dependencies {
 }
 ```
 
-<a href="https://github.com/STiiiCK/stick-protocol/blob/main/android/app/src/main/java/com/stiiick/stickprotocol/main/StickProtocol.java">The main java class file has full usage documentation.</a>
+The <a href="https://github.com/STiiiCK/stick-protocol/blob/main/android/app/src/main/java/com/stiiick/stickprotocol/main/StickProtocol.java">main java class file</a> has full usage documentation.
