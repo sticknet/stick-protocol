@@ -309,7 +309,8 @@ class StickProtocol():
             else:  # Sticky session has expired, increment chainId by 1
                 chainId = int(activeSenderKey.chainId) + 1
                 dict[user.id] = {'exists': False}
-                bundlesToFetch.append(user.id)
+                if user.id not in membersIds:
+                    bundlesToFetch.append(user.id)
         else:
             dict[user.id] = {'exists': False}
         stickId = str(partyId) + str(chainId)
