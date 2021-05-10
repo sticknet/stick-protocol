@@ -144,7 +144,7 @@ class StickProtocol():
         dict = {"bundles": bundles, "users_id": users_id}
         return dict
 
-    def get_sender_key(self, data, user): # todo if this method only sticky session, then remove isSticky
+    def get_sender_key(self, data, user):
         """
         This method is used to fetch the SenderKey of a stickySession.
         The body should contain the following fields:
@@ -155,7 +155,6 @@ class StickProtocol():
         """
         memberId = data['memberId']
         stickId = data['stickId']
-        isSticky = data['isSticky']
         isInvitation = False
         if 'isInvitation' in data:
             isInvitation = data['isInvitation']
@@ -172,7 +171,7 @@ class StickProtocol():
         elif stickId.startswith(user.party.id):  # A user is authorized to fetch SenderKeys of their own profile (user.party.id)
             authorized = True
         else:
-            groupId = stickId[:36] if isSticky else data['groupId']
+            groupId = stickId[:36]
             group = self.Group.objects.filter(id=groupId).first()
             if group:
                 if group in user.groups.all():  # A group member is authorized
@@ -194,18 +193,13 @@ class StickProtocol():
         if not authorized:  # if NOT authorized, return 401
             return {'authorized': authorized}
 
-        if isSticky:  # Fetching the SenderKey of a sticky session
-            if memberId != user.id:  # Trying to fetch DSK
-                senderKey = DecryptingSenderKey.objects.filter(stickId=stickId, ofUser=memberId,
-                                                               forUser=user).first()
-            else:  # Trying to fetch ESK
-                partyId = stickId[:36]
-                chainId = stickId[36:]
-                senderKey = EncryptingSenderKey.objects.filter(partyId=partyId, chainId=chainId, user=user).first()
-        else:  # Trying to fetch DSK of a standard group session
-            oneTimeId = data['oneTimeId']
-            senderKey = DecryptingSenderKey.objects.filter(stickId=stickId, ofOneTimeId=oneTimeId,
-                                                           forOneTimeId=user.oneTimeId).first()
+        if memberId != user.id:  # Trying to fetch DSK
+            senderKey = DecryptingSenderKey.objects.filter(stickId=stickId, ofUser=memberId,
+                                                           forUser=user).first()
+        else:  # Trying to fetch ESK
+            partyId = stickId[:36]
+            chainId = stickId[36:]
+            senderKey = EncryptingSenderKey.objects.filter(partyId=partyId, chainId=chainId, user=user).first()
         key = None
         if senderKey:  # If the SenderKey exists, we will return it
             if memberId != user.id:
@@ -215,10 +209,7 @@ class StickProtocol():
         # SenderKey does not exist, send a `PendingKey` request to the target user to upload their key,
         # through a realtime database.
         else:
-            if isSticky:
-                phone = self.User.objects.get(id=memberId).phone
-            else:
-                phone = data['phone']
+            phone = self.User.objects.get(id=memberId).phone
             isDev = data['isDev']
             firebase_ref = FIREBASE_REF_DEV if isDev else FIREBASE_REF
             ref = db.reference('users/' + phone + '/pendingKeys/', DEFAULT_APP, firebase_ref)
@@ -404,8 +395,6 @@ class StickProtocol():
                 EncryptingSenderKey.objects.create(keyId=senderKey['id'], preKey=preKey, identityKey=identityKey,
                                                    partyId=partyId, chainId=chainId,
                                                    user=user, key=senderKey['key'])
-        if "group_id" in data:  # TODO: REMOVE FROM HERE MAYBE?
-            user.just_added_groups.remove(data["group_id"])
 
     def process_standard_sender_keys(self, data, user):
         """

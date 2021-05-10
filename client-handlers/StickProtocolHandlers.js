@@ -139,7 +139,7 @@ export default class StickProtocolHandlers {
         const exists = await this.StickProtocol.sessionExists(memberId, stickId) // Check if the sticky session exists
         if (!exists) { // if the sticky session does not exists, then try to create it
             const body = {
-                stickId, memberId, isDev: this.isDev, isSticky: true,
+                stickId, memberId, isDev: this.isDev,
                 isInvitation: `${entityId}`.includes('invitation')
             }
             // try to fetch the sender key from the server
