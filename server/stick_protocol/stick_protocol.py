@@ -30,7 +30,7 @@ class StickProtocol():
 
     def process_pre_key_bundle(self, data, user):
         """
-        A user must upload their PreKeyBundle at registration time. Before uploading their PreKeyBundle, they need to verify
+        A user must upload their PreKeyBundles at registration time. Before uploading their PreKeyBundles, they need to verify
         their phone number, and get their LimitedAccessToken.
         """
         identityKey = data["identityKey"]
@@ -87,14 +87,15 @@ class StickProtocol():
             "signedPreKey": signedPreKey.public,
             "signedPreKeyId": signedPreKey.keyId,
             "signature": signedPreKey.signature,
-            "preKey": preKey.public,
-            "preKeyId": preKey.keyId,
             "oneTimeId": user.oneTimeId,
             "phone": user.phone
         }
+        if preKey:
+            PKB["preKey"] = preKey.public
+            PKB["preKeyId"] = preKey.keyId
         if not isSticky:
             preKey.delete()
-        else:
+        elif preKey:
             preKey.used = True
             preKey.save()
         return PKB
@@ -131,11 +132,12 @@ class StickProtocol():
                 "signedPreKey": signedPreKey.public,
                 "signedPreKeyId": signedPreKey.keyId,
                 "signature": signedPreKey.signature,
-                "preKey": preKey.public,
-                "preKeyId": preKey.keyId,
             }
-            preKey.used = True
-            preKey.save()
+            if preKey:
+                PKB["preKey"] = preKey.public
+                PKB["preKeyId"] = preKey.keyId
+                preKey.used = True
+                preKey.save()
             bundles[id] = PKB
         for id in toBeRemoved:
             users_id.remove(id)

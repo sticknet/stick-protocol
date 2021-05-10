@@ -416,15 +416,21 @@ public class StickProtocol {
             SignalProtocolStore store = new MyProtocolStore(context);
             SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(bundle.getString("userId"), 0);
             SessionBuilder sessionBuilder = new SessionBuilder(store, signalProtocolAddress);
-            ECPublicKey preKey = Curve.decodePoint(Base64.decode(bundle.getString("preKey")), 0);
             ECPublicKey signedPreKey = Curve.decodePoint(Base64.decode(bundle.getString("signedPreKey")), 0);
             ECPublicKey identityKey = Curve.decodePoint(Base64.decode(bundle.getString("identityKey")), 0);
             IdentityKey identityPublicKey = new IdentityKey(identityKey);
 
+            ECPublicKey preKey = null;
+            int preKeyId = -1;
+            if (bundle.has("preKey")) {
+                preKey = Curve.decodePoint(Base64.decode(bundle.getString("preKey")), 0);
+                preKeyId = bundle.getInt("preKeyId");
+            }
+
             PreKeyBundle preKeyBundle = new PreKeyBundle(
                     bundle.getInt("localId"),
                     0,
-                    bundle.getInt("preKeyId"),
+                    preKeyId,
                     preKey,
                     bundle.getInt("signedPreKeyId"),
                     signedPreKey,
