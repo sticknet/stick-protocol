@@ -185,7 +185,10 @@ export default class StickProtocolHandlers {
      */
     async refillPreKeys(nextPreKeyId, count) {
         const preKeys = await this.StickProtocol.generatePreKeys(nextPreKeyId, count)
-        await axios.post(`${this.URL}/api/upload-pre-keys/`, {preKeys, nextPreKeyId: nextPreKeyId + count}, this.httpConfig)
+        await axios.post(`${this.URL}/api/upload-pre-keys/`, {
+            preKeys,
+            nextPreKeyId: nextPreKeyId + count
+        }, this.httpConfig)
     }
 
 
@@ -242,19 +245,18 @@ export default class StickProtocolHandlers {
      * This function is used to fetch the sender key of a standard session from the server, and then init the session
      * if the server had the sender key.
      */
-    async fetchStandardSenderKey(stickId, groupId, memberId, oneTimeId, phone) {
-        const body = {
+    async fetchStandardSenderKey(stickId, groupId, oneTimeId) {
+
+        const keysToFetch = [oneTimeId]
+        const response = await axios.post(`${this.URL}/api/fetch-standard-sks/`, {
             stickId,
-            groupId,
-            memberId,
-            oneTimeId,
-            phone,
-            isSticky: false,
-            isDev: this.isDev
-        }
-        const response = await axios.post(`${this.URL}/api/fetch-sk/`, body, this.httpConfig);
-        if (response.data.senderKey)
-            await this.StickProtocol.initStandardGroupSession(oneTimeId, stickId, response.data.senderKey)
+            keysToFetch,
+            groupId
+        }, this.httpConfig)
+
+
+        if (response.data.senderKeys[keysToFetch[0]])
+            await this.StickProtocol.initStandardGroupSession(oneTimeId, stickId, response.data.senderKeys[keysToFetch[0]])
     }
 
     /**
@@ -328,7 +330,7 @@ export default class StickProtocolHandlers {
         }
     }
 
-     /**
+    /**
      * This function check if the current active identity key needs to be updated. If needed, it will generate a new
      * identity key and send it to the server.
      */

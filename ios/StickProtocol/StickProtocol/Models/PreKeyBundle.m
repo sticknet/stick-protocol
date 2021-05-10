@@ -89,6 +89,69 @@
     return self;
 }
 
+- (nullable instancetype) initWithRegistrationId:(uint32_t)registrationId
+                               deviceId:(uint32_t)deviceId
+                         signedPreKeyId:(uint32_t)signedPreKeyId
+                     signedPreKeyPublic:(NSData*)signedPreKeyPublic
+                              signature:(NSData*)signature
+                            identityKey:(NSData*)identityKey
+                                  error:(NSError* __autoreleasing *)error {
+    NSParameterAssert(signedPreKeyPublic);
+    NSParameterAssert(signature);
+    NSParameterAssert(identityKey);
+    if (!signedPreKeyPublic || !signature || !identityKey) {
+        if (error) {
+            *error = ErrorFromSignalError(SignalErrorInvalidArgument);
+        }
+        return nil;
+    }
+    if (self = [super init]) {
+        _registrationId = registrationId;
+        _deviceId = deviceId;
+        _preKeyId = -1;
+        _preKeyPublic = NULL;
+        _signedPreKeyId = signedPreKeyId;
+        _signedPreKeyPublic = signedPreKeyPublic;
+        _signature = signature;
+        _identityKey = identityKey;
+        
+        ec_public_key *signed_pre_key_public = [KeyPair publicKeyFromData:signedPreKeyPublic error:error];
+        if (!signed_pre_key_public) {
+            return nil;
+        }
+        ec_public_key *identity_key = [KeyPair publicKeyFromData:identityKey error:error];
+        if (!identity_key) {
+            return nil;
+        }
+        
+        int result = session_pre_key_bundle_create(&_bundle,
+                                                   registrationId,
+                                                   deviceId,
+                                                   -1,
+                                                   NULL,
+                                                   signedPreKeyId,
+                                                   signed_pre_key_public,
+                                                   signature.bytes,
+                                                   signature.length,
+                                                   identity_key);
+        SIGNAL_UNREF(signed_pre_key_public);
+        SIGNAL_UNREF(identity_key);
+        NSAssert(result >= 0, @"error creating prekey bundle");
+        if (result < 0 || !_bundle) {
+            if (error) {
+                *error = ErrorFromSignalErrorCode(result);
+            }
+            return nil;
+        }
+        BOOL valid = [self checkValidity:error];
+        if (!valid) {
+            return nil;
+        }
+    }
+    return self;
+}
+
+
 /** This will do a rough check if bundle is considered valid */
 - (BOOL) checkValidity:(NSError * __autoreleasing *)error {
     // session_builder.c:191

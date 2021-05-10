@@ -118,7 +118,7 @@ public class SP {
         do {
             let sessionBuilder = SessionBuilder(address: signalProtocolAddress, context: encryptionManager!.signalContext)
             var preKeyBundle: PreKeyBundle?
-            preKeyBundle = try PreKeyBundle(registrationId: encryptionManager!.registrationId, deviceId: 0, preKeyId: preKeys![0].preKeyId, preKeyPublic: preKeys![0].keyPair!.publicKey, signedPreKeyId: signedPreKey!.preKeyId, signedPreKeyPublic: (signedPreKey?.keyPair!.publicKey)!, signature: signedPreKey!.signature, identityKey: identityKey!.publicKey)
+            preKeyBundle = try PreKeyBundle(registrationId: encryptionManager!.registrationId, deviceId: 0, preKeyId: Int32(preKeys![0].preKeyId), preKeyPublic: preKeys![0].keyPair!.publicKey, signedPreKeyId: signedPreKey!.preKeyId, signedPreKeyPublic: (signedPreKey?.keyPair!.publicKey)!, signature: signedPreKey!.signature, identityKey: identityKey!.publicKey)
             try sessionBuilder.processPreKeyBundle(preKeyBundle!)
         } catch {
             print("Error info bundle: \(error)")
@@ -255,12 +255,18 @@ public class SP {
             let encryptionManager = try? EncryptionManager(accessGroup: accessGroup!, databaseConnection: databaseConnection)
             let signalProtocolAddress = SignalAddress(name: bundle["userId"] as! String, deviceId: 0)
             let sessionBuilder = SessionBuilder(address: signalProtocolAddress, context: encryptionManager!.signalContext)
-            let preKey = Data(base64Encoded: bundle["preKey"] as! String)
             let signedPreKey = Data(base64Encoded: bundle["signedPreKey"] as! String)
             let identityKey = Data(base64Encoded: bundle["identityKey"] as! String)
             let signature = Data(base64Encoded: bundle["signature"] as! String)
-            let preKeyBundle = try PreKeyBundle(registrationId: bundle["localId"] as! UInt32, deviceId: 0, preKeyId: bundle["preKeyId"] as! UInt32, preKeyPublic: preKey!, signedPreKeyId: bundle["signedPreKeyId"] as! UInt32, signedPreKeyPublic: signedPreKey!, signature: signature!, identityKey: identityKey!)
-            try sessionBuilder.processPreKeyBundle(preKeyBundle)
+            let preKeyBundle : PreKeyBundle?
+            if (bundle["preKey"] != nil) {
+                preKeyBundle = try PreKeyBundle(registrationId: bundle["localId"] as! UInt32, deviceId: 0, preKeyId: bundle["preKeyId"] as! Int32, preKeyPublic: Data(base64Encoded: bundle["preKey"] as! String)!, signedPreKeyId: bundle["signedPreKeyId"] as! UInt32, signedPreKeyPublic: signedPreKey!, signature: signature!, identityKey: identityKey!)
+            } else {
+                preKeyBundle = try PreKeyBundle(registrationId: bundle["localId"] as! UInt32, deviceId: 0, signedPreKeyId: bundle["signedPreKeyId"] as! UInt32, signedPreKeyPublic: signedPreKey!, signature: signature!, identityKey: identityKey!)
+            }
+
+
+            try sessionBuilder.processPreKeyBundle(preKeyBundle!)
         } catch {
             print("ERROR IN INIT SESSION: \(error)")
         }

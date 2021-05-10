@@ -78,7 +78,7 @@ class EncryptingSenderKey(models.Model):
     * The root key of an EncryptingSenderKey chain for a sticky session is called `StickyKey`.
     """
     keyId = models.IntegerField()
-    preKey = models.OneToOneField(PreKey, on_delete=models.CASCADE, related_name='esk_pk')
+    preKey = models.OneToOneField(PreKey, on_delete=models.CASCADE, blank=True, null=True, related_name='esk_pk')
     identityKey = models.ForeignKey(IdentityKey, on_delete=models.CASCADE, related_name='esk_ik')
     partyId = models.CharField(max_length=100)
     chainId = models.CharField(max_length=10)

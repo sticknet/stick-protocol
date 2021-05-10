@@ -93,11 +93,11 @@ class StickProtocol():
         if preKey:
             PKB["preKey"] = preKey.public
             PKB["preKeyId"] = preKey.keyId
-        if not isSticky:
-            preKey.delete()
-        elif preKey:
-            preKey.used = True
-            preKey.save()
+            if not isSticky:
+                preKey.delete()
+            elif preKey:
+                preKey.used = True
+                preKey.save()
         return PKB
 
     def get_pre_key_bundles(self, currentUser, users_id):
@@ -244,6 +244,7 @@ class StickProtocol():
         return {'authorized': True, 'senderKeys': senderKeys}
 
 
+
     def get_stick_id(self, data, user):
         groups_ids = data['groups_ids']
         connections_ids = data['connections_ids']
@@ -371,8 +372,9 @@ class StickProtocol():
         """
         decryptingSenderKey = DecryptingSenderKey.objects.create(key=data['key'],
                                                                  stickId=data['stickId'], ofUser=user)
-        preKey = PreKey.objects.get(keyId=data['preKeyId'], user__id=data['forUser'])
-        decryptingSenderKey.preKey = preKey
+        if 'preKeyId' in data:
+            preKey = PreKey.objects.get(keyId=data['preKeyId'], user__id=data['forUser'])
+            decryptingSenderKey.preKey = preKey
         forUser = self.User.objects.get(id=data['forUser'])
         decryptingSenderKey.forUser = forUser
         decryptingSenderKey.save()
@@ -387,7 +389,9 @@ class StickProtocol():
         keys = data['keys']
         for id in users_id:
             senderKey = keys[id]
-            preKey = PreKey.objects.get(keyId=senderKey['preKeyId'], user__id=id)
+            preKey = None
+            if 'preKeyId' in senderKey:
+                preKey = PreKey.objects.get(keyId=senderKey['preKeyId'], user__id=id)
             identityKey = IdentityKey.objects.get(keyId=senderKey['identityKeyId'], user__id=id)
             if id != user.id:  # Other user? Create a DSK
                 forUser = self.User.objects.get(id=senderKey['forUser'])
