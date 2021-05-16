@@ -362,13 +362,11 @@ class StickProtocol():
         This method is used to save a SenderKey of a sticky session for a user. Typically used when a user
         receives a `PendingKey` request.
         """
-        decryptingSenderKey = DecryptingSenderKey.objects.create(key=data['key'],
-                                                                 stickId=data['stickId'], ofUser=user)
-        if 'preKeyId' in data:
-            preKey = PreKey.objects.get(keyId=data['preKeyId'], user__id=data['forUser'])
-            decryptingSenderKey.preKey = preKey
+        preKey = PreKey.objects.get(keyId=data['preKeyId'], user__id=data['forUser'])
         forUser = self.User.objects.get(id=data['forUser'])
-        decryptingSenderKey.forUser = forUser
+        identityKey = IdentityKey.objects.get(keyId=data['identityKeyId'], user__id=data['forUser'])
+        decryptingSenderKey = DecryptingSenderKey.objects.create(key=data['key'],
+                                                                 stickId=data['stickId'], ofUser=user, forUser=forUser, preKey=preKey, identityKey=identityKey)
         decryptingSenderKey.save()
 
     def process_sender_keys(self, data, user):
@@ -381,9 +379,7 @@ class StickProtocol():
         keys = data['keys']
         for id in users_id:
             senderKey = keys[id]
-            preKey = None
-            if 'preKeyId' in senderKey:
-                preKey = PreKey.objects.get(keyId=senderKey['preKeyId'], user__id=id)
+            preKey = PreKey.objects.get(keyId=senderKey['preKeyId'], user__id=id)
             identityKey = IdentityKey.objects.get(keyId=senderKey['identityKeyId'], user__id=id)
             if id != user.id:  # Other user? Create a DSK
                 forUser = self.User.objects.get(id=senderKey['forUser'])
@@ -446,7 +442,7 @@ class StickProtocol():
         if user.check_password(data['passwordHash']):  # This will create a "double-hash" and verify it
             signedPreKeysList = SignedPreKey.objects.filter(user=user)
             identityKeysList = IdentityKey.objects.filter(user=user)
-            preKeysList = PreKey.objects.filter(user=user)
+            preKeysList = PreKey.objects.filter(user=user).order_by('-dt_timestamp')
             senderKeysList = EncryptingSenderKey.objects.filter(user=user)
             bundle = {'localId': user.localId}
             identityKeys = []
@@ -463,14 +459,14 @@ class StickProtocol():
             bundle['signedPreKeys'] = signedPreKeys
             preKeys = []
             for preKey in preKeysList:
-                key = {'id': preKey.keyId, 'public': preKey.public, 'cipher': preKey.cipher, 'salt': preKey.salt}
+                key = {'id': preKey.keyId, 'public': preKey.public, 'cipher': preKey.cipher, 'salt': preKey.salt, 'used': preKey.used}
                 preKeys.append(key)
             bundle['preKeys'] = preKeys
             senderKeys = []
             for senderKey in senderKeysList:
                 stickId = senderKey.partyId + senderKey.chainId
                 key = {'id': senderKey.keyId, 'key': senderKey.key, 'stickId': stickId, 'step': senderKey.step,
-                       'identityKeyId': senderKey.identityKey.keyId}
+                       'identityKeyId': senderKey.identityKey.keyId, 'preKeyId': senderKey.preKey.keyId}
                 senderKeys.append(key)
             bundle['senderKeys'] = senderKeys
             user.oneTimeId = uuid.uuid4()

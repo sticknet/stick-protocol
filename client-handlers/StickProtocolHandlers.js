@@ -143,6 +143,11 @@ export default class StickProtocolHandlers {
                 isInvitation: `${entityId}`.includes('invitation')
             }
             // try to fetch the sender key from the server
+            if (!this.httpConfig.headers.Authorization) {
+                await dispatch({type: 'PENDING_SESSION', payload: stickId})
+                await dispatch({type: 'DOWNLOADED', payload: entityId});
+                return canDecrypt
+            }
             const {data} = await axios.post(`${this.URL}/api/fetch-sk/`, body, this.httpConfig)
             const senderKey = data.senderKey;
             if (!senderKey) { // If there is no sender key yet, mark the session as pending
@@ -205,12 +210,12 @@ export default class StickProtocolHandlers {
         const {data: pkb} = await axios.get(`${this.URL}/api/fetch-pkb/?id=${memberId}`, this.httpConfig)
         // Init the session
         await this.StickProtocol.initPairwiseSession(pkb)
-        const preKeyId = pkb.preKeyId
-        const phone = pkb.phone
+        const {preKeyId, identityKeyId} = pkb
+        console.log('PPP', identityKeyId, preKeyId)
         if (memberId.length === 36 && stickId.length >= 36) {
             // Get the sender key and upload it
             const key = await this.StickProtocol.getSenderKey(this.userId, memberId, stickId, true);
-            const body = {preKeyId, key, stickId, forUser: memberId}
+            const body = {preKeyId, identityKeyId, key, stickId, forUser: memberId}
             await axios.post(`${this.URL}/api/upload-sk/`, body, this.httpConfig)
         }
     }
@@ -348,6 +353,7 @@ export default class StickProtocolHandlers {
     setToken(token, userId, userOneTimeId) {
         this.token = token
         this.httpConfig = {headers: {"Authorization": token}}
+        console.log('SETTING TOKEN DONE', this.httpConfig)
         this.userId = userId
         this.userOneTimeId = userOneTimeId
     }
