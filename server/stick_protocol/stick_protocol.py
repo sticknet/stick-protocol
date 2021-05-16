@@ -231,6 +231,7 @@ class StickProtocol():
             key = None
             if senderKey:
                 key = senderKey.key
+                senderKey.delete()
             senderKeys[id] = key
         return {'authorized': True, 'senderKeys': senderKeys}
 

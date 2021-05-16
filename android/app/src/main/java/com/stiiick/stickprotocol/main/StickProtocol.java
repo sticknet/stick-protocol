@@ -363,6 +363,23 @@ public class StickProtocol {
         }
     }
 
+    public void decryptPreKeys(JSONArray preKeys) throws Exception {
+        String userId = PreferenceManager.getDefaultSharedPreferences(context).getString("userId", "");
+        HashMap<String, String> serviceMap = new HashMap();
+        serviceMap.put("service", passwordKey);
+        String password = keychain.getGenericPassword(userId, serviceMap);
+        SignalProtocolStore store = new MyProtocolStore(context);
+        for (int i = 0; i < preKeys.length(); i++) {
+            JSONObject preKeyJson = preKeys.getJSONObject(i);
+            ECPublicKey prePubKey = Curve.decodePoint(Base64.decode(preKeyJson.getString("public")), 0);
+            byte[] cipher = pbDecrypt(preKeyJson.getString("cipher"), preKeyJson.getString("salt"), password);
+            ECPrivateKey prePrivKey = Curve.decodePrivatePoint(cipher);
+            ECKeyPair preKey = new ECKeyPair(prePubKey, prePrivKey);
+            PreKeyRecord pkRecord = new PreKeyRecord(preKeyJson.getInt("id"), preKey);
+            store.storePreKey(preKeyJson.getInt("id"), pkRecord);
+        }
+    }
+
     /***
      * This method is used to create the initial password hash using Argon2, from a provided password
      * and salt, at login.
@@ -530,7 +547,7 @@ public class StickProtocol {
             SenderKeyDistributionMessage senderKeyDistributionMessage = groupSessionBuilder.create(senderKeyName);
             DatabaseFactory.getStickyKeyDatabase(context).insertStickyKey(stickId, Base64.encodeBytes(senderKeyDistributionMessage.serialize()));
             SenderKeyState senderKeyState = senderKeyStore.loadSenderKey(senderKeyName).getSenderKeyState();
-            String key =  Base64.encodeBytes(senderKeyState.getSenderChainKey().getSeed()) + Base64.encodeBytes(senderKeyState.getSigningKeyPrivate().serialize()) + Base64.encodeBytes(senderKeyState.getSigningKeyPublic().serialize());
+            String key = Base64.encodeBytes(senderKeyState.getSenderChainKey().getSeed()) + Base64.encodeBytes(senderKeyState.getSigningKeyPrivate().serialize()) + Base64.encodeBytes(senderKeyState.getSigningKeyPublic().serialize());
             String encryptKey = encryptTextPairwise(userId, key);
             JSONObject map = new JSONObject();
             map.put("id", senderKeyState.getKeyId());
@@ -741,11 +758,11 @@ public class StickProtocol {
      *
      * @param userId
      * @param senderKey - JSONObject, contains the following:
-     *                      * id - int, id of the key
-     *                      * key - encrypted sender key (chainKey || signaturePrivateKey || signaturePublicKey)
-     *                      * stickId - String, id of the sticky session
-     *                      * identityKeyId - int, id of the identity key used to encrypt the private signature key
-     *                      * step - represents the age of the sticky session
+     *                  * id - int, id of the key
+     *                  * key - encrypted sender key (chainKey || signaturePrivateKey || signaturePublicKey)
+     *                  * stickId - String, id of the sticky session
+     *                  * identityKeyId - int, id of the identity key used to encrypt the private signature key
+     *                  * step - represents the age of the sticky session
      */
     public void reinitMyStickySession(String userId, JSONObject senderKey) throws IOException, InvalidKeyException, NoSessionException, JSONException {
         SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(userId, 0);
@@ -792,7 +809,7 @@ public class StickProtocol {
         int activeIdentityKeyId = Preferences.getActiveIdentityKeyId(context);
         // Swap identity key if needed
         if (activeIdentityKeyId != identityKeyId)
-           swapIdentityKey(identityKeyId);
+            swapIdentityKey(identityKeyId);
         String key = decryptTextPairwise(senderId, true, cipher);
         // Reverse identity key back if was swapped
         if (activeIdentityKeyId != identityKeyId)
@@ -825,11 +842,11 @@ public class StickProtocol {
      *
      * @param identityKeyAge - lifetime of an identity key in millis (ex.: TimeUnit.DAYS.toMillis(7))
      * @return identity key as a JSONObject containing the following:
-     *            * id - int, id of the identity key
-     *            * public - String, public part of the key
-     *            * cipher - String, private part encrypted
-     *            * salt - String, salt used to encrypt the private part
-     *            * timestamp - Long, unix timestamp
+     * * id - int, id of the identity key
+     * * public - String, public part of the key
+     * * cipher - String, private part encrypted
+     * * salt - String, salt used to encrypt the private part
+     * * timestamp - Long, unix timestamp
      */
     public JSONObject refreshIdentityKey(long identityKeyAge) throws Exception {
         long activeDuration = System.currentTimeMillis() - Preferences.getActiveIdentityKeyTimestamp(context);
@@ -860,12 +877,12 @@ public class StickProtocol {
      *
      * @param signedPreKeyAge - lifetime of a signed prekey in millis (ex.: TimeUnit.DAYS.toMillis(7))
      * @return signed prekey as a JSONObject containing the following:
-     *            * id - int, id of the identity key
-     *            * public - String, public part of the key
-     *            * cipher - String, private part encrypted
-     *            * salt - String, salt used to encrypt the private part
-     *            * signature - String
-     *            * timestamp - Long, unix timestamp
+     * * id - int, id of the identity key
+     * * public - String, public part of the key
+     * * cipher - String, private part encrypted
+     * * salt - String, salt used to encrypt the private part
+     * * signature - String
+     * * timestamp - Long, unix timestamp
      */
     public JSONObject refreshSignedPreKey(long signedPreKeyAge) throws Exception {
         long activeDuration = System.currentTimeMillis() - Preferences.getActiveSignedPreKeyTimestamp(context);
@@ -1026,8 +1043,8 @@ public class StickProtocol {
      *
      * @param filePath - file to be encrypted
      * @return HashMap - contains the following:
-     *                          * uri: path of the encrypted file
-     *                          * blob secret: (fileKey||fileHash)
+     * * uri: path of the encrypted file
+     * * blob secret: (fileKey||fileHash)
      */
     public HashMap<String, String> encryptBlob(String filePath) {
         try {
