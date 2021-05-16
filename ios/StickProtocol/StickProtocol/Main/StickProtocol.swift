@@ -251,6 +251,7 @@ public class SP {
      */
     public func initPairwiseSession(bundle: Dictionary<String, Any>) {
         do {
+            
             let databaseConnection = db!.newConnection()
             let encryptionManager = try? EncryptionManager(accessGroup: accessGroup!, databaseConnection: databaseConnection)
             let signalProtocolAddress = SignalAddress(name: bundle["userId"] as! String, deviceId: 0)

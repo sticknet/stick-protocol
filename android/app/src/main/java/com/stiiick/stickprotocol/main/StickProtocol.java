@@ -593,6 +593,7 @@ public class StickProtocol {
      * @param identityKeyId   - the identity key id of the target user that was used to encrypt the sender key
      */
     public void initStickySession(String senderId, String stickId, String cipherSenderKey, int identityKeyId) {
+        
         try {
             if (cipherSenderKey != null) {
                 SenderKeyStore senderKeyStore = new MySenderKeyStore(context);
