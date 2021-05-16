@@ -377,6 +377,7 @@ public class StickProtocol {
             ECKeyPair preKey = new ECKeyPair(prePubKey, prePrivKey);
             PreKeyRecord pkRecord = new PreKeyRecord(preKeyJson.getInt("id"), preKey);
             store.storePreKey(preKeyJson.getInt("id"), pkRecord);
+            Log.d("DECRYPTED XX", Integer.toString(i));
         }
     }
 
