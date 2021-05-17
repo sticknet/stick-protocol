@@ -178,8 +178,6 @@ public class SP {
             }
         }
         
-        // loop over the signedPreKeys, preKeys and senderKeys
-        // ...
 
         for key in signedPreKeys {
             let SPKPub = Data(base64Encoded: key["public"] as! String)
@@ -223,6 +221,24 @@ public class SP {
             } else {
                 print("Printing progress because progress event is null", count)
             }
+        }
+    }
+    
+    
+    public func decryptPreKeys(preKeys: [Dictionary<String, Any>]) {
+        let myId = UserDefaults(suiteName: self.accessGroup!)!.string(forKey: "userId")
+        let keychain = A0SimpleKeychain(service: self.service!, accessGroup: self.accessGroup!)
+        let password: String = keychain.string(forKey: myId! + "-password")!
+        let databaseConnection = self.db!.newConnection()
+        let encryptionManager = try? EncryptionManager(accessGroup: accessGroup!, databaseConnection: databaseConnection)
+        var count = 0
+        for key in preKeys {
+            let prePubKey = Data(base64Encoded: key["public"] as! String)
+            let prePrivKey = pbDecrypt(encryptedIvText: key["cipher"] as! String, salt: key["salt"] as! String, pass: password)
+            let keyPair = try! KeyPair(publicKey: prePubKey!, privateKey: prePrivKey)
+            let preKey = encryptionManager!.keyHelper()?.createPreKey(withKeyId: key["id"] as! UInt32, keyPair: keyPair)
+            encryptionManager!.storage.storePreKey(preKey!.serializedData()!, preKeyId: preKey!.preKeyId)
+            count += 1
         }
     }
 

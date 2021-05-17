@@ -377,7 +377,6 @@ public class StickProtocol {
             ECKeyPair preKey = new ECKeyPair(prePubKey, prePrivKey);
             PreKeyRecord pkRecord = new PreKeyRecord(preKeyJson.getInt("id"), preKey);
             store.storePreKey(preKeyJson.getInt("id"), pkRecord);
-            Log.d("DECRYPTED XX", Integer.toString(i));
         }
     }
 
@@ -593,7 +592,6 @@ public class StickProtocol {
      * @param identityKeyId   - the identity key id of the target user that was used to encrypt the sender key
      */
     public void initStickySession(String senderId, String stickId, String cipherSenderKey, int identityKeyId) {
-        
         try {
             if (cipherSenderKey != null) {
                 SenderKeyStore senderKeyStore = new MySenderKeyStore(context);
