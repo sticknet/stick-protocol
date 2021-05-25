@@ -57,8 +57,8 @@ export default class StickProtocolHandlers {
                 connections_ids.push(userId)
             }
         } else if (type === 'group') { // encrypting to a single group
-            groups_ids = [groups[0].id]
-        } else if (type === 'self') // encrypting to self (currentUser) only
+            groups_ids = [groups[0].id || groups[0]]
+        } else if (type === 'individual') // encrypting to self (currentUser) only
             connections_ids = [userId]
 
         connections_ids = connections_ids.filter(id => id !== null) // make sure no id is null
@@ -69,7 +69,8 @@ export default class StickProtocolHandlers {
             groups_ids,
             connections_ids,
             isSticky: true,
-            isProfile
+            isProfile,
+            type
         }
         if (providedPartyId)
             body.partyId = providedPartyId
@@ -144,16 +145,20 @@ export default class StickProtocolHandlers {
             }
             // try to fetch the sender key from the server
             if (!this.httpConfig.headers.Authorization) {
-                await dispatch({type: 'PENDING_SESSION', payload: stickId})
-                await dispatch({type: 'DOWNLOADED', payload: entityId});
+                if (dispatch) {
+                    await dispatch({type: 'PENDING_SESSION', payload: stickId})
+                    await dispatch({type: 'DOWNLOADED', payload: entityId});
+                }
                 return canDecrypt
             }
             const {data} = await axios.post(`${this.URL}/api/fetch-sk/`, body, this.httpConfig)
             const senderKey = data.senderKey;
             if (!senderKey) { // If there is no sender key yet, mark the session as pending
                 canDecrypt = false
-                await dispatch({type: 'PENDING_SESSION', payload: stickId})
-                await dispatch({type: 'DOWNLOADED', payload: entityId});
+                if (dispatch) {
+                    await dispatch({type: 'PENDING_SESSION', payload: stickId})
+                    await dispatch({type: 'DOWNLOADED', payload: entityId});
+                }
             } else { // otherwise initialize the session
                 if (memberId !== this.userId)
                     await this.StickProtocol.initStickySession(memberId, stickId, senderKey.key, senderKey.identityKeyId)
@@ -161,7 +166,8 @@ export default class StickProtocolHandlers {
                     senderKey.stickId = stickId
                     await this.StickProtocol.reinitMyStickySession(this.userId, senderKey)
                 }
-                await dispatch({type: 'PENDING_SESSION_DONE', payload: stickId})
+                if (dispatch)
+                    await dispatch({type: 'PENDING_SESSION_DONE', payload: stickId})
             }
         } else { // If the sticky session exists, mark the session as not pending
             if (dispatch)
@@ -212,13 +218,14 @@ export default class StickProtocolHandlers {
         // Init the session
         await this.StickProtocol.initPairwiseSession(pkb)
         const {preKeyId, identityKeyId} = pkb
-        console.log('PPP', identityKeyId, preKeyId)
         if (memberId.length === 36 && stickId.length >= 36) {
             // Get the sender key and upload it
             const key = await this.StickProtocol.getSenderKey(this.userId, memberId, stickId, true);
             const body = {preKeyId, identityKeyId, key, stickId, forUser: memberId}
             await axios.post(`${this.URL}/api/upload-sk/`, body, this.httpConfig)
+            return pkb.phone // on success
         }
+        return null
     }
 
     /**

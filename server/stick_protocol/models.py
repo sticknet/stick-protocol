@@ -133,7 +133,8 @@ class Party(models.Model):
     id = models.CharField(primary_key=True, unique=True, max_length=1000)
     groups = models.ManyToManyField(Group, blank=True)
     connections = models.ManyToManyField(User, blank=True, related_name='party_connections')
-    user = models.OneToOneField(User, on_delete=models.CASCADE, blank=True, null=True, related_name='party')
+    user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True, related_name='parties')
+    individual = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
         if not self.id:

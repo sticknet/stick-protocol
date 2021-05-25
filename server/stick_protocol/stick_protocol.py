@@ -54,6 +54,7 @@ class StickProtocol():
         user.save()
         self.Device.objects.create(user=user, deviceId=data['deviceId'], name=data['deviceName'])
         Party.objects.create(user=user)
+        Party.objects.create(user=user, individual=True)
 
     def process_pre_keys(self, data, user):
         """
@@ -168,7 +169,7 @@ class StickProtocol():
             group = self.Group.objects.get(id=stickId[:36])
             if group in user.invited_groups.all():
                 authorized = True
-        elif stickId.startswith(user.party.id):  # A user is authorized to fetch SenderKeys of their own profile (user.party.id)
+        elif stickId.startswith(user.parties.get(individual=False).id) or stickId.startswith(user.parties.get(individual=True).id):  # A user is authorized to fetch SenderKeys of their own profile (user.party.id)
             authorized = True
         else:
             groupId = stickId[:36]
@@ -208,7 +209,7 @@ class StickProtocol():
                 key = {'id': senderKey.keyId, 'key': senderKey.key, 'step': senderKey.step, 'identityKeyId': senderKey.identityKey.keyId}
         # SenderKey does not exist, send a `PendingKey` request to the target user to upload their key,
         # through a realtime database.
-        else:
+        else: # todo: refactor firebase out?
             phone = self.User.objects.get(id=memberId).phone
             isDev = data['isDev']
             firebase_ref = FIREBASE_REF_DEV if isDev else FIREBASE_REF
@@ -285,7 +286,8 @@ class StickProtocol():
             partyId = data['partyId']
         else:  # Sharing to the currentUser's party (currentUsers' profile)
             membersIds = connections_ids
-            partyId = Party.objects.get(user=user).id
+            isIndividual = data['type'] == 'individual'
+            partyId = Party.objects.get(user=user, individual=isIndividual).id
         dict = {}
         bundlesToFetch = []
         responseDict = {}
