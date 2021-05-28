@@ -59,6 +59,12 @@ public class MyPreKeyStore implements PreKeyStore, SignedPreKeyStore {
         }
     }
 
+    public List<PreKeyRecord> loadPreKeys() {
+        synchronized (FILE_LOCK) {
+            return DatabaseFactory.getPreKeyDatabase(context).getAllPreKeys();
+        }
+    }
+
     @Override
     public void storePreKey(int preKeyId, PreKeyRecord record) {
         synchronized (FILE_LOCK) {

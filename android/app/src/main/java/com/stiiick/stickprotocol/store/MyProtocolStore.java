@@ -10,6 +10,8 @@ package com.stiiick.stickprotocol.store;
 
 import android.content.Context;
 
+import com.stiiick.stickprotocol.database.IdentityKeyRecord;
+
 import org.whispersystems.libsignal.IdentityKey;
 import org.whispersystems.libsignal.IdentityKeyPair;
 import org.whispersystems.libsignal.InvalidKeyIdException;
@@ -27,9 +29,9 @@ import java.util.List;
 
 public class MyProtocolStore implements SignalProtocolStore {
 
-    private final PreKeyStore       preKeyStore;
+    private final MyPreKeyStore       preKeyStore;
     private final SignedPreKeyStore signedPreKeyStore;
-    private final IdentityKeyStore  identityKeyStore;
+    private final MyIdentityKeyStore  identityKeyStore;
     private final SessionStore      sessionStore;
 
     public MyProtocolStore(Context context) {
@@ -122,6 +124,14 @@ public class MyProtocolStore implements SignalProtocolStore {
     @Override
     public List<SignedPreKeyRecord> loadSignedPreKeys() {
         return signedPreKeyStore.loadSignedPreKeys();
+    }
+
+    public List<PreKeyRecord> loadPreKeys() {
+        return preKeyStore.loadPreKeys();
+    }
+
+    public List<IdentityKeyRecord> loadIdentityKeys() {
+        return identityKeyStore.loadIdentityKeys();
     }
 
     @Override

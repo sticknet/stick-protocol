@@ -10,6 +10,7 @@ package com.stiiick.stickprotocol.store;
 import android.content.Context;
 import android.util.Log;
 
+import com.stiiick.stickprotocol.database.IdentityKeyRecord;
 import com.stiiick.stickprotocol.util.IdentityKeyUtil;
 import com.stiiick.stickprotocol.util.Preferences;
 import com.stiiick.stickprotocol.recipient.Recipient;
@@ -23,8 +24,10 @@ import org.whispersystems.libsignal.IdentityKey;
 import org.whispersystems.libsignal.IdentityKeyPair;
 import org.whispersystems.libsignal.SignalProtocolAddress;
 import org.whispersystems.libsignal.state.IdentityKeyStore;
+import org.whispersystems.libsignal.state.SignedPreKeyRecord;
 import org.whispersystems.libsignal.util.guava.Optional;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class MyIdentityKeyStore implements IdentityKeyStore {
@@ -84,32 +87,6 @@ public class MyIdentityKeyStore implements IdentityKeyStore {
             } else {
                 return true;
             }
-
-//            if (!identityRecord.get().getIdentityKey().equals(identityKey)) {
-//                Log.d("REPLACING", "Replacing existing identity...");
-//                VerifiedStatus verifiedStatus;
-//
-//                if (identityRecord.get().getVerifiedStatus() == VerifiedStatus.VERIFIED ||
-//                        identityRecord.get().getVerifiedStatus() == VerifiedStatus.UNVERIFIED)
-//                {
-//                    verifiedStatus = VerifiedStatus.UNVERIFIED;
-//                } else {
-//                    verifiedStatus = VerifiedStatus.DEFAULT;
-//                }
-//
-//                identityDatabase.saveIdentity(recipient.getId(), identityKey, verifiedStatus, false, System.currentTimeMillis(), nonBlockingApproval);
-//                Log.d("ARHIVINGGG", "ARHIVIING");
-//                SessionUtil.archiveSiblingSessions(context, address);
-//                return true;
-//            }
-
-//            if (isNonBlockingApprovalRequired(identityRecord.get())) {
-//                Log.i("SETTING", "Setting approval status...");
-//                identityDatabase.setApproval(recipient.getId(), nonBlockingApproval);
-//                return false;
-//            }
-
-//            return false;
         }
     }
 
@@ -123,10 +100,10 @@ public class MyIdentityKeyStore implements IdentityKeyStore {
         return true;
     }
 
-    private boolean isNonBlockingApprovalRequired(IdentityDatabase.IdentityRecord identityRecord) {
-        return !identityRecord.isFirstUse() &&
-                System.currentTimeMillis() - identityRecord.getTimestamp() < TimeUnit.SECONDS.toMillis(TIMESTAMP_THRESHOLD_SECONDS) &&
-                !identityRecord.isApprovedNonBlocking();
+    public List<IdentityKeyRecord> loadIdentityKeys() {
+        synchronized (LOCK) {
+            return DatabaseFactory.getIdentityKeyDatabase(context).getAllIdentityKeys();
+        }
     }
 
 }

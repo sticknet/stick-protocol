@@ -13,6 +13,7 @@ import android.content.Context;
 import android.database.Cursor;
 import net.sqlcipher.database.SQLiteDatabase;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.stiiick.stickprotocol.util.Base64;
@@ -23,8 +24,11 @@ import org.whispersystems.libsignal.ecc.ECKeyPair;
 import org.whispersystems.libsignal.ecc.ECPrivateKey;
 import org.whispersystems.libsignal.ecc.ECPublicKey;
 import org.whispersystems.libsignal.state.PreKeyRecord;
+import org.whispersystems.libsignal.state.SignedPreKeyRecord;
 
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 
 public class OneTimePreKeyDatabase extends Database {
 
@@ -66,6 +70,26 @@ public class OneTimePreKeyDatabase extends Database {
         }
 
         return null;
+    }
+
+    public @NonNull
+    List<PreKeyRecord> getAllPreKeys() {
+        SQLiteDatabase           database = databaseHelper.fetchReadableDatabase();
+        List<PreKeyRecord> results  = new LinkedList<>();
+
+        try (Cursor cursor = database.query(TABLE_NAME, null, null, null, null, null, null)) {
+            while (cursor != null && cursor.moveToNext()) {
+                try {
+                    int          keyId      = cursor.getInt(cursor.getColumnIndexOrThrow(KEY_ID));
+                    ECPublicKey  publicKey  = Curve.decodePoint(Base64.decode(cursor.getString(cursor.getColumnIndexOrThrow(PUBLIC_KEY))), 0);
+                    ECPrivateKey privateKey = Curve.decodePrivatePoint(Base64.decode(cursor.getString(cursor.getColumnIndexOrThrow(PRIVATE_KEY))));
+                    results.add(new PreKeyRecord(keyId, new ECKeyPair(publicKey, privateKey)));
+                } catch (InvalidKeyException | IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return results;
     }
 
     public void insertPreKey(int keyId, PreKeyRecord record) {
