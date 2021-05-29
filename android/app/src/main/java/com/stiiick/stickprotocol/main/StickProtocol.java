@@ -475,23 +475,32 @@ public class StickProtocol {
         return Base64.encodeBytes(passwordHashBytes);
     }
 
-    public String createNewPasswordHash(String password) throws IOException, Argon2Exception {
-        // Generate password salt
-        SecureRandom randomSalt = new SecureRandom();
-        byte[] salt = new byte[32];
-        randomSalt.nextBytes(salt);
+    public JSONObject createNewPasswordHash(String password) {
+        try {
+            // Generate password salt
+            SecureRandom randomSalt = new SecureRandom();
+            byte[] salt = new byte[32];
+            randomSalt.nextBytes(salt);
 
-        // Hash
-        byte[] passwordHashBytes = new Argon2.Builder(Version.V13)
-                .type(Type.Argon2id)
-                .memoryCostKiB(4 * 1024)
-                .parallelism(2)
-                .iterations(3)
-                .hashLength(32)
-                .build()
-                .hash(password.getBytes(), salt)
-                .getHash();
-        return Base64.encodeBytes(passwordHashBytes);
+
+            // Hash
+            byte[] passwordHashBytes = new Argon2.Builder(Version.V13)
+                    .type(Type.Argon2id)
+                    .memoryCostKiB(4 * 1024)
+                    .parallelism(2)
+                    .iterations(3)
+                    .hashLength(32)
+                    .build()
+                    .hash(password.getBytes(), salt)
+                    .getHash();
+            JSONObject map = new JSONObject();
+            map.put("salt", Base64.encodeBytes(salt));
+            map.put("hash", Base64.encodeBytes(passwordHashBytes));
+            return map;
+        } catch (Argon2Exception | JSONException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     /***
