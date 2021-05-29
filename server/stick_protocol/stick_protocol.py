@@ -478,3 +478,11 @@ class StickProtocol():
             return {"bundle": bundle, "verify": True}
         else:
             return {"verify": False}
+
+
+    def process_reencrypted_keys(self, data, user):
+        success = False
+        if user.check_password(data['password']):
+
+            success = True
+        return {"success": success}
