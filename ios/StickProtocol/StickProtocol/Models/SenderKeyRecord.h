@@ -20,9 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (uint32_t)getChainStep;
 - (NSData*)getSeed;
 -(BOOL) isEmpty;
-- (nullable instancetype) initWithData:(NSData*)data
-context:(SignalContext*)context
-  error:(NSError**)error;
+- (nullable instancetype) initWithData:(NSData*)data context:(SignalContext*)context error:(NSError**)error;
 
 - (nullable instancetype) initWithContext:(SignalContext*)context error:(NSError**)error;
 

@@ -36,7 +36,6 @@ open class StorageManager: NSObject {
         // Might be a better way to guarantee we have an SPIdentity
         let spIdentity = (self.delegate?.generateIdentityKeyPair())!
         self.databaseConnection.readWrite { (transaction) in
-            print("SAVING IDENTITY KEY PAIR")
             spIdentity.save(with: transaction)
         }
 
@@ -44,7 +43,6 @@ open class StorageManager: NSObject {
         let currentTime = Date().timestamp
         let spIdentityKey: SPIdentityKey = SPIdentityKey(keyId: activeIKId + 1, timestamp: currentTime, identityKeyPair: spIdentity.identityKeyPair)!
         self.databaseConnection.readWrite { (transaction) in
-            print("SAVING NEW IDENTITY KEY RECORD")
             spIdentityKey.save(with: transaction)
         }
         UserDefaults(suiteName: self.accessGroup)!.set(activeIKId + 1, forKey: "activeIdentityKeyId")
@@ -187,6 +185,41 @@ extension StorageManager: SignalStore {
         }
         return preKeyData
     }
+    
+    public func loadPreKeys() -> [PreKey] {
+        var preKeys = [PreKey]()
+        self.databaseConnection.read { (transaction) in
+          transaction.enumerateKeysAndObjects(inCollection: "SPPreKey", using: {key, value, _ in
+            let preKey = try! PreKey(serializedData: (value as! SPPreKey).keyData!)
+            preKeys.append(preKey)
+          })
+        }
+        return preKeys
+    }
+    
+    public func loadSignedPreKeys() -> [SignedPreKey] {
+        var signedPreKeys = [SignedPreKey]()
+        self.databaseConnection.read { (transaction) in
+          transaction.enumerateKeysAndObjects(inCollection: "SPSignedPreKey", using: {key, value, _ in
+            let signedPreKey = try! SignedPreKey(serializedData: (value as! SPSignedPreKey).keyData)
+            signedPreKeys.append(signedPreKey)
+          })
+        }
+        return signedPreKeys
+    }
+    
+    public func loadIdentityKeys() -> [UInt32: IdentityKeyPair] {
+        var identityKeys = [UInt32: IdentityKeyPair]()
+        self.databaseConnection.read { (transaction) in
+          transaction.enumerateKeysAndObjects(inCollection: "SPIdentityKey", using: {key, value, _ in
+            let identityKey = try! IdentityKeyPair(publicKey: (value as! SPIdentityKey).identityKeyPair.publicKey, privateKey: (value as! SPIdentityKey).identityKeyPair.privateKey)
+            identityKeys[(value as! SPIdentityKey).keyId] = identityKey
+          })
+        }
+        return identityKeys
+    }
+    
+    
 
     public func storePreKey(_ preKey: Data, preKeyId: UInt32) -> Bool {
         var result = false

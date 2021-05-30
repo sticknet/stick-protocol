@@ -81,9 +81,7 @@ public class SP {
             counter += 1;
             if (progressEvent != nil) {
                 progressEvent!(["progress": counter, "total": preKeys!.count])
-            } else {
-                print("Printing progress because progress event is null", counter)
-            }
+            } 
         }
 
         var signedMap = [String: Any]()
@@ -125,7 +123,7 @@ public class SP {
         }
         return map
     }
-
+    
 
     /***
      * The StickProtocol Re-Initialize method to decrypt the user's keys and re-establish the sticky
@@ -192,8 +190,6 @@ public class SP {
             count += 1
             if (progressEvent != nil) {
                 progressEvent!(["progress": count, "total": totalKeys])
-            } else {
-                print("Printing progress because progress event is null", count)
             }
         }
 
@@ -206,8 +202,6 @@ public class SP {
             count += 1
             if (progressEvent != nil) {
                 progressEvent!(["progress": count, "total": totalKeys])
-            } else {
-                print("Printing progress because progress event is null", count)
             }
         }
 
@@ -218,8 +212,6 @@ public class SP {
             count += 1
             if (progressEvent != nil) {
                 progressEvent!(["progress": count, "total": totalKeys])
-            } else {
-                print("Printing progress because progress event is null", count)
             }
         }
     }
@@ -245,6 +237,12 @@ public class SP {
     public func createPasswordHash(password: String, salt: String) -> String {
         let (passwordHash, _) = try! Argon2.hash(iterations: 3, memoryInKiB: 4 * 1024, threads: 2, password: password.data(using: .utf8)!, salt: Data(base64Encoded: salt)!, desiredLength: 32, variant: .id, version: .v13)
         return passwordHash.base64EncodedString()
+    }
+    
+    public func createNewPasswordHash(password: String) -> [String: String] {
+        let salt = generateRandomBytes(count: 32)
+        let (passwordHash, _) = try! Argon2.hash(iterations: 3, memoryInKiB: 4 * 1024, threads: 2, password: password.data(using: .utf8)!, salt: salt!, desiredLength: 32, variant: .id, version: .v13)
+        return ["salt": salt!.base64EncodedString(), "hash": passwordHash.base64EncodedString()]
     }
 
     /****************************** END OF INITIALIZATION METHODS ******************************/
@@ -424,7 +422,7 @@ public class SP {
                     try groupSesisonBuilder.processSession(with: senderKeyName, senderKeyDistributionMessage: senderKeyDistributionMessage)
                 }
             } catch {
-                print("ERROR IN INTI GROUP SENDER SESSION: \(error)")
+                print("ERROR IN initStickySession: \(error)")
             }
         }
     }
@@ -770,6 +768,66 @@ public class SP {
         }
         return preKeysArray
     }
+    
+    public func reEncryptKeys(password: String, progressEvent: (([String: Any]) -> Void)?) -> [String: Any] {
+        let databaseConnection = db!.newConnection()
+        let encryptionManager = try? EncryptionManager(accessGroup: accessGroup!, databaseConnection: databaseConnection)
+        let preKeys = encryptionManager!.storage.loadPreKeys()
+        let signedPreKeys = encryptionManager!.storage.loadSignedPreKeys()
+        let identityKeys = encryptionManager!.storage.loadIdentityKeys()
+        let totalKeys = preKeys.count + signedPreKeys.count + identityKeys.count
+        var progress = 0
+        var preKeysArray = [[String: Any]]()
+        for key in preKeys {
+            var map = [String: Any]()
+            map["id"] = key.preKeyId
+            let cipherMap = self.pbEncrypt(text: key.keyPair!.privateKey, pass: password)
+            map["cipher"] = cipherMap["cipher"]!
+            map["salt"] = cipherMap["salt"]!
+            preKeysArray.append(map)
+            
+            // Progress
+            progress += 1
+            if (progressEvent != nil) {
+                progressEvent!(["progress": progress, "total": totalKeys])
+            }
+        }
+        var signedPreKeysArray = [[String: Any]]()
+        for key in signedPreKeys {
+            var map = [String: Any]()
+            map["id"] = key.preKeyId
+            let cipherMap = self.pbEncrypt(text: key.keyPair!.privateKey, pass: password)
+            map["cipher"] = cipherMap["cipher"]!
+            map["salt"] = cipherMap["salt"]!
+            signedPreKeysArray.append(map)
+            
+            // Progress
+            progress += 1
+            if (progressEvent != nil) {
+                progressEvent!(["progress": progress, "total": totalKeys])
+            }
+        }
+        var identityKeysArray = [[String: Any]]()
+        for (id, identityKey) in identityKeys {
+            var map = [String: Any]()
+            map["id"] = id
+            let cipherMap = self.pbEncrypt(text: identityKey.privateKey, pass: password)
+            map["cipher"] = cipherMap["cipher"]!
+            map["salt"] = cipherMap["salt"]!
+            identityKeysArray.append(map)
+            
+            // Progress
+            progress += 1
+            if (progressEvent != nil) {
+                progressEvent!(["progress": progress, "total": totalKeys])
+            }
+        }
+        var map = [String: Any]()
+        map["preKeys"] = preKeysArray
+        map["signedPreKeys"] = signedPreKeysArray
+        map["identityKeys"] = identityKeysArray
+        return map
+    }
 
     /****************************** END OF USER KEYS METHODS ******************************/
 
@@ -990,7 +1048,7 @@ public class SP {
                     try groupSesisonBuilder.processSession(with: senderKeyName, senderKeyDistributionMessage: senderKeyDistributionMessage)
                 }
             } catch {
-                print("ERROR IN INTI GROUP SENDER SESSION: \(error)")
+                print("ERROR IN initStandardGroupSession: \(error)")
             }
         }
     }

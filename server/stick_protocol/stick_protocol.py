@@ -482,7 +482,25 @@ class StickProtocol():
 
     def process_reencrypted_keys(self, data, user):
         success = False
-        if user.check_password(data['password']):
-
+        if user.check_password(data['currentPass']):
+            for key in data['preKeys']:
+                preKey = PreKey.objects.filter(keyId=key['id'], user=user).first()
+                if preKey:
+                    preKey.cipher = key['cipher']
+                    preKey.salt = key['salt']
+                    preKey.save()
+            for key in data['signedPreKeys']:
+                spk = SignedPreKey.objects.get(keyId=key['id'], user=user)
+                spk.cipher = key['cipher']
+                spk.salt = key['salt']
+                spk.save()
+            for key in data['identityKeys']:
+                ik = IdentityKey.objects.get(keyId=key['id'], user=user)
+                ik.cipher = key['cipher']
+                ik.salt = key['salt']
+                ik.save()
+            user.passwordSalt = data["newSalt"]
+            user.set_password(data["newPass"])
+            user.save()
             success = True
         return {"success": success}

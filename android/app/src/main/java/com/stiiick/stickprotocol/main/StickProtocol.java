@@ -238,79 +238,6 @@ public class StickProtocol {
         return null;
     }
 
-    public JSONObject reEncryptKeys(String password, ProgressEvent progressEvent)  {
-        try {
-            MyProtocolStore store = new MyProtocolStore(context);
-            List<PreKeyRecord> preKeys = store.loadPreKeys();
-            List<SignedPreKeyRecord> signedPreKeys = store.loadSignedPreKeys();
-            List<IdentityKeyRecord> identityKeys = store.loadIdentityKeys();
-            int total = identityKeys.size() + signedPreKeys.size() + preKeys.size();
-            int progress = 0;
-            JSONArray preKeysArray = new JSONArray();
-            for (int i=0; i<preKeys.size(); i++) {
-                JSONObject key = new JSONObject();
-                key.put("id", preKeys.get(i).getId());
-                HashMap<String, String> cipherMap = pbEncrypt(preKeys.get(i).getKeyPair().getPrivateKey().serialize(), password);
-                key.put("cipher", cipherMap.get("cipher"));
-                key.put("salt", cipherMap.get("salt"));
-                preKeysArray.put(key);
-
-                // PROGRESS
-                progress += 1;
-                if (progressEvent != null) {
-                    JSONObject event = new JSONObject();
-                    event.put("progress", progress);
-                    event.put("total", total);
-                    progressEvent.execute(event);
-                }
-            }
-            JSONArray signedPreKeysArray = new JSONArray();
-            for (int i=0; i<signedPreKeys.size(); i++) {
-                JSONObject key = new JSONObject();
-                key.put("id", signedPreKeys.get(i).getId());
-                HashMap<String, String> cipherMap = pbEncrypt(signedPreKeys.get(i).getKeyPair().getPrivateKey().serialize(), password);
-                key.put("cipher", cipherMap.get("cipher"));
-                key.put("salt", cipherMap.get("salt"));
-                signedPreKeysArray.put(key);
-
-                // PROGRESS
-                progress += 1;
-                if (progressEvent != null) {
-                    JSONObject event = new JSONObject();
-                    event.put("progress", progress);
-                    event.put("total", total);
-                    progressEvent.execute(event);
-                }
-            }
-            JSONArray identityKeysArray = new JSONArray();
-            for (int i=0; i<identityKeys.size(); i++) {
-                JSONObject key = new JSONObject();
-                key.put("id", identityKeys.get(i).getId());
-                HashMap<String, String> cipherMap = pbEncrypt(identityKeys.get(i).getKeyPair().getPrivateKey().serialize(), password);
-                key.put("cipher", cipherMap.get("cipher"));
-                key.put("salt", cipherMap.get("salt"));
-                identityKeysArray.put(key);
-
-                // PROGRESS
-                progress += 1;
-                if (progressEvent != null) {
-                    JSONObject event = new JSONObject();
-                    event.put("progress", progress);
-                    event.put("total", total);
-                    progressEvent.execute(event);
-                }
-            }
-            JSONObject map = new JSONObject();
-            map.put("preKeys", preKeysArray);
-            map.put("signedPreKeys", signedPreKeysArray);
-            map.put("identityKeys", identityKeysArray);
-            return map;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
     /***
      * The StickProtocol Re-Initialize method to decrypt the user's keys and re-establish the sticky
      * sessions. Needs to be called once, at login time.
@@ -1038,6 +965,79 @@ public class StickProtocol {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public JSONObject reEncryptKeys(String password, ProgressEvent progressEvent)  {
+        try {
+            MyProtocolStore store = new MyProtocolStore(context);
+            List<PreKeyRecord> preKeys = store.loadPreKeys();
+            List<SignedPreKeyRecord> signedPreKeys = store.loadSignedPreKeys();
+            List<IdentityKeyRecord> identityKeys = store.loadIdentityKeys();
+            int total = identityKeys.size() + signedPreKeys.size() + preKeys.size();
+            int progress = 0;
+            JSONArray preKeysArray = new JSONArray();
+            for (int i=0; i<preKeys.size(); i++) {
+                JSONObject key = new JSONObject();
+                key.put("id", preKeys.get(i).getId());
+                HashMap<String, String> cipherMap = pbEncrypt(preKeys.get(i).getKeyPair().getPrivateKey().serialize(), password);
+                key.put("cipher", cipherMap.get("cipher"));
+                key.put("salt", cipherMap.get("salt"));
+                preKeysArray.put(key);
+
+                // PROGRESS
+                progress += 1;
+                if (progressEvent != null) {
+                    JSONObject event = new JSONObject();
+                    event.put("progress", progress);
+                    event.put("total", total);
+                    progressEvent.execute(event);
+                }
+            }
+            JSONArray signedPreKeysArray = new JSONArray();
+            for (int i=0; i<signedPreKeys.size(); i++) {
+                JSONObject key = new JSONObject();
+                key.put("id", signedPreKeys.get(i).getId());
+                HashMap<String, String> cipherMap = pbEncrypt(signedPreKeys.get(i).getKeyPair().getPrivateKey().serialize(), password);
+                key.put("cipher", cipherMap.get("cipher"));
+                key.put("salt", cipherMap.get("salt"));
+                signedPreKeysArray.put(key);
+
+                // PROGRESS
+                progress += 1;
+                if (progressEvent != null) {
+                    JSONObject event = new JSONObject();
+                    event.put("progress", progress);
+                    event.put("total", total);
+                    progressEvent.execute(event);
+                }
+            }
+            JSONArray identityKeysArray = new JSONArray();
+            for (int i=0; i<identityKeys.size(); i++) {
+                JSONObject key = new JSONObject();
+                key.put("id", identityKeys.get(i).getId());
+                HashMap<String, String> cipherMap = pbEncrypt(identityKeys.get(i).getKeyPair().getPrivateKey().serialize(), password);
+                key.put("cipher", cipherMap.get("cipher"));
+                key.put("salt", cipherMap.get("salt"));
+                identityKeysArray.put(key);
+
+                // PROGRESS
+                progress += 1;
+                if (progressEvent != null) {
+                    JSONObject event = new JSONObject();
+                    event.put("progress", progress);
+                    event.put("total", total);
+                    progressEvent.execute(event);
+                }
+            }
+            JSONObject map = new JSONObject();
+            map.put("preKeys", preKeysArray);
+            map.put("signedPreKeys", signedPreKeysArray);
+            map.put("identityKeys", identityKeysArray);
+            return map;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     /****************************** END OF USER KEYS METHODS ******************************/
