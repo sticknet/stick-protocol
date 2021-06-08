@@ -5,15 +5,11 @@
 
 import uuid
 
-from .models import IdentityKey, SignedPreKey, PreKey, EncryptingSenderKey, DecryptingSenderKey, Party
+from .models import IdentityKey, SignedPreKey, PreKey, EncryptingSenderKey, DecryptingSenderKey, PendingKey, Party
 from django.db.models import Q
 from firebase_admin import db
 from django.conf import settings
 from django.utils.dateformat import format
-
-DEFAULT_APP = settings.DEFAULT_APP
-FIREBASE_REF = settings.FIREBASE_REF
-FIREBASE_REF_DEV = settings.FIREBASE_REF_DEV
 
 
 #
@@ -89,7 +85,6 @@ class StickProtocol():
             "signedPreKeyId": signedPreKey.keyId,
             "signature": signedPreKey.signature,
             "oneTimeId": user.oneTimeId,
-            "phone": user.phone
         }
         if preKey:
             PKB["preKey"] = preKey.public
@@ -159,7 +154,10 @@ class StickProtocol():
         isInvitation = False
         if 'isInvitation' in data:
             isInvitation = data['isInvitation']
-        member = self.User.objects.get(id=memberId)
+        try:
+            member = self.User.objects.get(id=memberId)
+        except:
+            member = self.User.objects.get(oneTimeId=memberId)
 
         # You need to check whether the user is authorized to fetch that SenderKey
         authorized = False
@@ -202,6 +200,7 @@ class StickProtocol():
             chainId = stickId[36:]
             senderKey = EncryptingSenderKey.objects.filter(partyId=partyId, chainId=chainId, user=user).first()
         key = None
+        phone = None
         if senderKey:  # If the SenderKey exists, we will return it
             if memberId != user.id:
                 key = {'key': senderKey.key, 'identityKeyId': senderKey.identityKey.keyId}
@@ -209,13 +208,11 @@ class StickProtocol():
                 key = {'id': senderKey.keyId, 'key': senderKey.key, 'step': senderKey.step, 'identityKeyId': senderKey.identityKey.keyId}
         # SenderKey does not exist, send a `PendingKey` request to the target user to upload their key,
         # through a realtime database.
-        else: # todo: refactor firebase out?
-            phone = self.User.objects.get(id=memberId).phone
-            isDev = data['isDev']
-            firebase_ref = FIREBASE_REF_DEV if isDev else FIREBASE_REF
-            ref = db.reference('users/' + phone + '/pendingKeys/', DEFAULT_APP, firebase_ref)
-            ref.update({stickId + '--' + str(user.id): user.phone})
-        return {'authorized': authorized, 'senderKey': key}
+        else:
+            if not PendingKey.objects.filter(user=user, stickId=stickId).exists():
+                PendingKey.objects.create(user=user, owner=member, stickId=stickId)
+                phone = member.phone
+        return {'authorized': authorized, 'senderKey': key, 'phone': phone}
 
     def get_standard_sender_keys(self, data, user, group):
         """
@@ -232,7 +229,7 @@ class StickProtocol():
             key = None
             if senderKey:
                 key = senderKey.key
-                senderKey.delete()
+                # senderKey.delete()
             senderKeys[id] = key
         return {'authorized': True, 'senderKeys': senderKeys}
 

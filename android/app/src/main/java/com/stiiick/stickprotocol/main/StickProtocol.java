@@ -103,7 +103,6 @@ public class StickProtocol {
     private static String path;
     private static LiveRecipientCache recipientCache;
     private final Keychain keychain;
-    private final String service;
     private final String passwordKey;
 
     /***
@@ -114,7 +113,6 @@ public class StickProtocol {
         StickProtocol.context = context;
         path = context.getFilesDir().getPath();
         keychain = new Keychain(context);
-        this.service = service;
         this.passwordKey = service + ".password";
     }
 

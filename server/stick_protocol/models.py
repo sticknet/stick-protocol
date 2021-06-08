@@ -116,6 +116,10 @@ class DecryptingSenderKey(models.Model):
     forOneTimeId = models.CharField(max_length=100, blank=True, null=True)
 
 
+class PendingKey(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sentPendingKeys')
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='pendingKeys')
+    stickId = models.CharField(max_length=100)
 
 
 class Party(models.Model):

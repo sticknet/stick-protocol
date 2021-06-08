@@ -25,7 +25,6 @@ export default class StickProtocolHandlers {
         this.URL = data.URL
         this.token = data.token
         this.httpConfig = {headers: {"Authorization": data.token}}
-        this.isDev = data.isDev
     }
 
     /**
@@ -137,11 +136,11 @@ export default class StickProtocolHandlers {
      */
     async canDecrypt(entityId, stickId, memberId, dispatch = null) {
         let canDecrypt = true
+        let data = {}
         const exists = await this.StickProtocol.sessionExists(memberId, stickId) // Check if the sticky session exists
         if (!exists) { // if the sticky session does not exists, then try to create it
             const body = {
-                stickId, memberId, isDev: this.isDev,
-                isInvitation: `${entityId}`.includes('invitation')
+                stickId, memberId, isInvitation: `${entityId}`.includes('invitation')
             }
             // try to fetch the sender key from the server
             if (!this.httpConfig.headers.Authorization) {
@@ -149,9 +148,11 @@ export default class StickProtocolHandlers {
                     await dispatch({type: 'PENDING_SESSION', payload: stickId})
                     await dispatch({type: 'DOWNLOADED', payload: entityId});
                 }
-                return canDecrypt
+                data.canDecrypt = canDecrypt
+                return data
             }
-            const {data} = await axios.post(`${this.URL}/api/fetch-sk/`, body, this.httpConfig)
+            const response = await axios.post(`${this.URL}/api/fetch-sk/`, body, this.httpConfig)
+            data = response.data
             const senderKey = data.senderKey;
             if (!senderKey) { // If there is no sender key yet, mark the session as pending
                 canDecrypt = false
@@ -173,7 +174,8 @@ export default class StickProtocolHandlers {
             if (dispatch)
                 await dispatch({type: 'PENDING_SESSION_DONE', payload: stickId})
         }
-        return canDecrypt; // return whether the sticky session has been initialized or not
+        data.canDecrypt = canDecrypt
+        return data; // return whether can decrypt (sticky session has been initialized) or not
     }
 
 
@@ -223,9 +225,7 @@ export default class StickProtocolHandlers {
             const key = await this.StickProtocol.getSenderKey(this.userId, memberId, stickId, true);
             const body = {preKeyId, identityKeyId, key, stickId, forUser: memberId}
             await axios.post(`${this.URL}/api/upload-sk/`, body, this.httpConfig)
-            return pkb.phone // on success
         }
-        return null
     }
 
     /**
@@ -357,10 +357,9 @@ export default class StickProtocolHandlers {
     /**
      * A helper function to reset the auth token, userId or oneTimeId
      */
-    setToken(token, userId, userOneTimeId) {
+    async setUp(token, userId, userOneTimeId) {
         this.token = token
         this.httpConfig = {headers: {"Authorization": token}}
-        console.log('SETTING TOKEN DONE', this.httpConfig)
         this.userId = userId
         this.userOneTimeId = userOneTimeId
     }
