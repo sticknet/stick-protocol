@@ -5,7 +5,9 @@
 
 # Motivation
 
-End-to-end encryption has become a de facto standard in messengers, especially after the outbreak of the highly secure messaging protocol – Signal. However, this high adoption of secure end-to-end communications has been limited to messengers, and has not yet seen a noticeable trace in social network platforms. The Stick protocol is an end-to-end encryption protocol, based on the Signal protocol, specifically designed for social networks, and will be the protocol powering STiiiCK. The Stick protocol supports re-establishable "many-to-many" encryption sessions in an asynchronous and multi-device setting while preserving forward secrecy and introducing backward secrecy. Evaluation 📈 <a target="_blank" href="https://omarbasem.com/pages/stickProtocolEvaluation.html">results</a> of the Stick protocol shows that it causes no noticeable compromise on usability or performance.A 📄 <a href="https://omarbasem.com/PDFs/StickProtocolPaper.pdf">Scientific Paper</a> is available for those interested in the project’s technical and research motivations. You can also checkout this <a href="https://www.youtube.com/watch?v=drNPWNQG1qA">🎥 demonstration video</a>.
+End-to-end encryption has become a de facto standard in messengers, especially after the outbreak of the highly secure messaging protocol – Signal. However, this high adoption of secure end-to-end communications has been limited to messengers, and has not yet seen a noticeable trace in social network platforms, despite the increase in users’ privacy violations. The Stick protocol is an end-to-end encryption protocol, based on the Signal protocol, specifically designed for social networks. The Stick protocol supports re-establishable "many-to-many" encryption sessions in an asynchronous and multi-device setting while preserving forward secrecy and introducing backward secrecy. Evaluation 📈 <a target="_blank" href="https://omarbasem.com/pages/stickProtocolEvaluation.html">results</a> of the Stick protocol shows that it causes no noticeable compromise on usability or performance.A 📄 <a href="https://omarbasem.com/PDFs/StickProtocolPaper.pdf">Scientific Paper</a> is available for those interested in the project’s technical and research motivations. You can also checkout this <a href="https://www.youtube.com/watch?v=drNPWNQG1qA">🎥 demonstration video</a>.
+
+Stick is the protocol that will be used in <a href="https://www.stiiick.com">STiiiCK</a> - an end-to-end encrypted social network platform.
 
 
 # Installation
@@ -26,7 +28,7 @@ common handler methods needed for the Stick protocol client-side.
 Gradle:
 ```gradle
 dependencies {
-  implementation 'com.github.STiiiCK:stick-protocol:1.1.80'
+  implementation 'com.github.STiiiCK:stick-protocol:1.1.84'
 }
 ```
 
@@ -37,7 +39,7 @@ The <a href="https://github.com/STiiiCK/stick-protocol/blob/main/android/app/src
 
 CocoaPods:
 ```
-pod 'StickProtocol', '1.1.69'
+pod 'StickProtocol', '1.1.80'
 ```
 The <a href="https://github.com/STiiiCK/stick-protocol/blob/main/ios/StickProtocol/StickProtocol/Main/StickProtocol.swift">main StickProtocol Swift class file</a> has full usage documentation. It includes all the methods that you would need.
 
@@ -61,6 +63,6 @@ npm install stick-protocol-handlers
 
 # License
 
-Copyright 2020-2021 STiiiCK
+Copyright 2020-2021 <a href="https://www.stiiick.com">STiiiCK</a>
 
 Licensed under the GPLv3: http://www.gnu.org/licenses/gpl-3.0.html
