@@ -28,7 +28,7 @@ common handler methods needed for the Stick protocol client-side.
 Gradle:
 ```gradle
 dependencies {
-  implementation 'com.github.STiiiCK:stick-protocol:1.1.80'
+  implementation 'com.github.STiiiCK:stick-protocol:1.1.84'
 }
 ```
 
@@ -39,7 +39,7 @@ The <a href="https://github.com/STiiiCK/stick-protocol/blob/main/android/app/src
 
 CocoaPods:
 ```
-pod 'StickProtocol', '1.1.69'
+pod 'StickProtocol', '1.1.80'
 ```
 The <a href="https://github.com/STiiiCK/stick-protocol/blob/main/ios/StickProtocol/StickProtocol/Main/StickProtocol.swift">main StickProtocol Swift class file</a> has full usage documentation. It includes all the methods that you would need.
 
