@@ -22,10 +22,6 @@
 
 
 - (instancetype) initWithSenderKeyState:(nonnull sender_key_state*)sender_key_state {
-  if (sender_key_state == NULL) {
-    printf("\n it is null");
-  } else
-    printf("\n it is not null");
     NSParameterAssert(sender_key_state);
     if (!sender_key_state) { return nil; }
     if (self = [super init]) {

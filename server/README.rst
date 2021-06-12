@@ -2,5 +2,5 @@
 Stick Protocol Server
 =====================
 
-UNDER DEVELOPMENT
+An end-to-end encryption protocol tailored for social network platforms
 

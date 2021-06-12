@@ -1,7 +1,7 @@
 {
   "name": "stick-protocol-handlers",
-  "version": "1.0.24",
-  "description": "UNDER DEVELOPMENT!",
+  "version": "1.0.29",
+  "description": "Client handlers for the Stick Protocol - an end-to-end encryption protocol tailored for social network platforms",
   "main": "StickProtocolHandlers.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

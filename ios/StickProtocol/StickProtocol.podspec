@@ -3,7 +3,7 @@ Pod::Spec.new do |spec|
 
   spec.name         = "StickProtocol"
   spec.version      = "1.1.81"
-  spec.summary      = "End-to-End Encryption protocol for Social Networks based on the Signal Protocol"
+  spec.summary      = "End-to-End Encryption Protocol Tailored For Social Network Platforms"
   spec.swift_version = "5.0"
 
   spec.description  = <<-DESC

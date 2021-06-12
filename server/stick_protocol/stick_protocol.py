@@ -157,10 +157,13 @@ class StickProtocol():
         try:
             member = self.User.objects.get(id=memberId)
         except:
-            member = self.User.objects.get(oneTimeId=memberId)
+            member = self.User.objects.filter(oneTimeId=memberId).first()
+            if not member:
+                return {'partyExists': False}
 
         # You need to check whether the user is authorized to fetch that SenderKey
         authorized = False
+        partyExists = True
         if user in member.blocked.all():  # A blocked user is not authorized
             return {'authorized': authorized}
         if isInvitation:  # An invited user is authorized
@@ -176,7 +179,9 @@ class StickProtocol():
                 if group in user.groups.all():  # A group member is authorized
                     authorized = True
             else:
-                party = Party.objects.get(id=stickId[:36])
+                party = Party.objects.filter(id=stickId[:36]).first()
+                if not party:
+                    return {'partyExists': False}
                 # A user connected with another user should be authorized
                 if party.user and (user in party.user.connections.all() or user.phone in party.user.contacts):
                     authorized = True
@@ -212,7 +217,7 @@ class StickProtocol():
             if not PendingKey.objects.filter(user=user, stickId=stickId).exists():
                 PendingKey.objects.create(user=user, owner=member, stickId=stickId)
                 phone = member.phone
-        return {'authorized': authorized, 'senderKey': key, 'phone': phone}
+        return {'authorized': authorized, 'senderKey': key, 'phone': phone, 'partyExists': partyExists}
 
     def get_standard_sender_keys(self, data, user, group):
         """
