@@ -1,11 +1,11 @@
 /*
- *  Copyright (c) 2018-2021 STiiiCK.
+ *  Copyright (c) 2020-2021 STiiiCK.
  *
  *  This source code is licensed under the GPLv3 license found in the
  *  LICENSE file in the root directory of this source tree.
  */
 
-import axios from "axios"; // To make HTTP requests
+import axios from "axios";
 
 /**
  *  This class contains common handler methods needed for the StickProtocol client-side. These handlers may differ
@@ -134,7 +134,7 @@ export default class StickProtocolHandlers {
      * from the server, and if it succeeds it will initialize the sticky session. This method returns a boolean indicating
      * whether the decryption process can proceed or not.
      */
-    async canDecrypt(entityId, stickId, memberId, dispatch = null, fetchingSenderKeys = {}) {
+    async canDecrypt(entityId, stickId, memberId, dispatch = null, fetchingSenderKeys) {
         let canDecrypt = true
         let data = {partyExists: true}
         const sessionExists = await this.StickProtocol.sessionExists(memberId, stickId) // Check if the sticky session exists
@@ -151,30 +151,32 @@ export default class StickProtocolHandlers {
                 data.canDecrypt = false
                 return data
             }
-            fetchingSenderKeys[stickId + memberId] = true // mark senderKey as being fetched to avoid multiple requests
-            const response = await axios.post(`${this.URL}/api/fetch-sk/`, body, this.httpConfig)
-            data = {...data, ...response.data}
-            if (!data.partyExists) {
-                data.canDecrypt = false
-                return data
-            }
-            const senderKey = data.senderKey;
-            if (!senderKey) { // If there is no sender key yet, mark the session as pending
-                canDecrypt = false
-                if (dispatch) {
-                    await dispatch({type: 'PENDING_SESSION', payload: stickId})
-                    await dispatch({type: 'DOWNLOADED', payload: entityId});
+            if (!fetchingSenderKeys[stickId + memberId]) {
+                fetchingSenderKeys[stickId + memberId] = true // mark senderKey as being fetched to avoid multiple requests
+                const response = await axios.post(`${this.URL}/api/fetch-sk/`, body, this.httpConfig)
+                data = {...data, ...response.data}
+                if (!data.partyExists) {
+                    data.canDecrypt = false
+                    return data
                 }
-            } else { // otherwise initialize the session
-                fetchingSenderKeys[stickId + memberId] = false
-                if (memberId !== this.userId)
-                    await this.StickProtocol.initStickySession(memberId, stickId, senderKey.key, senderKey.identityKeyId)
-                else {
-                    senderKey.stickId = stickId
-                    await this.StickProtocol.reinitMyStickySession(this.userId, senderKey)
+                const senderKey = data.senderKey;
+                if (!senderKey) { // If there is no sender key yet, mark the session as pending
+                    canDecrypt = false
+                    if (dispatch) {
+                        await dispatch({type: 'PENDING_SESSION', payload: stickId})
+                        await dispatch({type: 'DOWNLOADED', payload: entityId});
+                    }
+                } else { // otherwise initialize the session
+                    fetchingSenderKeys[stickId + memberId] = false
+                    if (memberId !== this.userId)
+                        await this.StickProtocol.initStickySession(memberId, stickId, senderKey.key, senderKey.identityKeyId)
+                    else {
+                        senderKey.stickId = stickId
+                        await this.StickProtocol.reinitMyStickySession(this.userId, senderKey)
+                    }
+                    if (dispatch)
+                        await dispatch({type: 'PENDING_SESSION_DONE', payload: stickId})
                 }
-                if (dispatch)
-                    await dispatch({type: 'PENDING_SESSION_DONE', payload: stickId})
             }
         } else { // If the sticky session exists, mark the session as not pending
             if (dispatch)
