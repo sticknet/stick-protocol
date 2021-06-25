@@ -3,7 +3,7 @@
 //  STiiiCK
 //
 //  Created by Omar Basem on 11/08/2020.
-//  Copyright © 2020 STiiiCK. All rights reserved.
+//  Copyright © 2018-2021 STiiiCK. All rights reserved.
 //
 
 #import "SenderKeyName.h"
