@@ -1,12 +1,12 @@
-#   Copyright (c) 2018-2021 STiiiCK.
+#   Copyright (c) 2020-2021 STiiiCK.
 #
 #   This source code is licensed under the GPLv3 license found in the
 #   LICENSE file in the root directory of this source tree.
 
-import uuid
+import uuid, hashlib
 
 from .models import IdentityKey, SignedPreKey, PreKey, EncryptingSenderKey, DecryptingSenderKey, PendingKey, Party
-from django.db.models import Q
+from django.db.models import Q, Count
 from firebase_admin import db
 from django.conf import settings
 from django.utils.dateformat import format
@@ -170,7 +170,8 @@ class StickProtocol():
             group = self.Group.objects.get(id=stickId[:36])
             if group in user.invited_groups.all():
                 authorized = True
-        elif stickId.startswith(user.parties.get(individual=False).id) or stickId.startswith(user.parties.get(individual=True).id):  # A user is authorized to fetch SenderKeys of their own profile (user.party.id)
+        elif stickId.startswith(user.parties.get(individual=False).id) or stickId.startswith(user.parties.get(
+                individual=True).id):  # A user is authorized to fetch SenderKeys of their own profile (user.party.id)
             authorized = True
         else:
             groupId = stickId[:36]
@@ -210,7 +211,8 @@ class StickProtocol():
             if memberId != user.id:
                 key = {'key': senderKey.key, 'identityKeyId': senderKey.identityKey.keyId}
             else:
-                key = {'id': senderKey.keyId, 'key': senderKey.key, 'step': senderKey.step, 'identityKeyId': senderKey.identityKey.keyId}
+                key = {'id': senderKey.keyId, 'key': senderKey.key, 'step': senderKey.step,
+                       'identityKeyId': senderKey.identityKey.keyId}
         # SenderKey does not exist, send a `PendingKey` request to the target user to upload their key,
         # through a realtime database.
         else:
@@ -238,8 +240,6 @@ class StickProtocol():
             senderKeys[id] = key
         return {'authorized': True, 'senderKeys': senderKeys}
 
-
-
     def get_stick_id(self, data, user):
         groups_ids = data['groups_ids']
         connections_ids = data['connections_ids']
@@ -257,15 +257,17 @@ class StickProtocol():
                     membersIds = self.Group.objects.get(id=groups_ids[0]).get_members_otids()
                     partyId = data["stickId"]
             else:  # Sharing with a collection of groups and/or users
-                if len(groups_ids) > 0 and len(connections_ids) > 0:
-                    party = Party.objects.filter(Q(groups=groups_ids) & Q(connections=connections_ids)).first()
-                elif len(groups_ids) > 0:
-                    party = Party.objects.filter(Q(groups=groups_ids) & Q(connections=None)).first()
-                else:
+                if len(connections_ids) > 0 and user.id not in connections_ids:
                     connections_ids.append(user.id)
-                    party = Party.objects.filter(Q(groups=None) & Q(connections=connections_ids)).first()
+                groups_ids.sort()
+                connections_ids.sort()
+                ids = ''.join(groups_ids + connections_ids)
+                h = hashlib.sha256()
+                h.update(ids.encode())
+                partyHash = h.hexdigest()
+                party = Party.objects.filter(partyHash=partyHash).first()
                 if party == None:  # Create a new Party object if does not exist
-                    party = Party.objects.create()
+                    party = Party.objects.create(partyHash=partyHash)
                     party.groups.set(groups_ids)
                     party.connections.set(connections_ids)
                 for group_id in groups_ids:
@@ -279,7 +281,7 @@ class StickProtocol():
                 if user.id not in membersIds:
                     membersIds.append(user.id)
                 partyId = party.id
-        elif 'partyId' in data:  # Sharing to the party of a another user
+        elif 'partyId' in data:
             membersIds = [user.id]
             if not (len(groups_ids) == 1 and len(connections_ids) == 0):
                 party = Party.objects.get(id=data['partyId'])
@@ -313,7 +315,6 @@ class StickProtocol():
         else:
             dict[user.id] = {'exists': False}
         stickId = str(partyId) + str(chainId)
-
 
         if not isSticky:
             stickId = partyId
@@ -370,7 +371,8 @@ class StickProtocol():
         forUser = self.User.objects.get(id=data['forUser'])
         identityKey = IdentityKey.objects.get(keyId=data['identityKeyId'], user__id=data['forUser'])
         decryptingSenderKey = DecryptingSenderKey.objects.create(key=data['key'],
-                                                                 stickId=data['stickId'], ofUser=user, forUser=forUser, preKey=preKey, identityKey=identityKey)
+                                                                 stickId=data['stickId'], ofUser=user, forUser=forUser,
+                                                                 preKey=preKey, identityKey=identityKey)
         decryptingSenderKey.save()
 
     def process_sender_keys(self, data, user):
@@ -463,7 +465,8 @@ class StickProtocol():
             bundle['signedPreKeys'] = signedPreKeys
             preKeys = []
             for preKey in preKeysList:
-                key = {'id': preKey.keyId, 'public': preKey.public, 'cipher': preKey.cipher, 'salt': preKey.salt, 'used': preKey.used}
+                key = {'id': preKey.keyId, 'public': preKey.public, 'cipher': preKey.cipher, 'salt': preKey.salt,
+                       'used': preKey.used}
                 preKeys.append(key)
             bundle['preKeys'] = preKeys
             senderKeys = []
@@ -480,7 +483,6 @@ class StickProtocol():
             return {"bundle": bundle, "verify": True}
         else:
             return {"verify": False}
-
 
     def process_reencrypted_keys(self, data, user):
         success = False

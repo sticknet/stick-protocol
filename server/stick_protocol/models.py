@@ -139,9 +139,17 @@ class Party(models.Model):
     connections = models.ManyToManyField(User, blank=True, related_name='party_connections')
     user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True, related_name='parties')
     individual = models.BooleanField(default=False)
+    partyHash = models.CharField(max_length=128, blank=True, null=True)
+    timestamp = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
     def save(self, *args, **kwargs):
         if not self.id:
             self.id = uuid.uuid4()
         super(Party, self).save(*args, **kwargs)
+
+    class Meta:
+        ordering = ['timestamp']
+
+    def __str__(self):
+        return str(self.timestamp)
 
