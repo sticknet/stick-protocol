@@ -14,7 +14,7 @@ Pod::Spec.new do |spec|
   spec.homepage     = "https://github.com/STiiiCK/stick-protocol"
 
 
-  spec.license      = { :type => "MIT", :text => "The MIT License (MIT) \n Copyright (c) Omar Basem
+  spec.license      = { :type => "MIT", :text => "The MIT License (MIT) \n Copyright © Omar Basem
      <founder@stiiick.com \n Permission is hereby granted, free fo charge, to any person obtaining a copy
      of this software and associated documentation files"}
  

@@ -3,7 +3,7 @@
 //  Mantle
 //
 //  Created by Robert Böhnke on 19/03/14.
-//  Copyright (c) 2014 GitHub. All rights reserved.
+//  Copyright © 2014 GitHub. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>

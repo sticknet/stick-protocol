@@ -319,7 +319,7 @@ typedef sqlite_uint64 sqlite3_uint64;
 ** ^If an [sqlite3] object is destroyed while a transaction is open,
 ** the transaction is automatically rolled back.
 **
-** The C parameter to [sqlite3_close(C)] and [sqlite3_close_v2(C)]
+** The C parameter to [sqlite3_close©] and [sqlite3_close_v2©]
 ** must be either a NULL
 ** pointer or an [sqlite3] object pointer obtained
 ** from [sqlite3_open()], [sqlite3_open16()], or
@@ -5755,7 +5755,7 @@ typedef void (*sqlite3_destructor_type)(void*);
 ** kind of [sqlite3_value] object can be used with this interface.
 **
 ** ^The sqlite3_result_pointer(C,P,T,D) interface sets the result to an
-** SQL NULL value, just like [sqlite3_result_null(C)], except that it
+** SQL NULL value, just like [sqlite3_result_null©], except that it
 ** also associates the host-language pointer P or type T with that
 ** NULL value such that the pointer can be retrieved within an
 ** [application-defined SQL function] using [sqlite3_value_pointer()].

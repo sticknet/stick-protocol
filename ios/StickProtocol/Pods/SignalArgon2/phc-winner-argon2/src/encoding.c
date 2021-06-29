@@ -52,7 +52,7 @@
  * neighboring rights to this file. This work is published from: Canada.
  * ---------------------------------------------------------------------
  *
- * Copyright (c) 2015 Thomas Pornin
+ * Copyright © 2015 Thomas Pornin
  */
 
 /* ==================================================================== */

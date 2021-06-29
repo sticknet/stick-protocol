@@ -2,7 +2,7 @@
  * Macros for metaprogramming
  * ExtendedC
  *
- * Copyright (C) 2012 Justin Spahr-Summers
+ * Copyright © 2012 Justin Spahr-Summers
  * Released under the MIT license
  */
 

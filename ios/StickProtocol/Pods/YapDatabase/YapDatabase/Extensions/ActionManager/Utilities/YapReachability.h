@@ -16,7 +16,7 @@
 #if !TARGET_OS_WATCH
 
 /*
- Copyright (c) 2011, Tony Million.
+ Copyright © 2011, Tony Million.
  All rights reserved.
  
  Redistribution and use in source and binary forms, with or without

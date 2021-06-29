@@ -133,7 +133,7 @@ support@zetetic.net!
 
 ## Community Edition Open Source License
 
-Copyright (c) 2020, ZETETIC LLC
+Copyright © 2020, ZETETIC LLC
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without

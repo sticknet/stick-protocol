@@ -262,7 +262,7 @@
  *      findBlock(E)       => NSOrderedDescending
  * 
  *      findBlock(B) => NSOrderedSame
- *      findBlock(C) => NSOrderedSame
+ *      findBlock© => NSOrderedSame
  *      findBlock(D) => NSOrderedSame
  * 
  * In other words, you can't sort one way in the sortingBlock, and "sort" another way in the findBlock.
