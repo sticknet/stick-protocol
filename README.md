@@ -9,6 +9,9 @@ End-to-end encryption has become a de facto standard in messengers, especially a
 
 Stick is the protocol that will be used in <a href="https://www.stiiick.com">STiiiCK</a> - an end-to-end encrypted social network platform.
 
+# Technical Documentation
+
+<a href="https://www.stiiick.com/StickProtocol">Click here<a/> for technical documentation of the Stick protocol.
 
 # Installation
 
