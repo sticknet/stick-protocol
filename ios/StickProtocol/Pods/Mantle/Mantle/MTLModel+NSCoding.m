@@ -3,7 +3,7 @@
 //  Mantle
 //
 //  Created by Justin Spahr-Summers on 2013-02-12.
-//  Copyright © 2013 GitHub. All rights reserved.
+//  Copyright (c) 2013 GitHub. All rights reserved.
 //
 
 #import "MTLEXTRuntimeExtensions.h"

@@ -5,12 +5,12 @@
 
 from django.contrib import admin
 
-from .models import IdentityKey, SignedPreKey, PreKey, EncryptingSenderKey, DecryptingSenderKey, Party, PendingKey
+from .models import IdentityKey, SignedPreKey, PreKey, EncryptionSenderKey, DecryptionSenderKey, Party, PendingKey
 
 admin.site.register(IdentityKey)
 admin.site.register(SignedPreKey)
 admin.site.register(PreKey)
-admin.site.register(EncryptingSenderKey)
-admin.site.register(DecryptingSenderKey)
+admin.site.register(EncryptionSenderKey)
+admin.site.register(DecryptionSenderKey)
 admin.site.register(Party)
 admin.site.register(PendingKey)

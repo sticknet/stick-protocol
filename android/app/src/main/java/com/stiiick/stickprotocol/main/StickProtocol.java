@@ -244,7 +244,7 @@ public class StickProtocol {
      *               * An array of identity keys
      *               * An array of signed prekeys
      *               * An array of prekeys
-     *               * An array of sender keys (EncryptingSenderKeys)
+     *               * An array of sender keys (EncryptionSenderKeys)
      *               * localId
      * @param password - String, user's plaintext password
      * @param userId - String, user's unique id
@@ -361,6 +361,14 @@ public class StickProtocol {
         }
     }
 
+    /***
+     * This method is used to decrypt an array of prekeys. Can be useful to make the above reInitialize method finish faster
+     * by decrypting only a limited number of prekeys in the reInitialize method at login, then decrypt
+     * the rest of the prekeys in the background after login.
+     *
+     * @param preKeys - JSONArray
+     **
+     */
     public void decryptPreKeys(JSONArray preKeys) throws Exception {
         String userId = PreferenceManager.getDefaultSharedPreferences(context).getString("userId", "");
         HashMap<String, String> serviceMap = new HashMap();
@@ -400,6 +408,14 @@ public class StickProtocol {
         return Base64.encodeBytes(passwordHashBytes);
     }
 
+
+    /***
+     * This method is used to create a new password hash, for example when changing password.
+     *
+     * @param password - String, plaintext password
+     *
+     * @return JSONObject containing hash and salt
+     */
     public JSONObject createNewPasswordHash(String password) {
         try {
             // Generate password salt
@@ -556,7 +572,7 @@ public class StickProtocol {
     /****************************** START OF STICKY SESSION METHODS ******************************/
 
     /***
-     * This method is used to create a sticky session and get the EncryptingSenderKey of a user for a party.
+     * This method is used to create a sticky session and get the EncryptionSenderKey of a user for a party.
      *
      * @param userId
      * @param stickId - String, the stickId of the sticky session
@@ -564,7 +580,7 @@ public class StickProtocol {
      *                          * id - int, the sender key id
      *                          * key - encrypted sender key (chainKey || private signature key || public signature key)
      */
-    public JSONObject getEncryptingSenderKey(String userId, String stickId) {
+    public JSONObject createStickySession(String userId, String stickId) {
         try {
             SenderKeyStore senderKeyStore = new MySenderKeyStore(context);
             SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(userId, 0);
@@ -586,7 +602,7 @@ public class StickProtocol {
     }
 
     /***
-     * This method is used to get a user's sender key (DecryptingSenderKey) of a sticky session (or a standard group session)
+     * This method is used to get a user's sender key (DecryptionSenderKey) of a sticky session (or a standard group session)
      * in order to share it with other members of a party.
      *
      * @param senderId - userId (or oneTimeId)
@@ -965,6 +981,16 @@ public class StickProtocol {
         return null;
     }
 
+    /***
+     * This method is used to reEncrypt the identity keys, signed prekeys and prekeys. Typically,
+     * would be needed when changing the password.
+     *
+     * @param password - String, plaintext password
+     * @param progressEvent - (optional) A ProgressEvent interface can be implemented to provide progress
+     *                        feedback to the user while the keys are being encrypted
+     *
+     * @return JSONObject containing an array of identity keys, an array of signed prekeys and an array of prekeys
+     */
     public JSONObject reEncryptKeys(String password, ProgressEvent progressEvent)  {
         try {
             MyProtocolStore store = new MyProtocolStore(context);

@@ -3,7 +3,7 @@
 //  Mantle
 //
 //  Created by Josh Abernathy on 9/19/12.
-//  Copyright © 2012 GitHub. All rights reserved.
+//  Copyright (c) 2012 GitHub. All rights reserved.
 //
 
 #import "NSArray+MTLManipulationAdditions.h"

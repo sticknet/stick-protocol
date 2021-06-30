@@ -3273,7 +3273,7 @@ static int connectionBusyHandler(void *ptr, int count) {
 	checkpointResult = sqlite3_wal_checkpoint_v2(db, "main", checkpointMode,
 	                                             &totalFrameCount, &checkpointedFrameCount);
 	
-	YDBLogInfo(@"Post-checkpoint: src© mode(%@) result(%d) frames(%d) checkpointed(%d)",
+	YDBLogInfo(@"Post-checkpoint: src(c) mode(%@) result(%d) frames(%d) checkpointed(%d)",
 	           (checkpointMode == SQLITE_CHECKPOINT_RESTART ? @"restart" : @"truncate"),
 	           checkpointResult, totalFrameCount, checkpointedFrameCount);
 	

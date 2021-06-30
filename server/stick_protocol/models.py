@@ -68,14 +68,14 @@ class PreKey(models.Model):
     def __str__(self):
         return self.user.username + ' - ' + str(self.keyId) + ' - ' + str(self.id)
 
-class EncryptingSenderKey(models.Model):
+class EncryptionSenderKey(models.Model):
     """
     * Every member of a sticky session has a sender key. The sender key representation is broken down into two,
-    'EncryptingSenderKey' (ESK) which only is owner should have, and a 'DecryptingSenderKey' (DSK) which is shared with other
+    'EncryptionSenderKey' (ESK) which only is owner should have, and a 'DecryptionSenderKey' (DSK) which is shared with other
     members of a sticky session individually. Those sender keys has a partyId and a chainId which together make the
     stickId (stickId = partyId || chainId).
     * These ESKs can also be used for a standard group session (not using sticky sessions).
-    * The root key of an EncryptingSenderKey chain for a sticky session is called `StickyKey`.
+    * The root key of an EncryptionSenderKey chain for a sticky session is called `StickyKey`.
     """
     keyId = models.IntegerField()
     preKey = models.OneToOneField(PreKey, on_delete=models.CASCADE, blank=True, null=True, related_name='esk_pk')
@@ -92,16 +92,16 @@ class EncryptingSenderKey(models.Model):
     def __str__(self):
         return self.user.username + ': ' + self.partyId + '-' + self.chainId
 
-class DecryptingSenderKey(models.Model):
+class DecryptionSenderKey(models.Model):
     """
-    * A user should get a DecryptingSenderKey (DSK) from every member of a sticky session to initialize the sticky session
+    * A user should get a DecryptionSenderKey (DSK) from every member of a sticky session to initialize the sticky session
     corresponding to that member and its stickId.
-    * Note that the DecryptingSenderKey does not have a chainId field, unlike
-    the EncryptingSenderKey, but it has a stickId field. The reason is that you would need to access the stickId more often
-    on the DecryptingSenderKey, and you should not need to access the chainId directly. However, if you ever need to access
+    * Note that the DecryptionSenderKey does not have a chainId field, unlike
+    the EncryptionSenderKey, but it has a stickId field. The reason is that you would need to access the stickId more often
+    on the DecryptionSenderKey, and you should not need to access the chainId directly. However, if you ever need to access
     the chainId you can simply do: `stickId[36:]`. This gets you whatever characters after the 36th character.
-    The root key of a DecryptingSenderKey chain is called `StickyKey`.
-    * A DecryptingSenderKey can be of a sticky session or a standard session. A sticky session DSK relates to users using
+    The root key of a DecryptionSenderKey chain is called `StickyKey`.
+    * A DecryptionSenderKey can be of a sticky session or a standard session. A sticky session DSK relates to users using
     the `ofUser` and `forUser` fields. A standard session DSK relates to users using the `ofOneTimeId` and `forOneTimeId`
     fields.
     """

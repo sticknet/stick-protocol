@@ -90,7 +90,7 @@ NS_ASSUME_NONNULL_BEGIN
  *      findBlock(E)       => NSOrderedDescending
  * 
  *      findBlock(B) => NSOrderedSame
- *      findBlock© => NSOrderedSame
+ *      findBlock(C) => NSOrderedSame
  *      findBlock(D) => NSOrderedSame
  * 
  * In other words, you can't sort one way in the sortingBlock, and "sort" another way in the findBlock.

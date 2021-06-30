@@ -1,7 +1,7 @@
 //
 //  CryptoSwift
 //
-//  Copyright © 2014-2017 Marcin Krzyżanowski <marcin@krzyzanowskim.com>
+//  Copyright (C) 2014-2017 Marcin Krzyżanowski <marcin@krzyzanowskim.com>
 //  This software is provided 'as-is', without any express or implied warranty.
 //
 //  In no event will the authors be held liable for any damages arising from the use of this software.
@@ -291,7 +291,7 @@ private final class GF {
   }
 
   func ghashFinish() -> UInt128 {
-    // len(A) || len©
+    // len(A) || len(C)
     let len = UInt128(a: UInt64(aadLength * 8), b: UInt64(ciphertextLength * 8))
     x = GF.multiply(self.x ^ len, self.h)
     return self.x

@@ -5,7 +5,7 @@ This application makes use of the following third party libraries:
 
 BSD 3-Clause License
 
-Copyright © 2010-2020, Deusty, LLC
+Copyright (c) 2010-2020, Deusty, LLC
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -21,7 +21,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 ## CryptoSwift
 
-Copyright © 2014-2017 Marcin Krzyżanowski <marcin.krzyzanowski@gmail.com>
+Copyright (C) 2014-2017 Marcin Krzyżanowski <marcin.krzyzanowski@gmail.com>
 This software is provided 'as-is', without any express or implied warranty.
 
 In no event will the authors be held liable for any damages arising from the use of this software.
@@ -36,7 +36,7 @@ Permission is granted to anyone to use this software for any purpose,including c
 
 ## Mantle
 
-**Copyright © GitHub, Inc.**
+**Copyright (c) GitHub, Inc.**
 **All rights reserved.**
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
@@ -48,7 +48,7 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 ---
 
 **This project uses portions of code from the Proton framework.**
-**Proton is copyright © 2012, Bitswift, Inc.**
+**Proton is copyright (c) 2012, Bitswift, Inc.**
 **All rights reserved.**
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -61,7 +61,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 ## SQLCipher
 
-Copyright © 2008, ZETETIC LLC
+Copyright (c) 2008, ZETETIC LLC
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -92,7 +92,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
                     GNU GENERAL PUBLIC LICENSE
                        Version 3, 29 June 2007
 
- Copyright © 2007 Free Software Foundation, Inc. <http://fsf.org/>
+ Copyright (C) 2007 Free Software Foundation, Inc. <http://fsf.org/>
  Everyone is permitted to copy and distribute verbatim copies
  of this license document, but changing it is not allowed.
 
@@ -716,7 +716,7 @@ copy of the Program in return for a fee.
 
 The MIT License (MIT)
 
-Copyright © 2014 Auth0 LLC
+Copyright (c) 2014 Auth0 LLC
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -739,7 +739,7 @@ SOFTWARE.
 ## StickySignalProtocolC
 
 The MIT License (MIT) 
- Copyright © Omar Basem
+ Copyright (c) Omar Basem
      <founder@stiiick.com 
  Permission is hereby granted, free fo charge, to any person obtaining a copy
      of this software and associated documentation files
@@ -748,7 +748,7 @@ The MIT License (MIT)
 
 Software License Agreement (BSD License)
 
-Copyright © 2013, yap.TV Inc.
+Copyright (c) 2013, yap.TV Inc.
 All rights reserved.
 
 Redistribution and use of this software in source and binary forms,

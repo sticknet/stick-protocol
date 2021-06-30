@@ -133,7 +133,7 @@ public class SP {
      *               * An array of identity keys
      *               * An array of signed prekeys
      *               * An array of prekeys
-     *               * An array of sender keys (EncryptingSenderKeys)
+     *               * An array of sender keys (EncryptionSenderKeys)
      *               * localId
      * @param password - String, user's plaintext password
      * @param userId - String, user's unique id
@@ -215,8 +215,16 @@ public class SP {
             }
         }
     }
-    
-    
+
+
+    /***
+     * This method is used to decrypt an array of prekeys. Can be useful to make the above reInitialize method finish faster
+     * by decrypting only a limited number of prekeys in the reInitialize method at login, then decrypt
+     * the rest of the prekeys in the background after login.
+     *
+     * @param preKeys - dictionary array
+     **
+     */
     public func decryptPreKeys(preKeys: [Dictionary<String, Any>]) {
         let myId = UserDefaults(suiteName: self.accessGroup!)!.string(forKey: "userId")
         let keychain = A0SimpleKeychain(service: self.service!, accessGroup: self.accessGroup!)
@@ -234,11 +242,27 @@ public class SP {
         }
     }
 
+    /***
+     * This method is used to create the initial password hash using Argon2, from a provided password
+     * and salt, at login.
+     *
+     * @param password - String, plaintext password
+     * @param salt - String, the salt that was used to create the initial password hash at registration time.
+     *
+     * @return initial password hash - String
+     */
     public func createPasswordHash(password: String, salt: String) -> String {
         let (passwordHash, _) = try! Argon2.hash(iterations: 3, memoryInKiB: 4 * 1024, threads: 2, password: password.data(using: .utf8)!, salt: Data(base64Encoded: salt)!, desiredLength: 32, variant: .id, version: .v13)
         return passwordHash.base64EncodedString()
     }
-    
+
+    /***
+     * This method is used to create a new password hash, for example when changing password.
+     *
+     * @param password - String, plaintext password
+     *
+     * @return JSONObject containing hash and salt
+     */
     public func createNewPasswordHash(password: String) -> [String: String] {
         let salt = generateRandomBytes(count: 32)
         let (passwordHash, _) = try! Argon2.hash(iterations: 3, memoryInKiB: 4 * 1024, threads: 2, password: password.data(using: .utf8)!, salt: salt!, desiredLength: 32, variant: .id, version: .v13)
@@ -337,7 +361,7 @@ public class SP {
     /****************************** START OF STICKY SESSION METHODS ******************************/
 
     /***
-     * This method is used to create a sticky session and get the EncryptingSenderKey of a user for a party.
+     * This method is used to create a sticky session and get the EncryptionSenderKey of a user for a party.
      *
      * @param userId
      * @param stickId - String, the stickId of the sticky session
@@ -345,7 +369,7 @@ public class SP {
      *                          * id - int, the sender key id
      *                          * key - encrypted sender key (chainKey || private signature key || public signature key)
      */
-    public func getEncryptingSenderKey(userId: String, stickId: String) -> Dictionary<String, Any>? {
+    public func createStickySession(userId: String, stickId: String) -> Dictionary<String, Any>? {
         do {
             let databaseConnection = db!.newConnection()
             let encryptionManager = try? EncryptionManager(accessGroup: accessGroup!, databaseConnection: databaseConnection)
@@ -372,7 +396,7 @@ public class SP {
     }
 
     /***
-     * This method is used to get a user's sender key (DecryptingSenderKey) of a sticky session (or a standard group session)
+     * This method is used to get a user's sender key (DecryptionSenderKey) of a sticky session (or a standard group session)
      * in order to share it with other members of a party.
      *
      * @param senderId - userId (or oneTimeId)
@@ -768,7 +792,17 @@ public class SP {
         }
         return preKeysArray
     }
-    
+
+    /***
+     * This method is used to reEncrypt the identity keys, signed prekeys and prekeys. Typically,
+     * would be needed when changing the password.
+     *
+     * @param password - String, plaintext password
+     * @param progressEvent - an optional callback function to provide progress
+     *                        feedback to the user while the keys are being encrypted
+     *
+     * @return Dictionary containing an array of identity keys, an array of signed prekeys and an array of prekeys
+     */
     public func reEncryptKeys(password: String, progressEvent: (([String: Any]) -> Void)?) -> [String: Any] {
         let databaseConnection = db!.newConnection()
         let encryptionManager = try? EncryptionManager(accessGroup: accessGroup!, databaseConnection: databaseConnection)

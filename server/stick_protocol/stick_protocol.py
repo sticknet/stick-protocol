@@ -5,7 +5,7 @@
 
 import uuid, hashlib
 
-from .models import IdentityKey, SignedPreKey, PreKey, EncryptingSenderKey, DecryptingSenderKey, PendingKey, Party
+from .models import IdentityKey, SignedPreKey, PreKey, EncryptionSenderKey, DecryptionSenderKey, PendingKey, Party
 from django.db.models import Q, Count
 from firebase_admin import db
 from django.conf import settings
@@ -102,8 +102,8 @@ class StickProtocol():
         communicate their SenderKey to multiple members of a party at once.
         """
         bundles = {}
-        # Make sure the current user is the first in the list. When creating DecryptingSenderKeys client-side to share
-        # with other members, their must already be a corresponding EncryptingSenderKey.
+        # Make sure the current user is the first in the list. When creating DecryptionSenderKeys client-side to share
+        # with other members, their must already be a corresponding EncryptionSenderKey.
         if currentUser.id in users_id:
             users_id.remove(currentUser.id)
             users_id.insert(0, currentUser.id)
@@ -199,12 +199,12 @@ class StickProtocol():
             return {'authorized': authorized}
 
         if memberId != user.id:  # Trying to fetch DSK
-            senderKey = DecryptingSenderKey.objects.filter(stickId=stickId, ofUser=memberId,
+            senderKey = DecryptionSenderKey.objects.filter(stickId=stickId, ofUser=memberId,
                                                            forUser=user).first()
         else:  # Trying to fetch ESK
             partyId = stickId[:36]
             chainId = stickId[36:]
-            senderKey = EncryptingSenderKey.objects.filter(partyId=partyId, chainId=chainId, user=user).first()
+            senderKey = EncryptionSenderKey.objects.filter(partyId=partyId, chainId=chainId, user=user).first()
         key = None
         phone = None
         if senderKey:  # If the SenderKey exists, we will return it
@@ -231,7 +231,7 @@ class StickProtocol():
             return {'authorized': False}
         senderKeys = {}
         for id in keysToFetch:
-            senderKey = DecryptingSenderKey.objects.filter(stickId=stickId, ofOneTimeId=id,
+            senderKey = DecryptionSenderKey.objects.filter(stickId=stickId, ofOneTimeId=id,
                                                            forOneTimeId=user.oneTimeId).first()
             key = None
             if senderKey:
@@ -298,7 +298,7 @@ class StickProtocol():
 
         # Find the right stickId
         chainId = 0
-        senderKeys = EncryptingSenderKey.objects.filter(partyId=partyId, user=user).order_by('-chainId')
+        senderKeys = EncryptionSenderKey.objects.filter(partyId=partyId, user=user).order_by('-chainId')
         if len(senderKeys) > 0:
             activeSenderKey = senderKeys[0]
             if not isSticky:  # A standard session is valid
@@ -322,13 +322,13 @@ class StickProtocol():
         for memberId in membersIds:  # loop of the target users and check if they have their SenderKey
             if isSticky:
                 if user.id != memberId:
-                    senderKey = DecryptingSenderKey.objects.filter(stickId=stickId, ofUser=user,
+                    senderKey = DecryptionSenderKey.objects.filter(stickId=stickId, ofUser=user,
                                                                    forUser=memberId).first()
                 else:
-                    senderKey = EncryptingSenderKey.objects.filter(partyId=partyId, chainId=chainId,
+                    senderKey = EncryptionSenderKey.objects.filter(partyId=partyId, chainId=chainId,
                                                                    user=user).first()
             else:
-                senderKey = DecryptingSenderKey.objects.filter(stickId=stickId, ofOneTimeId=user.oneTimeId,
+                senderKey = DecryptionSenderKey.objects.filter(stickId=stickId, ofOneTimeId=user.oneTimeId,
                                                                forOneTimeId=memberId).first()
             if senderKey:
                 response = {'exists': True}
@@ -351,7 +351,7 @@ class StickProtocol():
         its current step.
         """
         partyId = data['partyId']
-        senderKeys = EncryptingSenderKey.objects.filter(partyId=partyId, user=currentUser).reverse()
+        senderKeys = EncryptionSenderKey.objects.filter(partyId=partyId, user=currentUser).reverse()
         activeSenderKey = senderKeys[0]
         responseDict = {}
         if activeSenderKey.step < self.sessionAge:
@@ -370,7 +370,7 @@ class StickProtocol():
         preKey = PreKey.objects.get(keyId=data['preKeyId'], user__id=data['forUser'])
         forUser = self.User.objects.get(id=data['forUser'])
         identityKey = IdentityKey.objects.get(keyId=data['identityKeyId'], user__id=data['forUser'])
-        decryptingSenderKey = DecryptingSenderKey.objects.create(key=data['key'],
+        decryptingSenderKey = DecryptionSenderKey.objects.create(key=data['key'],
                                                                  stickId=data['stickId'], ofUser=user, forUser=forUser,
                                                                  preKey=preKey, identityKey=identityKey)
         decryptingSenderKey.save()
@@ -389,13 +389,13 @@ class StickProtocol():
             identityKey = IdentityKey.objects.get(keyId=senderKey['identityKeyId'], user__id=id)
             if id != user.id:  # Other user? Create a DSK
                 forUser = self.User.objects.get(id=senderKey['forUser'])
-                DecryptingSenderKey.objects.create(key=senderKey['key'],
+                DecryptionSenderKey.objects.create(key=senderKey['key'],
                                                    stickId=senderKey['stickId'], ofUser=user,
                                                    preKey=preKey, identityKey=identityKey, forUser=forUser)
             else:  # Current user? Create an ESK
                 partyId = senderKey['stickId'][:36]
                 chainId = senderKey['stickId'][36:]
-                EncryptingSenderKey.objects.create(keyId=senderKey['id'], preKey=preKey, identityKey=identityKey,
+                EncryptionSenderKey.objects.create(keyId=senderKey['id'], preKey=preKey, identityKey=identityKey,
                                                    partyId=partyId, chainId=chainId,
                                                    user=user, key=senderKey['key'])
 
@@ -406,7 +406,7 @@ class StickProtocol():
         stickId = data['stickId']
         keysToUpload = data['keysToUpload']
         for oneTimeId, senderKey in keysToUpload.items():
-            DecryptingSenderKey.objects.create(key=senderKey, stickId=stickId, ofUser=user,
+            DecryptionSenderKey.objects.create(key=senderKey, stickId=stickId, ofUser=user,
                                                forOneTimeId=oneTimeId, ofOneTimeId=user.oneTimeId)
 
     def update_active_spk(self, data, user):
@@ -449,7 +449,7 @@ class StickProtocol():
             signedPreKeysList = SignedPreKey.objects.filter(user=user)
             identityKeysList = IdentityKey.objects.filter(user=user)
             preKeysList = PreKey.objects.filter(user=user).order_by('-dt_timestamp')
-            senderKeysList = EncryptingSenderKey.objects.filter(user=user)
+            senderKeysList = EncryptionSenderKey.objects.filter(user=user)
             bundle = {'localId': user.localId}
             identityKeys = []
             for ik in identityKeysList:

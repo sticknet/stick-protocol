@@ -3,7 +3,7 @@
 //  Mantle
 //
 //  Created by Robert Böhnke on 7/6/13.
-//  Copyright © 2013 GitHub. All rights reserved.
+//  Copyright (c) 2013 GitHub. All rights reserved.
 //
 
 #import "MTLModel.h"
