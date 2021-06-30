@@ -91,7 +91,7 @@ export default class StickProtocolHandlers {
 
     /**
      * This function is used to upload sender keys of a sticky session to server. StickProtocol.getSenderKey() will return
-     * a DecryptionSenderKey for other members of a party, while StickProtocol.getEncryptionSenderKey() will return a
+     * a DecryptionSenderKey for other members of a party, while StickProtocol.createStickySession() will return a
      * user's own EncryptionSenderKey for a sticky session.
      *
      */
@@ -111,15 +111,15 @@ export default class StickProtocolHandlers {
             await this.StickProtocol.initPairwiseSession(bundles[memberId])
             const preKeyId = bundles[memberId].preKeyId
             const identityKeyId = bundles[memberId].identityKeyId
-            if (memberId !== this.userId) {
-                const key = await this.StickProtocol.getSenderKey(this.userId, memberId, stickId, true);
-                keys[memberId] = {identityKeyId, preKeyId, key, stickId, forUser: memberId}
-            } else {
-                let encryptionSenderKey = await this.StickProtocol.getEncryptionSenderKey(this.userId, stickId)
+            if (memberId === this.userId) {
+                let encryptionSenderKey = await this.StickProtocol.createStickySession(this.userId, stickId)
                 encryptionSenderKey['preKeyId'] = preKeyId
                 encryptionSenderKey['identityKeyId'] = identityKeyId
                 encryptionSenderKey['stickId'] = stickId
                 keys[memberId] = encryptionSenderKey
+            } else {
+                const key = await this.StickProtocol.getSenderKey(this.userId, memberId, stickId, true);
+                keys[memberId] = {identityKeyId, preKeyId, key, stickId, forUser: memberId}
             }
         }
 
