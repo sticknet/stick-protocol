@@ -48,6 +48,7 @@ public class SP {
 
         // Generate password salt
         let passwordSalt = generateRandomBytes(count: 32)
+        
         // Hashing password
         let (passwordHash, _) = try! Argon2.hash(iterations: 3, memoryInKiB: 4 * 1024, threads: 2, password: password.data(using: .utf8)!, salt: passwordSalt!, desiredLength: 32, variant: .id, version: .v13)
 
