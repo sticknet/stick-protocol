@@ -207,7 +207,7 @@ public class SP {
 
         // OWN SENDER KEYS
         for key in senderKeys {
-            reinitMyStickySession(senderKey: key, userId: userId)
+            reinitMyStickySession(userId: userId, senderKey: key)
             // send progress event
             count += 1
             if (progressEvent != nil) {
@@ -614,10 +614,10 @@ public class SP {
     *                      * id - int, id of the key
     *                      * key - encrypted sender key (chainKey || signaturePrivateKey || signaturePublicKey)
     *                      * stickId - String, id of the sticky session
-    *                      * identityKeyId - int, id of the identity key used to encrypt the private signature key
+    *                      * identityKeyId - int, id of the identity key used to encrypt the sender key
     *                      * step - represents the age of the sticky session
     */
-    public func reinitMyStickySession(senderKey: Dictionary<String, Any>, userId: String) {
+    public func reinitMyStickySession(userId: String, senderKey: Dictionary<String, Any>) {
         let databaseConnection = db!.newConnection()
         let encryptionManager = try? EncryptionManager(accessGroup: accessGroup!, databaseConnection: databaseConnection)
         let signalProtocolAddress = SignalAddress(name: userId, deviceId: 0)
@@ -1068,13 +1068,13 @@ public class SP {
      * @param stickId         - id of the sticky session
      * @param cipherSenderKey - encrypted sender key
      */
-    public func initStandardGroupSession(senderId: String, stickId: String, cipherSenderKey: String?) {
+    public func initStandardGroupSession(senderId: String, groupId: String, cipherSenderKey: String?) {
         if (cipherSenderKey != nil) {
             do {
                 let databaseConnection = db!.newConnection()
                 let encryptionManager = try? EncryptionManager(accessGroup: accessGroup!, databaseConnection: databaseConnection)
                 let signalProtocolAddress = SignalAddress(name: senderId, deviceId: 0)
-                let senderKeyName = SenderKeyName(groupId: stickId, address: signalProtocolAddress)
+                let senderKeyName = SenderKeyName(groupId: groupId, address: signalProtocolAddress)
                 let groupSesisonBuilder = GroupSessionBuilder(context: encryptionManager!.signalContext)
                 let senderKey = decryptTextPairwise(senderId: senderId, isStickyKey: false, cipher: cipherSenderKey!)
                 if (senderKey != nil) {

@@ -803,7 +803,7 @@ public class StickProtocol {
      *                  * id - int, id of the key
      *                  * key - encrypted sender key (chainKey || signaturePrivateKey || signaturePublicKey)
      *                  * stickId - String, id of the sticky session
-     *                  * identityKeyId - int, id of the identity key used to encrypt the private signature key
+     *                  * identityKeyId - int, id of the identity key used to encrypt the sender key
      *                  * step - represents the age of the sticky session
      */
     public void reinitMyStickySession(String userId, JSONObject senderKey) throws IOException, InvalidKeyException, NoSessionException, JSONException {
@@ -1309,15 +1309,15 @@ public class StickProtocol {
      * This method is used to create a standard group session from a sender key that was encrypted to the user.
      *
      * @param senderId        - userId of the sender
-     * @param stickId         - id of the sticky session
+     * @param groupId         - id of the group
      * @param cipherSenderKey - encrypted sender key
      */
-    public void initStandardGroupSession(String senderId, String stickId, String cipherSenderKey) {
+    public void initStandardGroupSession(String senderId, String groupId, String cipherSenderKey) {
         try {
             if (cipherSenderKey != null) {
                 SenderKeyStore senderKeyStore = new MySenderKeyStore(context);
                 SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(senderId, 0);
-                SenderKeyName senderKeyName = new SenderKeyName(stickId, signalProtocolAddress);
+                SenderKeyName senderKeyName = new SenderKeyName(groupId, signalProtocolAddress);
                 GroupSessionBuilder groupSessionBuilder = new GroupSessionBuilder(senderKeyStore);
                 String senderKey = decryptTextPairwise(senderId, false, cipherSenderKey);
                 if (senderKey != null) {

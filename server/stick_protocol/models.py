@@ -25,8 +25,8 @@ class IdentityKey(models.Model):
     cipher = models.CharField(max_length=88)
     salt = models.CharField(max_length=44)
     active = models.BooleanField(default=False)
-    timestamp = models.CharField(max_length=100)
-    dt_timestamp = models.DateTimeField(auto_now_add=True)
+    timestamp = models.CharField(max_length=100) # unix timestamp
+    dt_timestamp = models.DateTimeField(auto_now_add=True) # date timestamp
 
     class Meta:
         constraints = [models.UniqueConstraint(fields=['keyId', 'user'], name='unique_identity_key')]
@@ -117,6 +117,9 @@ class DecryptionSenderKey(models.Model):
 
 
 class PendingKey(models.Model):
+    """
+    A pending key object can be created if the sender key of a sticky session has not been uploaded to the server yet.
+    """
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sentPendingKeys')
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='pendingKeys')
     stickId = models.CharField(max_length=100)
