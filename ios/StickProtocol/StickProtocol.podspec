@@ -2,21 +2,18 @@ Pod::Spec.new do |spec|
 
 
   spec.name         = "StickProtocol"
-  spec.version      = "1.1.84"
+  spec.version      = "1.1.86"
   spec.summary      = "End-to-End Encryption Protocol Tailored For Social Network Platforms"
   spec.swift_version = "5.0"
 
   spec.description  = <<-DESC
-                  This is a ratcheting forward secrecy protocol that works in synchronous and asynchronous messaging environments.
-                  https://github.com/WhisperSystems/libsignal-protocol-c
+                  End-to-End Encryption (E2EE) has become a de facto standard in messengers, especially after the development of the secure messaging protocol – Signal. However, the adoption of E2EE has been limited to messengers, and has not yet seen a noticeable trace in social networks, despite the increase in users’ privacy violations. The Stick protocol is an E2EE protocol, based on the Signal protocol, specifically designed for social networks. The Stick Protocol is the first of its kind to support re-establishable encryption sessions in an asynchronous and multi-device setting while preserving forward secrecy and introducing backward secrecy.
                    DESC
 
   spec.homepage     = "https://github.com/STiiiCK/stick-protocol"
 
 
-  spec.license      = { :type => "MIT", :text => "The MIT License (MIT) \n Copyright © Omar Basem
-     <founder@stiiick.com \n Permission is hereby granted, free fo charge, to any person obtaining a copy
-     of this software and associated documentation files"}
+  spec.license      = { :type => "GPLv3", :text => "Copyright © 2018-2021 STiiiCK"}
  
 
   spec.author             = { "Omar Basem" => "founder@stiiick.com" }

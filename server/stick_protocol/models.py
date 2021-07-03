@@ -85,6 +85,7 @@ class EncryptionSenderKey(models.Model):
     step = models.IntegerField(default=0)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='encryptingSenderKeys')
     key = models.CharField(max_length=500)
+    dt_timestamp = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
     class Meta:
         constraints = [models.UniqueConstraint(fields=['partyId', 'chainId', 'user'], name='unique_esk')]
@@ -114,6 +115,7 @@ class DecryptionSenderKey(models.Model):
     forUser = models.ForeignKey(User, on_delete=models.CASCADE, related_name='receivedSenderKeys', null=True)
     ofOneTimeId = models.CharField(max_length=100, blank=True, null=True)
     forOneTimeId = models.CharField(max_length=100, blank=True, null=True)
+    dt_timestamp = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
 
 class PendingKey(models.Model):
@@ -123,6 +125,7 @@ class PendingKey(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sentPendingKeys')
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='pendingKeys')
     stickId = models.CharField(max_length=100)
+    dt_timestamp = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
 
 class Party(models.Model):
@@ -143,16 +146,10 @@ class Party(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True, related_name='parties')
     individual = models.BooleanField(default=False)
     partyHash = models.CharField(max_length=128, blank=True, null=True)
-    timestamp = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    dt_timestamp = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
     def save(self, *args, **kwargs):
         if not self.id:
             self.id = uuid.uuid4()
         super(Party, self).save(*args, **kwargs)
-
-    class Meta:
-        ordering = ['timestamp']
-
-    def __str__(self):
-        return str(self.timestamp)
 
