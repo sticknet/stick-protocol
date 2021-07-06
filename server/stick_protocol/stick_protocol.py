@@ -48,7 +48,7 @@ class StickProtocol():
         user.nextPreKeyId = data['nextPreKeyId']
         user.finishedRegistration = True
         user.save()
-        self.Device.objects.create(user=user, deviceId=data['deviceId'], name=data['deviceName'])
+        self.Device.objects.create(user=user, deviceId=data['deviceId'], name=data['deviceName'], chatId=data['oneTimeId'])
         Party.objects.create(user=user)
         Party.objects.create(user=user, individual=True)
 
@@ -479,7 +479,7 @@ class StickProtocol():
             user.oneTimeId = uuid.uuid4()
             user.save()
             if not self.Device.objects.filter(user=user, deviceId=data['deviceId']).exists():
-                self.Device.objects.create(user=user, deviceId=data['deviceId'], name=data['deviceName'])
+                self.Device.objects.create(user=user, deviceId=data['deviceId'], name=data['deviceName'], chatId=user.oneTimeId)
             return {"bundle": bundle, "verify": True}
         else:
             return {"verify": False}
