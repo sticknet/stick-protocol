@@ -476,10 +476,13 @@ class StickProtocol():
                        'identityKeyId': senderKey.identityKey.keyId, 'preKeyId': senderKey.preKey.keyId}
                 senderKeys.append(key)
             bundle['senderKeys'] = senderKeys
-            user.oneTimeId = uuid.uuid4()
             user.save()
-            if not self.Device.objects.filter(user=user, deviceId=data['deviceId']).exists():
-                self.Device.objects.create(user=user, deviceId=data['deviceId'], name=data['deviceName'], chatId=user.oneTimeId)
+            device = self.Device.objects.filter(user=user, deviceId=data['deviceId']).first()
+            if not device:
+                device = self.Device.objects.create(user=user, deviceId=data['deviceId'], name=data['deviceName'], chatId=uuid.uuid4())
+            else:
+                device.chatId = uuid.uuid4()
+            bundle['oneTimeId'] = device.chatId
             return {"bundle": bundle, "verify": True}
         else:
             return {"verify": False}
