@@ -308,7 +308,7 @@ class StickProtocol():
                 dict[user.id] = {'exists': True}
                 responseDict["step"] = activeSenderKey.step
             else:  # Sticky session has expired, increment chainId by 1
-                chainId = int(activeSenderKey.chainId) + 1
+                chainId = activeSenderKey.chainId + 1
                 dict[user.id] = {'exists': False}
                 if user.id not in membersIds:
                     bundlesToFetch.append(user.id)
@@ -351,14 +351,14 @@ class StickProtocol():
         its current step.
         """
         partyId = data['partyId']
-        senderKeys = EncryptionSenderKey.objects.filter(partyId=partyId, user=currentUser).reverse()
+        senderKeys = EncryptionSenderKey.objects.filter(partyId=partyId, user=currentUser).order_by('-chainId')
         activeSenderKey = senderKeys[0]
         responseDict = {}
         if activeSenderKey.step < self.sessionAge:
             chainId = activeSenderKey.chainId
             responseDict['step'] = activeSenderKey.step
         else:
-            chainId = int(activeSenderKey.chainId) + 1
+            chainId = activeSenderKey.chainId + 1
         responseDict['stickId'] = str(partyId) + str(chainId)
         return responseDict
 

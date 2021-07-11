@@ -81,7 +81,7 @@ class EncryptionSenderKey(models.Model):
     preKey = models.OneToOneField(PreKey, on_delete=models.CASCADE, blank=True, null=True, related_name='esk_pk')
     identityKey = models.ForeignKey(IdentityKey, on_delete=models.CASCADE, related_name='esk_ik')
     partyId = models.CharField(max_length=100)
-    chainId = models.CharField(max_length=10)
+    chainId = models.IntegerField(default=0, blank=True, null=True)
     step = models.IntegerField(default=0)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='encryptingSenderKeys')
     key = models.CharField(max_length=500)
@@ -91,7 +91,7 @@ class EncryptionSenderKey(models.Model):
         constraints = [models.UniqueConstraint(fields=['partyId', 'chainId', 'user'], name='unique_esk')]
 
     def __str__(self):
-        return self.user.username + ': ' + self.partyId + '-' + self.chainId
+        return self.user.username + ': ' + self.partyId + '-' + str(self.chainId)
 
 class DecryptionSenderKey(models.Model):
     """
