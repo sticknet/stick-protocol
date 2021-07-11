@@ -1,6 +1,8 @@
+<h1 align="center">
 <h1 align="center">Stick Protocol</h1>
-
+<a href=""><img src="https://firebasestorage.googleapis.com/v0/b/stiiick-1545628981656.appspot.com/o/StickProtocol.png?alt=media&token=d4c31888-f3b1-4827-9475-e5fa17051f38" alt="p2prc" width="400"></a>
 <p align="center">An End-to-End Encryption Protocol Tailored for Social Network Platforms</p>
+</h1>
 
 
 # Motivation
