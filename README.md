@@ -1,9 +1,8 @@
 <h1 align="center">
-  <a href="" align="center"><img src="https://firebasestorage.googleapis.com/v0/b/stiiick-1545628981656.appspot.com/o/StickProtocol.png?alt=media&token=d4c31888-f3b1-4827-9475-e5fa17051f38" alt="p2prc" width="400"></a>
 <h1 align="center">Stick Protocol</h1>
-
 <p align="center">An End-to-End Encryption Protocol Tailored for Social Network Platforms</p>
-</h1>
+
+[![GPLv3 license](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.html)
 
 
 # Motivation
