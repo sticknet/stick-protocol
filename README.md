@@ -1,6 +1,8 @@
 <h1 align="center">
-<h1 align="center">Stick Protocol</h1>
-<p align="center">An End-to-End Encryption Protocol Tailored for Social Network Platforms</p>
+  Stick Protocol
+  <p align="center">An End-to-End Encryption Protocol Tailored for Social Network Platforms</p>
+
+</h1>
 
 [![GPLv3 license](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.html)
 
