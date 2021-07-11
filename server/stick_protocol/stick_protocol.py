@@ -471,7 +471,7 @@ class StickProtocol():
             bundle['preKeys'] = preKeys
             senderKeys = []
             for senderKey in senderKeysList:
-                stickId = senderKey.partyId + senderKey.chainId
+                stickId = senderKey.partyId + str(senderKey.chainId)
                 key = {'id': senderKey.keyId, 'key': senderKey.key, 'stickId': stickId, 'step': senderKey.step,
                        'identityKeyId': senderKey.identityKey.keyId, 'preKeyId': senderKey.preKey.keyId}
                 senderKeys.append(key)
