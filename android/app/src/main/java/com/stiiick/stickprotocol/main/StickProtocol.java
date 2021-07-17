@@ -164,7 +164,7 @@ public class StickProtocol {
             SignedPreKeyRecord signedPreKey = PreKeyUtil.generateSignedPreKey(context, identityKey, true);
             List<PreKeyRecord> preKeys = PreKeyUtil.generatePreKeys(context, 0, 10);
             JSONArray preKeysArray = new JSONArray();
-            for (int i = 1; i < preKeys.size(); i++) {
+            for (int i = 0; i < preKeys.size(); i++) {
                 JSONObject preKey = new JSONObject();
                 preKey.put("id", preKeys.get(i).getId());
                 preKey.put("public", Base64.encodeBytes(preKeys.get(i).getKeyPair().getPublicKey().serialize()));
@@ -210,25 +210,8 @@ public class StickProtocol {
             map.put("passwordSalt", Base64.encodeBytes(salt));
             map.put("oneTimeId", oneTimeId);
             map.put("localId", localId);
-
             PreferenceManager.getDefaultSharedPreferences(context).edit().putString("oneTimeId", oneTimeId).apply();
             PreferenceManager.getDefaultSharedPreferences(context).edit().putString("userId", userId).apply();
-
-            SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(userId, 0);
-            SessionBuilder sessionBuilder = new SessionBuilder(store, signalProtocolAddress);
-            ECPublicKey preKey = Curve.decodePoint(preKeys.get(0).getKeyPair().getPublicKey().serialize(), 0);
-
-            PreKeyBundle preKeyBundle = new PreKeyBundle(
-                    store.getLocalRegistrationId(),
-                    0,
-                    preKeys.get(0).getId(),
-                    preKey,
-                    signedPreKey.getId(),
-                    signedPreKey.getKeyPair().getPublicKey(),
-                    signedPreKey.getSignature(),
-                    identityKey.getPublicKey()
-            );
-            sessionBuilder.process(preKeyBundle);
             return map;
         } catch (Exception e) {
             e.printStackTrace();
