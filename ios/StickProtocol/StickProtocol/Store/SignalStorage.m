@@ -160,15 +160,6 @@ static int contains_signed_pre_key(uint32_t signed_pre_key_id, void *user_data) 
     return result;
 }
 
-static int remove_signed_pre_key(uint32_t signed_pre_key_id, void *user_data) {
-    id <SignedPreKeyStore> signedPreKeyStore = (__bridge id<SignedPreKeyStore>)(user_data);
-    BOOL result = [signedPreKeyStore removeSignedPreKeyWithId:signed_pre_key_id];
-    if (result) {
-        return 0;
-    } else {
-        return -1;
-    }
-}
 
 #pragma mark signal_protocol_identity_key_store
 
@@ -322,7 +313,6 @@ static int load_sender_key(signal_buffer **record, signal_buffer **user_record, 
     signedPreKeyStoreCallbacks.load_signed_pre_key = load_signed_pre_key;
     signedPreKeyStoreCallbacks.store_signed_pre_key = store_signed_pre_key;
     signedPreKeyStoreCallbacks.contains_signed_pre_key = contains_signed_pre_key;
-    signedPreKeyStoreCallbacks.remove_signed_pre_key = remove_signed_pre_key;
     signedPreKeyStoreCallbacks.destroy_func = destroy_func;
     signedPreKeyStoreCallbacks.user_data = (__bridge void *)(_signedPreKeyStore);
     signal_protocol_store_context_set_signed_pre_key_store(_storeContext, &signedPreKeyStoreCallbacks);

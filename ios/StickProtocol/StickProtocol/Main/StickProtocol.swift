@@ -1110,7 +1110,12 @@ public class SP {
     public func resetDatabase() {
         let databaseConnection = db!.newConnection()
         databaseConnection.readWrite { (transaction) in
-            transaction.removeAllObjectsInAllCollections()
+            transaction.removeAllObjects(inCollection: "SPPreKey")
+            transaction.removeAllObjects(inCollection: "SPSignedPreKey")
+            transaction.removeAllObjects(inCollection: "SPIdentityKey")
+            transaction.removeAllObjects(inCollection: "SPStickyKey")
+            transaction.removeAllObjects(inCollection: "SPSenderKey")
+            transaction.removeAllObjects(inCollection: "SPSignalSession")
         }
         UserDefaults.resetStandardUserDefaults()
     }

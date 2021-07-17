@@ -5,21 +5,14 @@ public protocol StorageManagerDelegate: class {
     func setActiveIdentityKeyPair(keyPair: IdentityKeyPair) -> SPIdentity
 }
 
-/**
- * This class implements the SignalStore. One SPStorageManager should be created per account key/collection.
- */
+
 open class StorageManager: NSObject {
     public let databaseConnection: YapDatabaseConnection
     public let userId: String
     public let accessGroup: String
     open weak var delegate: StorageManagerDelegate?
 
-    /**
-     Create a Store Manager for each account.
-     
-     - parameter databaseConnection: The yap connection to use internally
-     - parameter delegate: An object that handles SPStorageManagerDelegate
-     */
+
     public init(userId: String, accessGroup: String, databaseConnection: YapDatabaseConnection, delegate: StorageManagerDelegate?) {
         self.databaseConnection = databaseConnection
         self.delegate = delegate
@@ -27,13 +20,8 @@ open class StorageManager: NSObject {
         self.accessGroup = accessGroup
     }
 
-    /**
-     Convenience function to create a new SPIdentity and save it to yap
-     
-     - returns: an SPIdentity that is already saved to the database
-     */
+
     public func generateIdentityKeyPair() -> SPIdentity {
-        // Might be a better way to guarantee we have an SPIdentity
         let spIdentity = (self.delegate?.generateIdentityKeyPair())!
         self.databaseConnection.readWrite { (transaction) in
             spIdentity.save(with: transaction)
@@ -62,13 +50,6 @@ open class StorageManager: NSObject {
         return identityKeyPair
     }
 
-    //MARK: Database Utilities
-
-    /**
-     Fetches the SPIdentity for the account key from this class.
-     
-     returns: An SPIdentity or nil if none was created and stored.
-     */
 
     fileprivate func identity() -> SPIdentity? {
         var identityKeyPair: SPIdentity? = nil
@@ -302,13 +283,6 @@ extension StorageManager: SignalStore {
         } else {
             return false
         }
-    }
-
-    public func removeSignedPreKey(withId signedPreKeyId: UInt32) -> Bool {
-//        self.databaseConnection.readWrite { (transaction) in
-//            transaction.removeObject(inCollection: SPSignedPreKey.collection)
-//        }
-        return true
     }
 
     //MARK: IdentityKeyStore

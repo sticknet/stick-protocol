@@ -81,7 +81,7 @@ class EncryptionSenderKey(models.Model):
     preKey = models.OneToOneField(PreKey, on_delete=models.CASCADE, blank=True, null=True, related_name='esk_pk')
     identityKey = models.ForeignKey(IdentityKey, on_delete=models.CASCADE, related_name='esk_ik')
     partyId = models.CharField(max_length=100)
-    chainId = models.IntegerField(default=0, blank=True, null=True)
+    chainId = models.IntegerField(default=0)
     step = models.IntegerField(default=0)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='encryptingSenderKeys')
     key = models.CharField(max_length=500)

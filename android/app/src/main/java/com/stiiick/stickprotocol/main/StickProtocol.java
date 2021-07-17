@@ -1351,6 +1351,7 @@ public class StickProtocol {
      */
     public void resetDatabase() {
         DatabaseFactory.getInstance(context).resetDatabase(context);
+        Preferences.resetPreferences(context);
     }
 
     /**

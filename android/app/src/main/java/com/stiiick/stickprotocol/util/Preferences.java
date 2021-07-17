@@ -137,4 +137,17 @@ public class Preferences {
         setLongPrefrence(context, ACTIVE_IDENTITY_KEY_TIMESTAMP, value);;
     }
 
+    public static void resetPreferences(Context context) {
+        PreferenceManager.getDefaultSharedPreferences(context).edit().putInt(NEXT_IDENTITY_KEY_ID, 0).apply();
+        PreferenceManager.getDefaultSharedPreferences(context).edit().putInt(NEXT_SIGNED_PRE_KEY_ID, 0).apply();
+        PreferenceManager.getDefaultSharedPreferences(context).edit().putInt(NEXT_PRE_KEY_ID, 0).apply();
+        PreferenceManager.getDefaultSharedPreferences(context).edit().putInt(ACTIVE_IDENTITY_KEY_ID, 0).apply();
+        PreferenceManager.getDefaultSharedPreferences(context).edit().putInt(ACTIVE_SIGNED_PRE_KEY_ID, 0).apply();
+        PreferenceManager.getDefaultSharedPreferences(context).edit().putInt(ACTIVE_IDENTITY_KEY_TIMESTAMP, 0).apply();
+        PreferenceManager.getDefaultSharedPreferences(context).edit().putInt(ACTIVE_SIGNED_PRE_KEY_TIMESTAMP, 0).apply();
+        PreferenceManager.getDefaultSharedPreferences(context).edit().putInt(LOCAL_REGISTRATION_ID_PREF, 0).apply();
+        PreferenceManager.getDefaultSharedPreferences(context).edit().putString("userId", "").apply();
+        PreferenceManager.getDefaultSharedPreferences(context).edit().putString("oneTimeId", "").apply();
+    }
+
 }

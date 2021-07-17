@@ -55,6 +55,7 @@ public class PreKeyUtil {
             signedPreKeyStore.storeSignedPreKey(signedPreKeyId, record);
             Preferences.setNextSignedPreKeyId(context, signedPreKeyId + 1);
 
+
             if (active) {
                 Preferences.setActiveSignedPreKeyId(context, signedPreKeyId);
                 Preferences.setActiveSignedPreKeyTimestamp(context, System.currentTimeMillis());

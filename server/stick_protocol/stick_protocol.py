@@ -488,6 +488,9 @@ class StickProtocol():
             return {"verify": False}
 
     def process_reencrypted_keys(self, data, user):
+        """
+        A method to process reencrypted keys for when changing the user's password
+        """
         success = False
         if user.check_password(data['currentPass']):
             for key in data['preKeys']:

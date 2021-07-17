@@ -28,10 +28,6 @@ NS_ASSUME_NONNULL_BEGIN
  */
 - (BOOL) containsSignedPreKeyWithId:(uint32_t)signedPreKeyId;
 
-/**
- * Delete a SignedPreKeyRecord from local storage.
- */
-- (BOOL) removeSignedPreKeyWithId:(uint32_t)signedPreKeyId;
 
 @end
 NS_ASSUME_NONNULL_END
