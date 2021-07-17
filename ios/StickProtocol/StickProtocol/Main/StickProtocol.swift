@@ -84,7 +84,7 @@ public class SP {
                 progressEvent!(["progress": counter, "total": preKeys!.count])
             } 
         }
-
+        
         var signedMap = [String: Any]()
         signedMap["id"] = signedPreKey?.preKeyId
         signedMap["public"] = signedPreKey?.keyPair?.publicKey.base64EncodedString()
@@ -93,8 +93,6 @@ public class SP {
         signedMap["cipher"] = signedCipherMap["cipher"]!
         signedMap["salt"] = signedCipherMap["salt"]!
         signedMap["timestamp"] = signedPreKey?.unixTimestamp
-
-
         var identityMap = [String: Any]()
         identityMap["id"] = UserDefaults(suiteName: self.accessGroup!)!.integer(forKey: "activeIdentityKeyId")
         identityMap["public"] = identityKey!.publicKey.base64EncodedString()
@@ -102,7 +100,7 @@ public class SP {
         identityMap["cipher"] = identityCipherMap["cipher"]!
         identityMap["salt"] = identityCipherMap["salt"]!
         identityMap["timestamp"] = UserDefaults(suiteName: self.accessGroup!)!.integer(forKey: "activeIdentityKeyTimestamp")
-
+        
         let oneTimeId = UUID().uuidString.lowercased()
         var map = [String: Any]()
         map["identityKey"] = identityMap
@@ -112,16 +110,6 @@ public class SP {
         map["localId"] = localId
         map["passwordHash"] = passwordHash.base64EncodedString()
         map["passwordSalt"] = passwordSalt?.base64EncodedString()
-
-        let signalProtocolAddress = SignalAddress(name: userId, deviceId: 0)
-        do {
-            let sessionBuilder = SessionBuilder(address: signalProtocolAddress, context: encryptionManager!.signalContext)
-            var preKeyBundle: PreKeyBundle?
-            preKeyBundle = try PreKeyBundle(registrationId: encryptionManager!.registrationId, deviceId: 0, preKeyId: Int32(preKeys![0].preKeyId), preKeyPublic: preKeys![0].keyPair!.publicKey, signedPreKeyId: signedPreKey!.preKeyId, signedPreKeyPublic: (signedPreKey?.keyPair!.publicKey)!, signature: signedPreKey!.signature, identityKey: identityKey!.publicKey)
-            try sessionBuilder.processPreKeyBundle(preKeyBundle!)
-        } catch {
-            print("Error info bundle: \(error)")
-        }
         return map
     }
     

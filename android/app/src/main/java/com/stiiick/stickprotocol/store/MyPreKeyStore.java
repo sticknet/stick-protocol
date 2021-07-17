@@ -90,9 +90,7 @@ public class MyPreKeyStore implements PreKeyStore, SignedPreKeyStore {
     }
 
     @Override
-    public void removePreKey(int preKeyId) {
-        DatabaseFactory.getPreKeyDatabase(context).removePreKey(preKeyId);
-    }
+    public void removePreKey(int preKeyId) {}
 
     @Override
     public void removeSignedPreKey(int signedPreKeyId) {
