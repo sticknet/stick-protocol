@@ -40,7 +40,7 @@ dependencies {
     implementation 'com.google.android.material:material:1.2.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
 
-    api 'com.github.STiiiCK:sticky-signal-protocol-java:2.8.7'
+    api 'com.github.STiiiCK:sticky-signal-protocol-java:2.8.9'
     api 'org.signal:argon2:13.1@aar'
     api 'net.zetetic:android-database-sqlcipher:4.3.0'
     implementation 'com.stiiick:encoding:1.0.1'
