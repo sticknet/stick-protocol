@@ -220,17 +220,7 @@ extension StorageManager: SignalStore {
 
     /// Returns true if deleted, false if not found
     public func deletePreKey(withId preKeyId: UInt32) -> Bool {
-        var result = false
-        self.databaseConnection.readWrite { (transaction) in
-            let yapKey = SPPreKey.uniqueKey(forKeyId: preKeyId)
-            if let preKey = SPPreKey.fetchObject(withUniqueID: yapKey, transaction: transaction) {
-                preKey.keyData = nil
-                preKey.save(with: transaction)
-                result = true
-            }
-
-        }
-        return result
+        return true
     }
     
     public func loadIdentityKey(withId identityKeyId: UInt32) -> IdentityKeyPair? {

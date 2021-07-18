@@ -134,7 +134,7 @@ export default class StickProtocolHandlers {
      * from the server, and if it succeeds it will initialize the sticky session. This method returns a boolean indicating
      * whether the decryption process can proceed or not.
      */
-    async canDecrypt(entityId, stickId, memberId, dispatch = null, fetchingSenderKeys) {
+    async canDecrypt(entityId, stickId, memberId, fetchingSenderKeys, successCallback, pendingCallback) {
         let canDecrypt = true
         let data = {partyExists: true}
         const sessionExists = await this.StickProtocol.sessionExists(memberId, stickId) // Check if the sticky session exists
@@ -144,10 +144,7 @@ export default class StickProtocolHandlers {
             }
             // try to fetch the sender key from the server
             if (!this.httpConfig.headers.Authorization) {
-                if (dispatch) { // dispatch is a function to update the app's state
-                    await dispatch({type: 'PENDING_SESSION', payload: stickId})
-                    await dispatch({type: 'DOWNLOADED', payload: entityId});
-                }
+                pendingCallback()
                 data.canDecrypt = false
                 return data
             }
@@ -161,11 +158,8 @@ export default class StickProtocolHandlers {
                 }
                 const senderKey = data.senderKey;
                 if (!senderKey) { // If there is no sender key yet, mark the session as pending
+                    pendingCallback()
                     canDecrypt = false
-                    if (dispatch) {
-                        await dispatch({type: 'PENDING_SESSION', payload: stickId})
-                        await dispatch({type: 'DOWNLOADED', payload: entityId});
-                    }
                 } else { // otherwise initialize the session
                     fetchingSenderKeys[stickId + memberId] = false
                     if (memberId !== this.userId)
@@ -174,13 +168,15 @@ export default class StickProtocolHandlers {
                         senderKey.stickId = stickId
                         await this.StickProtocol.reinitMyStickySession(this.userId, senderKey)
                     }
-                    if (dispatch)
-                        await dispatch({type: 'PENDING_SESSION_DONE', payload: stickId})
+                    successCallback()
                 }
+            } else {
+                pendingCallback()
+                data.canDecrypt = false
+                return data
             }
         } else { // If the sticky session exists, mark the session as not pending
-            if (dispatch)
-                await dispatch({type: 'PENDING_SESSION_DONE', payload: stickId})
+            successCallback()
         }
         data.canDecrypt = canDecrypt
         return data; // return whether can decrypt (sticky session has been initialized) or not

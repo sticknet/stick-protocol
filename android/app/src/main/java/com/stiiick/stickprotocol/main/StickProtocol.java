@@ -435,7 +435,7 @@ public class StickProtocol {
         void execute(JSONObject event);
     }
 
-    /****************************** END OF INITIALIZATION METHODS ******************************/
+    /****************************** END OF INITIALIZATION METHODS *******************************/
 
     /************* START OF PAIRWISE SESSION METHODS REQUIRED BY STICKY SESSIONS *****************/
 

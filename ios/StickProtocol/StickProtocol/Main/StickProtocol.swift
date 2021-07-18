@@ -70,15 +70,13 @@ public class SP {
         var preKeysArray = [[String: Any]]()
         var counter = 0;
         for preKey in preKeys! {
-            if (counter > 0) {
-                var map = [String: Any]()
-                map["id"] = preKey.preKeyId
-                map["public"] = preKey.keyPair?.publicKey.base64EncodedString()
-                let cipherMap = pbEncrypt(text: preKey.keyPair!.privateKey, pass: password)
-                map["cipher"] = cipherMap["cipher"]!
-                map["salt"] = cipherMap["salt"]!
-                preKeysArray.append(map)
-            }
+            var map = [String: Any]()
+            map["id"] = preKey.preKeyId
+            map["public"] = preKey.keyPair?.publicKey.base64EncodedString()
+            let cipherMap = pbEncrypt(text: preKey.keyPair!.privateKey, pass: password)
+            map["cipher"] = cipherMap["cipher"]!
+            map["salt"] = cipherMap["salt"]!
+            preKeysArray.append(map)
             counter += 1;
             if (progressEvent != nil) {
                 progressEvent!(["progress": counter, "total": preKeys!.count])

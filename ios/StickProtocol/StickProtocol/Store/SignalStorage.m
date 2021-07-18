@@ -121,13 +121,7 @@ static int contains_pre_key(uint32_t pre_key_id, void *user_data) {
 }
 
 static int remove_pre_key(uint32_t pre_key_id, void *user_data) {
-    id <PreKeyStore> preKeyStore = (__bridge id<PreKeyStore>)(user_data);
-    BOOL success = [preKeyStore deletePreKeyWithId:pre_key_id];
-    if (success) {
-        return 0;
-    } else {
-        return -1;
-    }
+    return 0;
 }
 
 #pragma mark signal_protocol_signed_pre_key_store

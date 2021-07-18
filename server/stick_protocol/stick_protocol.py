@@ -18,11 +18,11 @@ from django.utils.dateformat import format
 
 class StickProtocol():
 
-    def __init__(self, UserModel, DeviceModel, GroupModel, sessionAge):
+    def __init__(self, UserModel, DeviceModel, GroupModel, sessionLifecycle):
         self.User = UserModel
         self.Device = DeviceModel
         self.Group = GroupModel
-        self.sessionAge = sessionAge
+        self.sessionLifecycle = sessionLifecycle
 
     def process_pre_key_bundle(self, data, user):
         """
@@ -103,7 +103,7 @@ class StickProtocol():
         """
         bundles = {}
         # Make sure the current user is the first in the list. When creating DecryptionSenderKeys client-side to share
-        # with other members, their must already be a corresponding EncryptionSenderKey.
+        # with other members - there must already be a corresponding EncryptionSenderKey.
         if currentUser.id in users_id:
             users_id.remove(currentUser.id)
             users_id.insert(0, currentUser.id)
@@ -264,7 +264,7 @@ class StickProtocol():
                 ids = ''.join(groups_ids + connections_ids)
                 h = hashlib.sha256()
                 h.update(ids.encode())
-                partyHash = h.hexdigest()
+                partyHash = h.hexdigest() # partyHash is used for faster DB querying
                 party = Party.objects.filter(partyHash=partyHash).first()
                 if party == None:  # Create a new Party object if does not exist
                     party = Party.objects.create(partyHash=partyHash)
@@ -303,7 +303,7 @@ class StickProtocol():
             activeSenderKey = senderKeys[0]
             if not isSticky:  # A standard session is valid
                 dict[user.id] = {'exists': True}
-            elif activeSenderKey.step < self.sessionAge:  # Check whether is sticky session has not expired
+            elif activeSenderKey.step < self.sessionLifecycle:  # Check whether is sticky session has not expired
                 chainId = activeSenderKey.chainId
                 dict[user.id] = {'exists': True}
                 responseDict["step"] = activeSenderKey.step
@@ -354,7 +354,7 @@ class StickProtocol():
         senderKeys = EncryptionSenderKey.objects.filter(partyId=partyId, user=currentUser).order_by('-chainId')
         activeSenderKey = senderKeys[0]
         responseDict = {}
-        if activeSenderKey.step < self.sessionAge:
+        if activeSenderKey.step < self.sessionLifecycle:
             chainId = activeSenderKey.chainId
             responseDict['step'] = activeSenderKey.step
         else:
