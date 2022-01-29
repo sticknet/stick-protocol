@@ -71,6 +71,6 @@ npm install stick-protocol-handlers
 
 # License
 
-Copyright © 2018-2021 <a href="https://www.stiiick.com">STiiiCK</a>
+Copyright © 2018-2022 <a href="https://www.stiiick.com">STiiiCK</a>
 
 Licensed under the GPLv3: http://www.gnu.org/licenses/gpl-3.0.html
