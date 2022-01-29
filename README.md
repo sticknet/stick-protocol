@@ -47,7 +47,7 @@ The <a href="https://github.com/STiiiCK/stick-protocol/blob/main/android/app/src
 
 CocoaPods:
 ```
-pod 'StickProtocol', '1.2.1'
+pod 'StickProtocol', '1.2.2'
 ```
 The <a href="https://github.com/STiiiCK/stick-protocol/blob/main/ios/StickProtocol/StickProtocol/Main/StickProtocol.swift">main StickProtocol Swift class file</a> has usage documentation as well. It includes all the methods that you would need.
 
