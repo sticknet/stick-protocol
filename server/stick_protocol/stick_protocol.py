@@ -285,8 +285,10 @@ class StickProtocol():
             membersIds = [user.id]
             if not (len(groups_ids) == 1 and len(connections_ids) == 0):
                 party = Party.objects.get(id=data['partyId'])
-                if party.user and party.user.id != user.id:
-                    membersIds.append(party.user.id)
+                if party.user:
+                    membersIds += party.user.get_connectionsIds()
+                    if party.user.id != user.id:
+                        membersIds.append(party.user.id)
             partyId = data['partyId']
         else:  # Sharing to the currentUser's party (currentUsers' profile)
             membersIds = connections_ids
