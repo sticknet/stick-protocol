@@ -8,15 +8,15 @@
 
 End-to-end encryption has become a de facto standard in messengers, especially after the outbreak of the highly secure messaging protocol – Signal. However, this high adoption of secure end-to-end communications has been limited to messengers, and has not yet seen a noticeable trace in social network platforms, despite the increase in users’ privacy violations. The Stick protocol is an end-to-end encryption protocol, based on the Signal protocol, specifically designed for social networks. The Stick protocol supports re-establishable "many-to-many" encryption sessions in an asynchronous and multi-device setting while preserving forward secrecy and introducing backward secrecy. Evaluation 📈 <a target="_blank" href="https://omarbasem.com/pages/stickProtocolEvaluation.html">results</a> of the Stick protocol shows that it causes no noticeable compromise on usability or performance.A 📄 <a href="https://omarbasem.com/PDFs/StickProtocolPaper.pdf">Scientific Paper</a> is available for those interested in the project’s technical and research motivations. You can also checkout this <a href="https://www.youtube.com/watch?v=drNPWNQG1qA">🎥 demonstration video</a>.
 
-Stick is the protocol used in <a href="https://www.stiiick.com">STiiiCK</a> - an end-to-end encrypted social network platform.
+Stick is the protocol used in <a href="https://www.stickapp.net">Stick</a> - an end-to-end encrypted social network platform.
 
 # Technical Documentation
 
-<a href="https://www.stiiick.com/StickProtocol">Click here<a/> for technical documentation of the Stick protocol.
+<a href="https://www.stickapp.net/StickProtocol">Click here<a/> for technical documentation of the Stick protocol.
 
 # Usage Documentation
 
-<a href="https://www.stiiick.com/StickProtocol/usage-documentation">Click here<a/> for usage documentation of the Stick protocol.
+<a href="https://www.stickapp.net/StickProtocol/usage-documentation">Click here<a/> for usage documentation of the Stick protocol.
 
 # Installation
 
@@ -36,11 +36,11 @@ common handler methods needed for the Stick protocol client-side.
 Gradle:
 ```gradle
 dependencies {
-  implementation 'com.github.STiiiCK:stick-protocol:1.2.1'
+  implementation 'com.github.stickapp:stick-protocol:1.2.1'
 }
 ```
 
-The <a href="https://github.com/STiiiCK/stick-protocol/blob/main/android/app/src/main/java/com/stiiick/stickprotocol/main/StickProtocol.java">main StickProtocol java class file</a> has usage documentation as well. It includes all the methods that you would need.
+The <a href="https://github.com/stickapp/stick-protocol/blob/main/android/app/src/main/java/com/stiiick/stickprotocol/main/StickProtocol.java">main StickProtocol java class file</a> has usage documentation as well. It includes all the methods that you would need.
 
 
 ## iOS
@@ -49,11 +49,11 @@ CocoaPods:
 ```
 pod 'StickProtocol', '1.2.2'
 ```
-The <a href="https://github.com/STiiiCK/stick-protocol/blob/main/ios/StickProtocol/StickProtocol/Main/StickProtocol.swift">main StickProtocol Swift class file</a> has usage documentation as well. It includes all the methods that you would need.
+The <a href="https://github.com/stickapp/stick-protocol/blob/main/ios/StickProtocol/StickProtocol/Main/StickProtocol.swift">main StickProtocol Swift class file</a> has usage documentation as well. It includes all the methods that you would need.
 
 ## Server
 
-This is a server library for the Stick protocol in Python for Django. If you have a Django server you can use this library. If not, you can easily implement your own. The <a href="https://github.com/STiiiCK/stick-protocol/blob/main/server/stick_protocol/stick_protocol.py">main StickProtocol python class<a/> includes full usage documentation needed on the server.
+This is a server library for the Stick protocol in Python for Django. If you have a Django server you can use this library. If not, you can easily implement your own. The <a href="https://github.com/stickapp/stick-protocol/blob/main/server/stick_protocol/stick_protocol.py">main StickProtocol python class<a/> includes full usage documentation needed on the server.
   
 ```
 pip3 install stick-protocol-server
@@ -63,7 +63,7 @@ pip3 install stick-protocol-server
 
 The Stick protocol implementation features a client handlers library in JavaScript. It contains
 common handler methods needed for the Stick protocol client-side. These handlers may differ
-from one application to another. A developer is free to write their own handlers.  They can be implemented in any programming language. The <a href="https://github.com/STiiiCK/stick-protocol/blob/main/client-handlers/StickProtocolHandlers.js">main javascript class</a> contains full usage documentation.
+from one application to another. A developer is free to write their own handlers.  They can be implemented in any programming language. The <a href="https://github.com/stickapp/stick-protocol/blob/main/client-handlers/StickProtocolHandlers.js">main javascript class</a> contains full usage documentation.
 
 ```
 npm install stick-protocol-handlers
@@ -71,6 +71,6 @@ npm install stick-protocol-handlers
 
 # License
 
-Copyright © 2018-2022 <a href="https://www.stiiick.com">STiiiCK</a>
+Copyright © 2018-2022 <a href="https://www.stickapp.net">Stick</a>
 
 Licensed under the GPLv3: http://www.gnu.org/licenses/gpl-3.0.html

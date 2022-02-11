@@ -13,7 +13,7 @@ Pod::Spec.new do |spec|
   spec.homepage     = "https://github.com/STiiiCK/stick-protocol"
 
 
-  spec.license      = { :type => "GPLv3", :text => "Copyright © 2018-2021 STiiiCK"}
+  spec.license      = { :type => "GPLv3", :text => "Copyright © 2018-2022 Stick"}
  
 
   spec.author             = { "Omar Basem" => "founder@stiiick.com" }

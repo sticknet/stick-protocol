@@ -3,7 +3,7 @@
 //  STiiiCK
 //
 //  Created by Omar Basem on 09/08/2020.
-//  Copyright © 2018-2021 STiiiCK. All rights reserved.
+//  Copyright © 2018-2022 Stick. All rights reserved.
 //
 
 
