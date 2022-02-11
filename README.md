@@ -36,7 +36,7 @@ common handler methods needed for the Stick protocol client-side.
 Gradle:
 ```gradle
 dependencies {
-  implementation 'com.github.stickapp:stick-protocol:1.2.1'
+  implementation 'com.github.stickapp:stick-protocol:1.2.2'
 }
 ```
 
