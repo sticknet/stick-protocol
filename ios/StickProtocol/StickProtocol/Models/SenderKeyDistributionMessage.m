@@ -3,7 +3,7 @@
 //  STiiiCK
 //
 //  Created by Omar Basem on 11/08/2020.
-//  Copyright © 2018-2022 Stick. All rights reserved.
+//  Copyright © 2018-2022 StickNet. All rights reserved.
 //
 
 #import "SenderKeyDistributionMessage_Internal.h"
