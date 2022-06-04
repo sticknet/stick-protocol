@@ -12,7 +12,7 @@ violations. The Stick protocol is an end-to-end encryption protocol, based on th
 for social networks. The Stick protocol supports re-establishable "many-to-many" encryption sessions in an asynchronous
 and multi-device setting while preserving forward secrecy and introducing backward secrecy. Performance evaluation of
 the Stick protocol shows that it causes no noticeable compromise on usability or performance. The Stick protocol's
-scientific foundation is 📄 <a href="PDFs/StickProtocolPaper.pdf">published in IEEE</a> for those interested in the
+scientific foundation is 📄 <a href="https://omarbasem.com/PDFs/StickProtocolPaper.pdf">published in IEEE</a> for those interested in the
 project’s technical and research motivations.
 
 Stick is the protocol used in <a href="https://www.sticknet.org">StickNet</a> - an end-to-end encrypted social network
