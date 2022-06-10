@@ -63,7 +63,7 @@ main StickProtocol java class file</a> has usage documentation as well. It inclu
 CocoaPods:
 
 ```
-pod 'StickProtocol', '1.2.2'
+pod 'StickProtocol', '1.2.3'
 ```
 
 The <a href="https://github.com/sticknet/stick-protocol/blob/main/ios/StickProtocol/StickProtocol/Main/StickProtocol.swift">
