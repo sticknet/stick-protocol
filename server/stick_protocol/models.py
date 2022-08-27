@@ -117,6 +117,12 @@ class DecryptionSenderKey(models.Model):
     forOneTimeId = models.CharField(max_length=100, blank=True, null=True)
     dt_timestamp = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
+    def __str__(self):
+        if self.ofOneTimeId == None:
+            return self.ofUser.username + ' : ' + self.forUser.username + ' : ' + self.stickId
+        else:
+            return self.ofOneTimeId + ' : ' + self.forOneTimeId + ' : ' + self.stickId
+
 
 class PendingKey(models.Model):
     """

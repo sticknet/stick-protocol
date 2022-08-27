@@ -247,7 +247,6 @@ class StickProtocol():
         isProfile = False
         if 'isProfile' in data:
             isProfile = data['isProfile']
-        membersIds = []
         if not isProfile and 'partyId' not in data:
             if len(groups_ids) == 1 and len(connections_ids) == 0:  # Sharing with a single group
                 if isSticky:  # Using sticky session
@@ -270,25 +269,18 @@ class StickProtocol():
                     party = Party.objects.create(partyHash=partyHash)
                     party.groups.set(groups_ids)
                     party.connections.set(connections_ids)
-                for group_id in groups_ids:
-                    group = self.Group.objects.get(id=group_id)
-                    for memberId in group.get_members_ids():
-                        if not memberId in membersIds:
-                            membersIds.append(memberId)
-                for connection_id in connections_ids:
-                    if not connection_id in membersIds:
-                        membersIds.append(connection_id)
-                if user.id not in membersIds:
-                    membersIds.append(user.id)
+                membersIds = self.__create_targets(user, groups_ids, connections_ids)
                 partyId = party.id
         elif 'partyId' in data:
             membersIds = [user.id]
-            if not (len(groups_ids) == 1 and len(connections_ids) == 0):
+            if data['type'] != 'group':
                 party = Party.objects.get(id=data['partyId'])
                 if party.user:
                     membersIds += party.user.get_connectionsIds()
                     if party.user.id != user.id:
                         membersIds.append(party.user.id)
+                elif data['type'] != 'individual':
+                    membersIds = self.__create_targets(user, groups_ids, connections_ids)
             partyId = data['partyId']
         else:  # Sharing to the currentUser's party (currentUsers' profile)
             membersIds = connections_ids
@@ -346,6 +338,20 @@ class StickProtocol():
             bundlesToFetch.insert(0, user.id)
         responseDict["bundlesToFetch"] = bundlesToFetch
         return responseDict
+
+    def __create_targets(self, user, groups_ids, connections_ids):
+        membersIds = []
+        for group_id in groups_ids:
+            group = self.Group.objects.get(id=group_id)
+            for memberId in group.get_members_ids():
+                if not memberId in membersIds:
+                    membersIds.append(memberId)
+        for connection_id in connections_ids:
+            if not connection_id in membersIds:
+                membersIds.append(connection_id)
+        if user.id not in membersIds:
+            membersIds.append(user.id)
+        return membersIds
 
     def get_active_stick_id(self, data, currentUser):
         """
