@@ -5,8 +5,6 @@
  *  LICENSE file in the root directory of this source tree.
  */
 
-import axios from "axios";
-
 /**
  *  This class contains common handler methods needed for the StickProtocol client-side. These handlers may differ
  *  from one application to another. So, you are free to write your own handlers. These handlers can be implemented
@@ -20,6 +18,7 @@ export default class StickProtocolHandlers {
 
     constructor(StickProtocol, data) {
         this.StickProtocol = StickProtocol
+        this.axios = data.axios
         this.userId = data.userId
         this.userOneTimeId = data.userOneTimeId
         this.URL = data.URL
@@ -41,32 +40,32 @@ export default class StickProtocolHandlers {
      */
     async getStickId(groups, connections, isProfile, type, providedPartyId = null) {
         const userId = this.userId
-        let groups_ids = [], connections_ids = [];
+        let groupsIds = [], connectionsIds = [];
 
         if (type === 'multi') { // encrypting to multiple groups and/or users
             if (!isProfile) {
                 for (let i = 0; i < groups.length; i++) {
-                    groups_ids.push(groups[i].id || groups[i])
+                    groupsIds.push(groups[i].id || groups[i])
                 }
                 for (let i = 0; i < connections.length; i++) {
-                    connections_ids.push(connections[i].id || connections[i])
+                    connectionsIds.push(connections[i].id || connections[i])
                 }
             } else { // encrypting to all of a user's connections
-                connections_ids = connections
-                connections_ids.push(userId)
+                connectionsIds = connections
+                connectionsIds.push(userId)
             }
         } else if (type === 'group') { // encrypting to a single group
-            groups_ids = [groups[0].id || groups[0]]
+            groupsIds = [groups[0].id || groups[0]]
         } else if (type === 'individual') // encrypting to self (currentUser) only
-            connections_ids = [userId]
+            connectionsIds = [userId]
 
-        connections_ids = connections_ids.filter(id => id !== null) // make sure no id is null
+        connectionsIds = connectionsIds.filter(id => id !== null) // make sure no id is null
 
         // make a request to the server to get the stickId, and which users does not yet have the sender keys
         // corresponding to that stickId
         let body = {
-            groups_ids,
-            connections_ids,
+            groupsIds,
+            connectionsIds,
             isSticky: true,
             isProfile,
             type
@@ -74,19 +73,19 @@ export default class StickProtocolHandlers {
         if (providedPartyId)
             body.partyId = providedPartyId
         let partyId, stickId;
-        const res = await axios.post(`${this.URL}/api/fetch-uploaded-sks/`, body, this.httpConfig)
+        const res = await this.axios.post(`${this.URL}/api/fetch-uploaded-sks/`, body, this.httpConfig)
         stickId = res.data.stickId
         partyId = res.data.partyId
-        let users_id = res.data.bundlesToFetch
-        if (users_id.length > 0) {
+        let usersId = res.data.bundlesToFetch
+        if (usersId.length > 0) {
             // upload sender keys to users that do not have them yet
-            await this.uploadSenderKeys(stickId, users_id)
+            await this.uploadSenderKeys(stickId, usersId)
         }
 
         // Update the chain step of the corresponding sticky session if needed
         await this.syncChain(res.data.step, stickId)
 
-        return {partyId, stickId, groups_ids, connections_ids}
+        return {partyId, stickId, groupsIds, connectionsIds}
     }
 
     /**
@@ -95,19 +94,19 @@ export default class StickProtocolHandlers {
      * user's own EncryptionSenderKey for a sticky session.
      *
      */
-    async uploadSenderKeys(stickId, users_id = null, group_id = null) {
+    async uploadSenderKeys(stickId, usersId = null, groupId = null) {
         // Fetch preKey bundles of users to create new pairwise sessions and encrypt to them the sender keys
 
-        // you can either provide a list of users_id, or a group_id which will correspond to all the members of that group
-        const data = users_id ? {users_id} : {group_id};
-        const bundlesRes = await axios.post(`${this.URL}/api/fetch-pkbs/`, data, this.httpConfig)
+        // you can either provide a list of usersId, or a groupId which will correspond to all the members of that group
+        const data = usersId ? {usersId} : {groupId};
+        const bundlesRes = await this.axios.post(`${this.URL}/api/fetch-pkbs/`, data, this.httpConfig)
         const {bundles} = bundlesRes.data
-        users_id = bundlesRes.data.users_id
+        usersId = bundlesRes.data.usersId
         const keys = {};
 
         // loop over the users list returned from the server and encrypt to each of them the sender key
-        for (let i = 0; i < users_id.length; i++) {
-            const memberId = users_id[i];
+        for (let i = 0; i < usersId.length; i++) {
+            const memberId = usersId[i];
             await this.StickProtocol.initPairwiseSession(bundles[memberId])
             const preKeyId = bundles[memberId].preKeyId
             const identityKeyId = bundles[memberId].identityKeyId
@@ -124,7 +123,7 @@ export default class StickProtocolHandlers {
         }
 
         // Upload the sender keys to the server
-        await axios.post(`${this.URL}/api/upload-sks/`, {keys, users_id}, this.httpConfig)
+        await this.axios.post(`${this.URL}/api/upload-sks/`, {keys, usersId}, this.httpConfig)
     }
 
 
@@ -150,7 +149,7 @@ export default class StickProtocolHandlers {
             }
             if (!fetchingSenderKeys[stickId + memberId]) {
                 fetchingSenderKeys[stickId + memberId] = true // mark senderKey as being fetched to avoid multiple requests
-                const response = await axios.post(`${this.URL}/api/fetch-sk/`, body, this.httpConfig)
+                const response = await this.axios.post(`${this.URL}/api/fetch-sk/`, body, this.httpConfig)
                 data = {...data, ...response.data}
                 if (!data.partyExists) {
                     data.canDecrypt = false
@@ -189,7 +188,7 @@ export default class StickProtocolHandlers {
     async checkPairwiseSession(userId, oneTimeId) {
         const exists = await this.StickProtocol.pairwiseSessionExists(oneTimeId)
         if (!exists) {
-            const {data: pkb} = await axios.get(`${this.URL}/api/fetch-pkb/?id=${userId}&isSticky=false`, this.httpConfig)
+            const {data: pkb} = await this.axios.get(`${this.URL}/api/fetch-pkb/?id=${userId}&isSticky=false`, this.httpConfig)
             pkb.userId = oneTimeId
             await this.StickProtocol.initPairwiseSession(pkb)
         }
@@ -203,7 +202,7 @@ export default class StickProtocolHandlers {
      */
     async refillPreKeys(nextPreKeyId, count) {
         const preKeys = await this.StickProtocol.generatePreKeys(nextPreKeyId, count)
-        await axios.post(`${this.URL}/api/upload-pre-keys/`, {
+        await this.axios.post(`${this.URL}/api/upload-pre-keys/`, {
             preKeys,
             nextPreKeyId: nextPreKeyId + count
         }, this.httpConfig)
@@ -220,7 +219,7 @@ export default class StickProtocolHandlers {
      */
     async uploadPendingKey(memberId, stickId) {
         // Fetch preKeyBundle to create a new pairwise session to encrypt the sender key
-        const {data: pkb} = await axios.get(`${this.URL}/api/fetch-pkb/?id=${memberId}`, this.httpConfig)
+        const {data: pkb} = await this.axios.get(`${this.URL}/api/fetch-pkb/?id=${memberId}`, this.httpConfig)
         // Init the session
         await this.StickProtocol.initPairwiseSession(pkb)
         const {preKeyId, identityKeyId} = pkb
@@ -228,7 +227,7 @@ export default class StickProtocolHandlers {
             // Get the sender key and upload it
             const key = await this.StickProtocol.getSenderKey(this.userId, memberId, stickId, true);
             const body = {preKeyId, identityKeyId, key, stickId, forUser: memberId}
-            await axios.post(`${this.URL}/api/upload-sk/`, body, this.httpConfig)
+            await this.axios.post(`${this.URL}/api/upload-sk/`, body, this.httpConfig)
         }
     }
 
@@ -254,7 +253,7 @@ export default class StickProtocolHandlers {
      * chain step.
      */
     async getActiveStickId(partyId) {
-        const res = await axios.post(`${this.URL}/api/get-active-stick-id/`, {partyId}, this.httpConfig)
+        const res = await this.axios.post(`${this.URL}/api/get-active-stick-id/`, {partyId}, this.httpConfig)
         return {stickId: res.data.stickId, step: res.data.step};
     }
 
@@ -264,7 +263,7 @@ export default class StickProtocolHandlers {
      */
     async fetchStandardSenderKey(stickId, groupId, oneTimeId) {
         const keysToFetch = [oneTimeId]
-        const response = await axios.post(`${this.URL}/api/fetch-standard-sks/`, {
+        const response = await this.axios.post(`${this.URL}/api/fetch-standard-sks/`, {
             stickId,
             keysToFetch,
             groupId
@@ -302,7 +301,7 @@ export default class StickProtocolHandlers {
 
         // Try to fetch the standard session sender keys from the server, and create group sessions
         if (keysToFetch.length > 0) {
-            const response = await axios.post(`${this.URL}/api/fetch-standard-sks/`, {
+            const response = await this.axios.post(`${this.URL}/api/fetch-standard-sks/`, {
                 stickId,
                 keysToFetch,
                 groupId
@@ -315,9 +314,9 @@ export default class StickProtocolHandlers {
         }
 
         // Get from the server which members the currentUser have not yet uploaded their sender key to
-        const res = await axios.post(`${this.URL}/api/fetch-uploaded-sks/`, {
-            groups_ids: [groupId],
-            connections_ids: [],
+        const res = await this.axios.post(`${this.URL}/api/fetch-uploaded-sks/`, {
+            groupsIds: [groupId],
+            connectionsIds: [],
             isSticky: false,
             stickId
         }, this.httpConfig)
@@ -332,7 +331,7 @@ export default class StickProtocolHandlers {
             }
         }
         if (Object.values(keysToUpload).length > 0)
-            await axios.post(`${this.URL}/api/upload-standard-sks/`, {stickId, keysToUpload}, this.httpConfig)
+            await this.axios.post(`${this.URL}/api/upload-standard-sks/`, {stickId, keysToUpload}, this.httpConfig)
     }
 
     /**
@@ -342,7 +341,7 @@ export default class StickProtocolHandlers {
     async refreshSignedPreKey() {
         const result = await this.StickProtocol.refreshSignedPreKey()
         if (result) {
-            await axios.post(`${this.URL}/api/update-active-spk/`, result, this.httpConfig)
+            await this.axios.post(`${this.URL}/api/update-active-spk/`, result, this.httpConfig)
         }
     }
 
@@ -353,7 +352,7 @@ export default class StickProtocolHandlers {
     async refreshIdentityKey() {
         const result = await this.StickProtocol.refreshIdentityKey()
         if (result) {
-            await axios.post(`${this.URL}/api/update-active-ik/`, result, this.httpConfig)
+            await this.axios.post(`${this.URL}/api/update-active-ik/`, result, this.httpConfig)
         }
     }
 

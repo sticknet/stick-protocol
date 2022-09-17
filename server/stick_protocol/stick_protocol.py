@@ -18,82 +18,82 @@ from django.utils.dateformat import format
 
 class StickProtocol():
 
-    def __init__(self, UserModel, DeviceModel, GroupModel, sessionLifecycle):
+    def __init__(self, UserModel, DeviceModel, GroupModel, session_life_cycle):
         self.User = UserModel
         self.Device = DeviceModel
         self.Group = GroupModel
-        self.sessionLifecycle = sessionLifecycle
+        self.session_life_cycle = session_life_cycle
 
     def process_pre_key_bundle(self, data, user):
         """
         A user must upload their PreKeyBundles at registration time. Before uploading their PreKeyBundles, they need to verify
         their phone number, and get their LimitedAccessToken.
         """
-        identityKey = data["identityKey"]
-        signedPreKey = data["signedPreKey"]
-        preKeys = data["preKeys"]
-        IdentityKey.objects.create(keyId=identityKey['id'], public=identityKey['public'],
-                                   user=user, cipher=identityKey['cipher'], salt=identityKey['salt'],
-                                   timestamp=identityKey['timestamp'], active=True)
-        SignedPreKey.objects.create(public=signedPreKey['public'], signature=signedPreKey["signature"],
-                                    keyId=signedPreKey['id'], user=user, cipher=signedPreKey['cipher'],
-                                    salt=signedPreKey['salt'], timestamp=signedPreKey['timestamp'], active=True)
-        for preKey in preKeys:
-            PreKey.objects.create(public=preKey['public'], keyId=preKey["id"], user=user, cipher=preKey['cipher'],
-                                  salt=preKey['salt'])
-        user.passwordSalt = data["passwordSalt"]
-        user.set_password(data["passwordHash"])  # This will create a "Double-Hashed" password
-        user.oneTimeId = data["oneTimeId"]
-        user.localId = data['localId']
-        user.nextPreKeyId = data['nextPreKeyId']
-        user.finishedRegistration = True
+        identity_key = data['identity_key']
+        signed_pre_key = data['signed_pre_key']
+        pre_keys = data['pre_keys']
+        IdentityKey.objects.create(key_id=identity_key['id'], public=identity_key['public'],
+                                   user=user, cipher=identity_key['cipher'], salt=identity_key['salt'],
+                                   timestamp=identity_key['timestamp'], active=True)
+        SignedPreKey.objects.create(public=signed_pre_key['public'], signature=signed_pre_key['signature'],
+                                    key_id=signed_pre_key['id'], user=user, cipher=signed_pre_key['cipher'],
+                                    salt=signed_pre_key['salt'], timestamp=signed_pre_key['timestamp'], active=True)
+        for pre_key in pre_keys:
+            PreKey.objects.create(public=pre_key['public'], key_id=pre_key['id'], user=user, cipher=pre_key['cipher'],
+                                  salt=pre_key['salt'])
+        user.password_salt = data['password_salt']
+        user.set_password(data['password_hash'])  # This will create a "Double-Hashed" password
+        user.one_time_id = data['one_time_id']
+        user.local_id = data['local_id']
+        user.next_pre_key_id = data['next_pre_key_id']
+        user.finished_registration = True
         user.save()
-        self.Device.objects.create(user=user, deviceId=data['deviceId'], name=data['deviceName'], chatId=data['oneTimeId'])
+        self.Device.objects.create(user=user, device_id=data['device_id'], name=data['device_name'], chat_id=data['one_time_id'])
         Party.objects.create(user=user)
         Party.objects.create(user=user, individual=True)
 
     def process_pre_keys(self, data, user):
         """
         A user would need to refill their PreKeys on the server every while whenever it goes below a certain N value.
-        This method save preKeys and updates the nextPreKeyId value
+        This method save pre_keys and updates the next_pre_key_id value
         """
-        preKeys = data['preKeys']
-        for preKey in preKeys:
-            PreKey.objects.create(public=preKey['public'], keyId=preKey["id"], user=user, cipher=preKey['cipher'],
-                                  salt=preKey['salt'])
-        user.nextPreKeyId = data['nextPreKeyId']
+        pre_keys = data['pre_keys']
+        for pre_key in pre_keys:
+            PreKey.objects.create(public=pre_key['public'], key_id=pre_key['id'], user=user, cipher=pre_key['cipher'],
+                                  salt=pre_key['salt'])
+        user.next_pre_key_id = data['next_pre_key_id']
         user.save()
 
     def get_pre_key_bundle(self, data):
         """
         The following get method is used to fetch the PreKeyBundle of user to create a pairwise signal session. The request must contain
-        a boolean `isSticky` to know whether this bundle would be used to communicate a SenderKey or not. If it will be used to
+        a boolean `is_sticky` to know whether this bundle would be used to communicate a SenderKey or not. If it will be used to
         communicate a SenderKey, then the PreKey must be marked as used, otherwise the PreKey is deleted from the server.
         """
-        userId = data['userId']
-        isSticky = data['isSticky']
-        user = self.User.objects.get(id=userId)
-        identityKey = IdentityKey.objects.get(user=user, active=True)
-        signedPreKey = SignedPreKey.objects.get(user=user, active=True)
-        preKey = PreKey.objects.filter(user=user, used=False).first()
+        user_id = data['user_id']
+        is_sticky = data['is_sticky']
+        user = self.User.objects.get(id=user_id)
+        identity_key = IdentityKey.objects.get(user=user, active=True)
+        signed_pre_key = SignedPreKey.objects.get(user=user, active=True)
+        pre_key = PreKey.objects.filter(user=user, used=False).first()
         PKB = {
-            "identityKey": identityKey.public,
-            "identityKeyId": identityKey.keyId,
-            "userId": userId,
-            "localId": user.localId,
-            "signedPreKey": signedPreKey.public,
-            "signedPreKeyId": signedPreKey.keyId,
-            "signature": signedPreKey.signature,
-            "oneTimeId": user.oneTimeId,
+            'identity_key': identity_key.public,
+            'identity_key_id': identity_key.key_id,
+            'user_id': user_id,
+            'local_id': user.local_id,
+            'signed_pre_key': signed_pre_key.public,
+            'signed_pre_key_id': signed_pre_key.key_id,
+            'signature': signed_pre_key.signature,
+            'one_time_id': user.one_time_id,
         }
-        if preKey:
-            PKB["preKey"] = preKey.public
-            PKB["preKeyId"] = preKey.keyId
-            if not isSticky:
-                preKey.delete()
-            elif preKey:
-                preKey.used = True
-                preKey.save()
+        if pre_key:
+            PKB['pre_key'] = pre_key.public
+            PKB['pre_key_id'] = pre_key.key_id
+            if not is_sticky:
+                pre_key.delete()
+            elif pre_key:
+                pre_key.used = True
+                pre_key.save()
         return PKB
 
     def get_pre_key_bundles(self, currentUser, users_id):
@@ -108,81 +108,81 @@ class StickProtocol():
             users_id.remove(currentUser.id)
             users_id.insert(0, currentUser.id)
 
-        toBeRemoved = []
+        to_be_removed = []
         for id in users_id:
             # If a non-existent user_id was provided, then their id must be removed from the list
             try:
-                identityKey = IdentityKey.objects.get(user__id=id, active=True)
+                identity_key = IdentityKey.objects.get(user__id=id, active=True)
             except:
-                toBeRemoved.append(id)
+                to_be_removed.append(id)
                 continue
-            signedPreKey = SignedPreKey.objects.get(user__id=id, active=True)
-            preKey = PreKey.objects.filter(user__id=id, used=False).first()
+            signed_pre_key = SignedPreKey.objects.get(user__id=id, active=True)
+            pre_key = PreKey.objects.filter(user__id=id, used=False).first()
             user = self.User.objects.get(id=id)
             PKB = {
-                "identityKey": identityKey.public,
-                "identityKeyId": identityKey.keyId,
-                "localId": user.localId,
-                "userId": id,
-                "oneTimeId": user.oneTimeId,
-                "signedPreKey": signedPreKey.public,
-                "signedPreKeyId": signedPreKey.keyId,
-                "signature": signedPreKey.signature,
+                'identity_key': identity_key.public,
+                'identity_key_id': identity_key.key_id,
+                'local_id': user.local_id,
+                'user_id': id,
+                'one_time_id': user.one_time_id,
+                'signed_pre_key': signed_pre_key.public,
+                'signed_pre_key_id': signed_pre_key.key_id,
+                'signature': signed_pre_key.signature,
             }
-            if preKey:
-                PKB["preKey"] = preKey.public
-                PKB["preKeyId"] = preKey.keyId
-                preKey.used = True
-                preKey.save()
+            if pre_key:
+                PKB['pre_key'] = pre_key.public
+                PKB['pre_key_id'] = pre_key.key_id
+                pre_key.used = True
+                pre_key.save()
             bundles[id] = PKB
-        for id in toBeRemoved:
+        for id in to_be_removed:
             users_id.remove(id)
-        dict = {"bundles": bundles, "users_id": users_id}
+        dict = {'bundles': bundles, 'users_id': users_id}
         return dict
 
     def get_sender_key(self, data, user):
         """
         This method is used to fetch the SenderKey of a stickySession.
         The body should contain the following fields:
-            * stickId - String
-            * memberId - String
-            * isSticky - Boolean (are you fetching the SenderKey of a Sticky session or a standard session)
-            * isInvitation - Boolean
+            * stick_id - String
+            * member_id - String
+            * is_sticky - Boolean (are you fetching the SenderKey of a Sticky session or a standard session)
+            * is_invitation - Boolean
         """
-        memberId = data['memberId']
-        stickId = data['stickId']
-        isInvitation = False
-        if 'isInvitation' in data:
-            isInvitation = data['isInvitation']
+        member_id = data['member_id']
+        stick_id = data['stick_id']
+        is_invitation = False
+        if 'is_invitation' in data:
+            is_invitation = data['is_invitation']
         try:
-            member = self.User.objects.get(id=memberId)
+            member = self.User.objects.get(id=member_id)
         except:
-            member = self.User.objects.filter(oneTimeId=memberId).first()
+            member = self.User.objects.filter(one_time_id=member_id).first()
             if not member:
-                return {'partyExists': False}
+                return {'party_exists': False}
 
         # You need to check whether the user is authorized to fetch that SenderKey
         authorized = False
-        partyExists = True
+        party_exists = True
         if user in member.blocked.all():  # A blocked user is not authorized
             return {'authorized': authorized}
-        if isInvitation:  # An invited user is authorized
-            group = self.Group.objects.get(id=stickId[:36])
+        if is_invitation:  # An invited user is authorized
+            group = self.Group.objects.get(id=stick_id[:36])
             if group in user.invited_groups.all():
                 authorized = True
-        elif stickId.startswith(user.parties.get(individual=False).id) or stickId.startswith(user.parties.get(
+        elif stick_id.startswith(user.parties.get(individual=False).id) or stick_id.startswith(user.parties.get(
                 individual=True).id):  # A user is authorized to fetch SenderKeys of their own profile (user.party.id)
             authorized = True
         else:
-            groupId = stickId[:36]
-            group = self.Group.objects.filter(id=groupId).first()
+            group_id = stick_id[:36]
+            group = self.Group.objects.filter(id=group_id).first()
             if group:
                 if group in user.groups.all():  # A group member is authorized
                     authorized = True
             else:
-                party = Party.objects.filter(id=stickId[:36]).first()
+                party = Party.objects.filter(id=stick_id[:36]).first()
                 if not party:
-                    return {'partyExists': False}
+                    return {'party_exists': False}
                 # A user connected with another user should be authorized
                 if party.user and (user in party.user.connections.all() or user.phone in party.user.contacts):
                     authorized = True
@@ -190,71 +190,71 @@ class StickProtocol():
                     if user in party.connections.all():  # A user in the connections list of a party should be authorized
                         authorized = True
                     else:
-                        userGroups = user.groups.all()
+                        user_groups = user.groups.all()
                         for group in party.groups.all():
-                            if group in userGroups:  # If a Party and a User have a mutual Group, then that user is authorized
+                            if group in user_groups:  # If a Party and a User have a mutual Group, then that user is authorized
                                 authorized = True
                                 break
         if not authorized:  # if NOT authorized, return 401
             return {'authorized': authorized}
 
-        if memberId != user.id:  # Trying to fetch DSK
-            senderKey = DecryptionSenderKey.objects.filter(stickId=stickId, ofUser=memberId,
-                                                           forUser=user).first()
+        if member_id != user.id:  # Trying to fetch DSK
+            sender_key = DecryptionSenderKey.objects.filter(stick_id=stick_id, of_user=member_id,
+                                                           for_user=user).first()
         else:  # Trying to fetch ESK
-            partyId = stickId[:36]
-            chainId = stickId[36:]
-            senderKey = EncryptionSenderKey.objects.filter(partyId=partyId, chainId=chainId, user=user).first()
+            party_id = stick_id[:36]
+            chain_id = stick_id[36:]
+            sender_key = EncryptionSenderKey.objects.filter(party_id=party_id, chain_id=chain_id, user=user).first()
         key = None
         phone = None
-        if senderKey:  # If the SenderKey exists, we will return it
-            if memberId != user.id:
-                key = {'key': senderKey.key, 'identityKeyId': senderKey.identityKey.keyId}
+        if sender_key:  # If the SenderKey exists, we will return it
+            if member_id != user.id:
+                key = {'key': sender_key.key, 'identity_key_id': sender_key.identity_key.key_id}
             else:
-                key = {'id': senderKey.keyId, 'key': senderKey.key, 'step': senderKey.step,
-                       'identityKeyId': senderKey.identityKey.keyId}
+                key = {'id': sender_key.key_id, 'key': sender_key.key, 'step': sender_key.step,
+                       'identity_key_id': sender_key.identity_key.key_id}
         # SenderKey does not exist, send a `PendingKey` request to the target user to upload their key,
         # through a realtime database.
         else:
-            if not PendingKey.objects.filter(user=user, stickId=stickId).exists():
-                PendingKey.objects.create(user=user, owner=member, stickId=stickId)
+            if not PendingKey.objects.filter(user=user, stick_id=stick_id).exists():
+                PendingKey.objects.create(user=user, owner=member, stick_id=stick_id)
                 phone = member.phone
-        return {'authorized': authorized, 'senderKey': key, 'phone': phone, 'partyExists': partyExists}
+        return {'authorized': authorized, 'sender_key': key, 'phone': phone, 'party_exists': party_exists}
 
     def get_standard_sender_keys(self, data, user, group):
         """
         This method is used to fetch the standard session sender keys of a group.
         """
-        stickId = data['stickId']
-        keysToFetch = data['keysToFetch']
+        stick_id = data['stick_id']
+        keys_to_fetch = data['keys_to_fetch']
         if group not in user.groups.all():
             return {'authorized': False}
-        senderKeys = {}
-        for id in keysToFetch:
-            senderKey = DecryptionSenderKey.objects.filter(stickId=stickId, ofOneTimeId=id,
-                                                           forOneTimeId=user.oneTimeId).first()
+        sender_keys = {}
+        for id in keys_to_fetch:
+            sender_key = DecryptionSenderKey.objects.filter(stick_id=stick_id, of_one_time_id=id,
+                                                           for_one_time_id=user.one_time_id).first()
             key = None
-            if senderKey:
-                key = senderKey.key
-                # senderKey.delete()
-            senderKeys[id] = key
-        return {'authorized': True, 'senderKeys': senderKeys}
+            if sender_key:
+                key = sender_key.key
+                # sender_key.delete()
+            sender_keys[id] = key
+        return {'authorized': True, 'sender_keys': sender_keys}
 
     def get_stick_id(self, data, user):
         groups_ids = data['groups_ids']
         connections_ids = data['connections_ids']
-        isSticky = data['isSticky']
-        isProfile = False
-        if 'isProfile' in data:
-            isProfile = data['isProfile']
-        if not isProfile and 'partyId' not in data:
+        is_sticky = data['is_sticky']
+        is_profile = False
+        if 'is_profile' in data:
+            is_profile = data['is_profile']
+        if not is_profile and 'party_id' not in data:
             if len(groups_ids) == 1 and len(connections_ids) == 0:  # Sharing with a single group
-                if isSticky:  # Using sticky session
-                    membersIds = self.Group.objects.get(id=groups_ids[0]).get_members_ids()
-                    partyId = groups_ids[0]
+                if is_sticky:  # Using sticky session
+                    members_ids = self.Group.objects.get(id=groups_ids[0]).get_members_ids()
+                    party_id = groups_ids[0]
                 else:  # Using standard session
-                    membersIds = self.Group.objects.get(id=groups_ids[0]).get_members_otids()
-                    partyId = data["stickId"]
+                    members_ids = self.Group.objects.get(id=groups_ids[0]).get_members_otids()
+                    party_id = data['stick_id']
             else:  # Sharing with a collection of groups and/or users
                 if len(connections_ids) > 0 and user.id not in connections_ids:
                     connections_ids.append(user.id)
@@ -263,125 +263,125 @@ class StickProtocol():
                 ids = ''.join(groups_ids + connections_ids)
                 h = hashlib.sha256()
                 h.update(ids.encode())
-                partyHash = h.hexdigest() # partyHash is used for faster DB querying
-                party = Party.objects.filter(partyHash=partyHash).first()
+                party_hash = h.hexdigest() # party_hash is used for faster DB querying
+                party = Party.objects.filter(party_hash=party_hash).first()
                 if party == None:  # Create a new Party object if does not exist
-                    party = Party.objects.create(partyHash=partyHash)
+                    party = Party.objects.create(party_hash=party_hash)
                     party.groups.set(groups_ids)
                     party.connections.set(connections_ids)
-                membersIds = self.__create_targets(user, groups_ids, connections_ids)
-                partyId = party.id
-        elif 'partyId' in data:
-            membersIds = [user.id]
+                members_ids = self.__create_targets(user, groups_ids, connections_ids)
+                party_id = party.id
+        elif 'party_id' in data:
+            members_ids = [user.id]
             if data['type'] != 'group':
-                party = Party.objects.get(id=data['partyId'])
+                party = Party.objects.get(id=data['party_id'])
                 if party.user:
-                    membersIds += party.user.get_connectionsIds()
+                    members_ids += party.user.get_connections_ids()
                     if party.user.id != user.id:
-                        membersIds.append(party.user.id)
+                        members_ids.append(party.user.id)
                 elif data['type'] != 'individual':
-                    membersIds = self.__create_targets(user, groups_ids, connections_ids)
-            partyId = data['partyId']
+                    members_ids = self.__create_targets(user, groups_ids, connections_ids)
+            party_id = data['party_id']
         else:  # Sharing to the currentUser's party (currentUsers' profile)
-            membersIds = connections_ids
-            isIndividual = data['type'] == 'individual'
-            partyId = Party.objects.get(user=user, individual=isIndividual).id
+            members_ids = connections_ids
+            is_individual = data['type'] == 'individual'
+            party_id = Party.objects.get(user=user, individual=is_individual).id
         dict = {}
         bundlesToFetch = []
-        responseDict = {}
+        response_dict = {}
 
-        # Find the right stickId
-        chainId = 0
-        senderKeys = EncryptionSenderKey.objects.filter(partyId=partyId, user=user).order_by('-chainId')
-        if len(senderKeys) > 0:
-            activeSenderKey = senderKeys[0]
-            if not isSticky:  # A standard session is valid
+        # Find the right stick_id
+        chain_id = 0
+        sender_keys = EncryptionSenderKey.objects.filter(party_id=party_id, user=user).order_by('-chain_id')
+        if len(sender_keys) > 0:
+            active_sender_key = sender_keys[0]
+            if not is_sticky:  # A standard session is valid
                 dict[user.id] = {'exists': True}
-            elif activeSenderKey.step < self.sessionLifecycle:  # Check whether is sticky session has not expired
-                chainId = activeSenderKey.chainId
+            elif active_sender_key.step < self.session_life_cycle:  # Check whether is sticky session has not expired
+                chain_id = active_sender_key.chain_id
                 dict[user.id] = {'exists': True}
-                responseDict["step"] = activeSenderKey.step
-            else:  # Sticky session has expired, increment chainId by 1
-                chainId = activeSenderKey.chainId + 1
+                response_dict['step'] = active_sender_key.step
+            else:  # Sticky session has expired, increment chain_id by 1
+                chain_id = active_sender_key.chain_id + 1
                 dict[user.id] = {'exists': False}
-                if user.id not in membersIds:
+                if user.id not in members_ids:
                     bundlesToFetch.append(user.id)
         else:
             dict[user.id] = {'exists': False}
-        stickId = str(partyId) + str(chainId)
+        stick_id = str(party_id) + str(chain_id)
 
-        if not isSticky:
-            stickId = partyId
+        if not is_sticky:
+            stick_id = party_id
 
-        for memberId in membersIds:  # loop of the target users and check if they have their SenderKey
-            if isSticky:
-                if user.id != memberId:
-                    senderKey = DecryptionSenderKey.objects.filter(stickId=stickId, ofUser=user,
-                                                                   forUser=memberId).first()
+        for member_id in members_ids:  # loop of the target users and check if they have their SenderKey
+            if is_sticky:
+                if user.id != member_id:
+                    sender_key = DecryptionSenderKey.objects.filter(stick_id=stick_id, of_user=user,
+                                                                   for_user=member_id).first()
                 else:
-                    senderKey = EncryptionSenderKey.objects.filter(partyId=partyId, chainId=chainId,
+                    sender_key = EncryptionSenderKey.objects.filter(party_id=party_id, chain_id=chain_id,
                                                                    user=user).first()
             else:
-                senderKey = DecryptionSenderKey.objects.filter(stickId=stickId, ofOneTimeId=user.oneTimeId,
-                                                               forOneTimeId=memberId).first()
-            if senderKey:
+                sender_key = DecryptionSenderKey.objects.filter(stick_id=stick_id, of_one_time_id=user.one_time_id,
+                                                               for_one_time_id=member_id).first()
+            if sender_key:
                 response = {'exists': True}
             else:
                 response = {'exists': False}
-                bundlesToFetch.append(memberId)
-            dict[memberId] = response
-        responseDict["stickId"] = stickId
-        responseDict["partyId"] = partyId
-        responseDict["members"] = dict
+                bundlesToFetch.append(member_id)
+            dict[member_id] = response
+        response_dict['stick_id'] = stick_id
+        response_dict['party_id'] = party_id
+        response_dict['members'] = dict
         if user.id in bundlesToFetch:
             bundlesToFetch.remove(user.id)
             bundlesToFetch.insert(0, user.id)
-        responseDict["bundlesToFetch"] = bundlesToFetch
-        return responseDict
+        response_dict['bundlesToFetch'] = bundlesToFetch
+        return response_dict
 
     def __create_targets(self, user, groups_ids, connections_ids):
-        membersIds = []
+        members_ids = []
         for group_id in groups_ids:
             group = self.Group.objects.get(id=group_id)
-            for memberId in group.get_members_ids():
-                if not memberId in membersIds:
-                    membersIds.append(memberId)
+            for member_id in group.get_members_ids():
+                if not member_id in members_ids:
+                    members_ids.append(member_id)
         for connection_id in connections_ids:
-            if not connection_id in membersIds:
-                membersIds.append(connection_id)
-        if user.id not in membersIds:
-            membersIds.append(user.id)
-        return membersIds
+            if not connection_id in members_ids:
+                members_ids.append(connection_id)
+        if user.id not in members_ids:
+            members_ids.append(user.id)
+        return members_ids
 
     def get_active_stick_id(self, data, currentUser):
         """
-        This method gets the active sticky session stickId associated with a particular partyId that already exists, and
+        This method gets the active sticky session stick_id associated with a particular party_id that already exists, and
         its current step.
         """
-        partyId = data['partyId']
-        senderKeys = EncryptionSenderKey.objects.filter(partyId=partyId, user=currentUser).order_by('-chainId')
-        activeSenderKey = senderKeys[0]
-        responseDict = {}
-        if activeSenderKey.step < self.sessionLifecycle:
-            chainId = activeSenderKey.chainId
-            responseDict['step'] = activeSenderKey.step
+        party_id = data['party_id']
+        sender_keys = EncryptionSenderKey.objects.filter(party_id=party_id, user=currentUser).order_by('-chain_id')
+        active_sender_key = sender_keys[0]
+        response_dict = {}
+        if active_sender_key.step < self.session_life_cycle:
+            chain_id = active_sender_key.chain_id
+            response_dict['step'] = active_sender_key.step
         else:
-            chainId = activeSenderKey.chainId + 1
-        responseDict['stickId'] = str(partyId) + str(chainId)
-        return responseDict
+            chain_id = active_sender_key.chain_id + 1
+        response_dict['stick_id'] = str(party_id) + str(chain_id)
+        return response_dict
 
     def process_sender_key(self, data, user):
         """
         This method is used to save a SenderKey of a sticky session for a user. Typically used when a user
         receives a `PendingKey` request.
         """
-        preKey = PreKey.objects.get(keyId=data['preKeyId'], user__id=data['forUser'])
-        forUser = self.User.objects.get(id=data['forUser'])
-        identityKey = IdentityKey.objects.get(keyId=data['identityKeyId'], user__id=data['forUser'])
-        decryptingSenderKey = DecryptionSenderKey.objects.create(key=data['key'],
-                                                                 stickId=data['stickId'], ofUser=user, forUser=forUser,
-                                                                 preKey=preKey, identityKey=identityKey)
-        decryptingSenderKey.save()
+        pre_key = PreKey.objects.get(key_id=data['pre_key_id'], user__id=data['for_user'])
+        for_user = self.User.objects.get(id=data['for_user'])
+        identity_key = IdentityKey.objects.get(key_id=data['identity_key_id'], user__id=data['for_user'])
+        decrypting_sender_key = DecryptionSenderKey.objects.create(key=data['key'],
+                                                                 stick_id=data['stick_id'], of_user=user, for_user=for_user,
+                                                                 pre_key=pre_key, identity_key=identity_key)
+        decrypting_sender_key.save()
 
     def process_sender_keys(self, data, user):
         """
@@ -392,30 +392,30 @@ class StickProtocol():
         users_id = data['users_id']
         keys = data['keys']
         for id in users_id:
-            senderKey = keys[id]
-            preKey = PreKey.objects.get(keyId=senderKey['preKeyId'], user__id=id)
-            identityKey = IdentityKey.objects.get(keyId=senderKey['identityKeyId'], user__id=id)
+            sender_key = keys[id]
+            pre_key = PreKey.objects.get(key_id=sender_key['pre_key_id'], user__id=id)
+            identity_key = IdentityKey.objects.get(key_id=sender_key['identity_key_id'], user__id=id)
             if id != user.id:  # Other user? Create a DSK
-                forUser = self.User.objects.get(id=senderKey['forUser'])
-                DecryptionSenderKey.objects.create(key=senderKey['key'],
-                                                   stickId=senderKey['stickId'], ofUser=user,
-                                                   preKey=preKey, identityKey=identityKey, forUser=forUser)
+                for_user = self.User.objects.get(id=sender_key['for_user'])
+                DecryptionSenderKey.objects.create(key=sender_key['key'],
+                                                   stick_id=sender_key['stick_id'], of_user=user,
+                                                   pre_key=pre_key, identity_key=identity_key, for_user=for_user)
             else:  # Current user? Create an ESK
-                partyId = senderKey['stickId'][:36]
-                chainId = senderKey['stickId'][36:]
-                EncryptionSenderKey.objects.create(keyId=senderKey['id'], preKey=preKey, identityKey=identityKey,
-                                                   partyId=partyId, chainId=chainId,
-                                                   user=user, key=senderKey['key'])
+                party_id = sender_key['stick_id'][:36]
+                chain_id = sender_key['stick_id'][36:]
+                EncryptionSenderKey.objects.create(key_id=sender_key['id'], pre_key=pre_key, identity_key=identity_key,
+                                                   party_id=party_id, chain_id=chain_id,
+                                                   user=user, key=sender_key['key'])
 
     def process_standard_sender_keys(self, data, user):
         """
         This method is used to upload the SenderKeys of a standard session.
         """
-        stickId = data['stickId']
+        stick_id = data['stick_id']
         keysToUpload = data['keysToUpload']
-        for oneTimeId, senderKey in keysToUpload.items():
-            DecryptionSenderKey.objects.create(key=senderKey, stickId=stickId, ofUser=user,
-                                               forOneTimeId=oneTimeId, ofOneTimeId=user.oneTimeId)
+        for one_time_id, sender_key in keysToUpload.items():
+            DecryptionSenderKey.objects.create(key=sender_key, stick_id=stick_id, of_user=user,
+                                               for_one_time_id=one_time_id, of_one_time_id=user.one_time_id)
 
     def update_active_spk(self, data, user):
         """
@@ -424,8 +424,8 @@ class StickProtocol():
         old_spk = SignedPreKey.objects.get(user=user, active=True)
         old_spk.active = False
         old_spk.save()
-        SignedPreKey.objects.create(user=user, public=data['public'], signature=data["signature"],
-                                    keyId=data['id'], cipher=data['cipher'], salt=data['salt'],
+        SignedPreKey.objects.create(user=user, public=data['public'], signature=data['signature'],
+                                    key_id=data['id'], cipher=data['cipher'], salt=data['salt'],
                                     timestamp=data['timestamp'], active=True)
 
     def update_active_ik(self, data, user):
@@ -436,7 +436,7 @@ class StickProtocol():
         old_ik.active = False
         old_ik.save()
         IdentityKey.objects.create(user=user, public=data['public'],
-                                   keyId=data['id'], cipher=data['cipher'], salt=data['salt'],
+                                   key_id=data['id'], cipher=data['cipher'], salt=data['salt'],
                                    timestamp=data['timestamp'], active=True)
 
     def verify_password_and_get_keys(self, data, user):
@@ -453,72 +453,72 @@ class StickProtocol():
         The user will be able to re-establish their pairwise signal sessions. After that, the user can decrypt their ESKs
         as well as any of the DSKs the was sent to them, which they can fetch again from the server as needed.
         """
-        if user.check_password(data['passwordHash']):  # This will create a "double-hash" and verify it
-            signedPreKeysList = SignedPreKey.objects.filter(user=user)
-            identityKeysList = IdentityKey.objects.filter(user=user)
-            preKeysList = PreKey.objects.filter(user=user).order_by('-dt_timestamp')
-            senderKeysList = EncryptionSenderKey.objects.filter(user=user)
-            bundle = {'localId': user.localId}
-            identityKeys = []
-            for ik in identityKeysList:
-                key = {'id': ik.keyId, 'public': ik.public, 'cipher': ik.cipher, 'salt': ik.salt, 'active': ik.active,
+        if user.check_password(data['password_hash']):  # This will create a "double-hash" and verify it
+            signed_pre_keysList = SignedPreKey.objects.filter(user=user)
+            identity_keysList = IdentityKey.objects.filter(user=user)
+            pre_keysList = PreKey.objects.filter(user=user).order_by('-dt_timestamp')
+            sender_keysList = EncryptionSenderKey.objects.filter(user=user)
+            bundle = {'local_id': user.local_id}
+            identity_keys = []
+            for ik in identity_keysList:
+                key = {'id': ik.key_id, 'public': ik.public, 'cipher': ik.cipher, 'salt': ik.salt, 'active': ik.active,
                        'timestamp': ik.timestamp}
-                identityKeys.append(key)
-            bundle['identityKeys'] = identityKeys
-            signedPreKeys = []
-            for spk in signedPreKeysList:
-                key = {'id': spk.keyId, 'public': spk.public, 'cipher': spk.cipher, 'salt': spk.salt,
+                identity_keys.append(key)
+            bundle['identity_keys'] = identity_keys
+            signed_pre_keys = []
+            for spk in signed_pre_keysList:
+                key = {'id': spk.key_id, 'public': spk.public, 'cipher': spk.cipher, 'salt': spk.salt,
                        'signature': spk.signature, 'active': spk.active, 'timestamp': spk.timestamp}
-                signedPreKeys.append(key)
-            bundle['signedPreKeys'] = signedPreKeys
-            preKeys = []
-            for preKey in preKeysList:
-                key = {'id': preKey.keyId, 'public': preKey.public, 'cipher': preKey.cipher, 'salt': preKey.salt,
-                       'used': preKey.used}
-                preKeys.append(key)
-            bundle['preKeys'] = preKeys
-            senderKeys = []
-            for senderKey in senderKeysList:
-                stickId = senderKey.partyId + str(senderKey.chainId)
-                key = {'id': senderKey.keyId, 'key': senderKey.key, 'stickId': stickId, 'step': senderKey.step,
-                       'identityKeyId': senderKey.identityKey.keyId, 'preKeyId': senderKey.preKey.keyId}
-                senderKeys.append(key)
-            bundle['senderKeys'] = senderKeys
+                signed_pre_keys.append(key)
+            bundle['signed_pre_keys'] = signed_pre_keys
+            pre_keys = []
+            for pre_key in pre_keysList:
+                key = {'id': pre_key.key_id, 'public': pre_key.public, 'cipher': pre_key.cipher, 'salt': pre_key.salt,
+                       'used': pre_key.used}
+                pre_keys.append(key)
+            bundle['pre_keys'] = pre_keys
+            sender_keys = []
+            for sender_key in sender_keysList:
+                stick_id = sender_key.party_id + str(sender_key.chain_id)
+                key = {'id': sender_key.key_id, 'key': sender_key.key, 'stick_id': stick_id, 'step': sender_key.step,
+                       'identity_key_id': sender_key.identity_key.key_id, 'pre_key_id': sender_key.pre_key.key_id}
+                sender_keys.append(key)
+            bundle['sender_keys'] = sender_keys
             user.save()
-            device = self.Device.objects.filter(user=user, deviceId=data['deviceId']).first()
+            device = self.Device.objects.filter(user=user, device_id=data['device_id']).first()
             if not device:
-                device = self.Device.objects.create(user=user, deviceId=data['deviceId'], name=data['deviceName'], chatId=uuid.uuid4())
+                device = self.Device.objects.create(user=user, device_id=data['device_id'], name=data['device_name'], chat_id=uuid.uuid4())
             else:
-                device.chatId = uuid.uuid4()
-            bundle['oneTimeId'] = device.chatId
-            return {"bundle": bundle, "verify": True}
+                device.chat_id = uuid.uuid4()
+            bundle['one_time_id'] = device.chat_id
+            return {'bundle': bundle, 'verify': True}
         else:
-            return {"verify": False}
+            return {'verify': False}
 
     def process_reencrypted_keys(self, data, user):
         """
         A method to process reencrypted keys for when changing the user's password
         """
         success = False
-        if user.check_password(data['currentPass']):
-            for key in data['preKeys']:
-                preKey = PreKey.objects.filter(keyId=key['id'], user=user).first()
-                if preKey:
-                    preKey.cipher = key['cipher']
-                    preKey.salt = key['salt']
-                    preKey.save()
-            for key in data['signedPreKeys']:
-                spk = SignedPreKey.objects.get(keyId=key['id'], user=user)
+        if user.check_password(data['current_pass']):
+            for key in data['pre_keys']:
+                pre_key = PreKey.objects.filter(key_id=key['id'], user=user).first()
+                if pre_key:
+                    pre_key.cipher = key['cipher']
+                    pre_key.salt = key['salt']
+                    pre_key.save()
+            for key in data['signed_pre_keys']:
+                spk = SignedPreKey.objects.get(key_id=key['id'], user=user)
                 spk.cipher = key['cipher']
                 spk.salt = key['salt']
                 spk.save()
-            for key in data['identityKeys']:
-                ik = IdentityKey.objects.get(keyId=key['id'], user=user)
+            for key in data['identity_keys']:
+                ik = IdentityKey.objects.get(key_id=key['id'], user=user)
                 ik.cipher = key['cipher']
                 ik.salt = key['salt']
                 ik.save()
-            user.passwordSalt = data["newSalt"]
-            user.set_password(data["newPass"])
+            user.password_salt = data['new_salt']
+            user.set_password(data['new_pass'])
             user.save()
             success = True
-        return {"success": success}
+        return {'success': success}
