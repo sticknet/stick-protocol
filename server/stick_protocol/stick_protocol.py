@@ -287,7 +287,7 @@ class StickProtocol():
             is_individual = data['type'] == 'individual'
             party_id = Party.objects.get(user=user, individual=is_individual).id
         dict = {}
-        bundlesToFetch = []
+        bundles_to_fetch = []
         response_dict = {}
 
         # Find the right stick_id
@@ -305,7 +305,7 @@ class StickProtocol():
                 chain_id = active_sender_key.chain_id + 1
                 dict[user.id] = {'exists': False}
                 if user.id not in members_ids:
-                    bundlesToFetch.append(user.id)
+                    bundles_to_fetch.append(user.id)
         else:
             dict[user.id] = {'exists': False}
         stick_id = str(party_id) + str(chain_id)
@@ -328,15 +328,15 @@ class StickProtocol():
                 response = {'exists': True}
             else:
                 response = {'exists': False}
-                bundlesToFetch.append(member_id)
+                bundles_to_fetch.append(member_id)
             dict[member_id] = response
         response_dict['stick_id'] = stick_id
         response_dict['party_id'] = party_id
         response_dict['members'] = dict
-        if user.id in bundlesToFetch:
-            bundlesToFetch.remove(user.id)
-            bundlesToFetch.insert(0, user.id)
-        response_dict['bundlesToFetch'] = bundlesToFetch
+        if user.id in bundles_to_fetch:
+            bundles_to_fetch.remove(user.id)
+            bundles_to_fetch.insert(0, user.id)
+        response_dict['bundles_to_fetch'] = bundles_to_fetch
         return response_dict
 
     def __create_targets(self, user, groups_ids, connections_ids):
@@ -412,8 +412,8 @@ class StickProtocol():
         This method is used to upload the SenderKeys of a standard session.
         """
         stick_id = data['stick_id']
-        keysToUpload = data['keysToUpload']
-        for one_time_id, sender_key in keysToUpload.items():
+        keys_to_upload = data['keys_to_upload']
+        for one_time_id, sender_key in keys_to_upload.items():
             DecryptionSenderKey.objects.create(key=sender_key, stick_id=stick_id, of_user=user,
                                                for_one_time_id=one_time_id, of_one_time_id=user.one_time_id)
 
