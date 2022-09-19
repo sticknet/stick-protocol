@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		07100FC92607262A00CD0E47 /* StickProtocol.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 07100FBF2607262A00CD0E47 /* StickProtocol.framework */; };
-		07100FCE2607262A00CD0E47 /* StickProtocolTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07100FCD2607262A00CD0E47 /* StickProtocolTests.swift */; };
 		071017D0260741D900CD0E47 /* StorageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07101764260741D900CD0E47 /* StorageManager.swift */; };
 		071017D1260741D900CD0E47 /* StorageManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 07101764260741D900CD0E47 /* StorageManager.swift */; };
 		071017D4260741D900CD0E47 /* SPPreKey.m in Sources */ = {isa = PBXBuildFile; fileRef = 07101767260741D900CD0E47 /* SPPreKey.m */; };
@@ -165,8 +164,6 @@
 /* Begin PBXFileReference section */
 		07100FBF2607262A00CD0E47 /* StickProtocol.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = StickProtocol.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		07100FC82607262A00CD0E47 /* StickProtocolTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = StickProtocolTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		07100FCD2607262A00CD0E47 /* StickProtocolTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StickProtocolTests.swift; sourceTree = "<group>"; };
-		07100FCF2607262A00CD0E47 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		07101764260741D900CD0E47 /* StorageManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StorageManager.swift; sourceTree = "<group>"; };
 		07101767260741D900CD0E47 /* SPPreKey.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SPPreKey.m; sourceTree = "<group>"; };
 		07101768260741D900CD0E47 /* SPIdentity.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SPIdentity.h; sourceTree = "<group>"; };
@@ -305,7 +302,7 @@
 			isa = PBXGroup;
 			children = (
 				07101763260741D900CD0E47 /* StickProtocol */,
-				07100FCC2607262A00CD0E47 /* StickProtocolTests */,
+				078A870D28D75A9100AD3A43 /* StickProtocolTests */,
 				07100FC02607262A00CD0E47 /* Products */,
 				741EF2C16ECE300B8457D45C /* Pods */,
 				17DB993732A2C09AFF2B5521 /* Frameworks */,
@@ -319,15 +316,6 @@
 				07100FC82607262A00CD0E47 /* StickProtocolTests.xctest */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		07100FCC2607262A00CD0E47 /* StickProtocolTests */ = {
-			isa = PBXGroup;
-			children = (
-				07100FCD2607262A00CD0E47 /* StickProtocolTests.swift */,
-				07100FCF2607262A00CD0E47 /* Info.plist */,
-			);
-			path = StickProtocolTests;
 			sourceTree = "<group>";
 		};
 		07101763260741D900CD0E47 /* StickProtocol */ = {
@@ -489,6 +477,13 @@
 				071017CF260741D900CD0E47 /* SignalError.h */,
 			);
 			path = Utility;
+			sourceTree = "<group>";
+		};
+		078A870D28D75A9100AD3A43 /* StickProtocolTests */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = StickProtocolTests;
 			sourceTree = "<group>";
 		};
 		07DB3D562611975700237665 /* Internal */ = {
@@ -838,7 +833,6 @@
 				071017EA260741D900CD0E47 /* CommonCryptoProvider.m in Sources */,
 				07101824260741D900CD0E47 /* PreKey.m in Sources */,
 				0710182A260741D900CD0E47 /* SignalStorage.m in Sources */,
-				07100FCE2607262A00CD0E47 /* StickProtocolTests.swift in Sources */,
 				0710183C260741D900CD0E47 /* GroupCipher.m in Sources */,
 				07101831260741D900CD0E47 /* StickProtocol.swift in Sources */,
 				07101822260741D900CD0E47 /* PreKeyBundle.m in Sources */,

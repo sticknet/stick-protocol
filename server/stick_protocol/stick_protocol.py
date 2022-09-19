@@ -454,31 +454,31 @@ class StickProtocol():
         as well as any of the DSKs the was sent to them, which they can fetch again from the server as needed.
         """
         if user.check_password(data['password_hash']):  # This will create a "double-hash" and verify it
-            signed_pre_keysList = SignedPreKey.objects.filter(user=user)
-            identity_keysList = IdentityKey.objects.filter(user=user)
-            pre_keysList = PreKey.objects.filter(user=user).order_by('-dt_timestamp')
-            sender_keysList = EncryptionSenderKey.objects.filter(user=user)
+            signed_pre_keys_list = SignedPreKey.objects.filter(user=user)
+            identity_keys_list = IdentityKey.objects.filter(user=user)
+            pre_keys_list = PreKey.objects.filter(user=user).order_by('-dt_timestamp')
+            sender_keys_list = EncryptionSenderKey.objects.filter(user=user)
             bundle = {'local_id': user.local_id}
             identity_keys = []
-            for ik in identity_keysList:
+            for ik in identity_keys_list:
                 key = {'id': ik.key_id, 'public': ik.public, 'cipher': ik.cipher, 'salt': ik.salt, 'active': ik.active,
                        'timestamp': ik.timestamp}
                 identity_keys.append(key)
             bundle['identity_keys'] = identity_keys
             signed_pre_keys = []
-            for spk in signed_pre_keysList:
+            for spk in signed_pre_keys_list:
                 key = {'id': spk.key_id, 'public': spk.public, 'cipher': spk.cipher, 'salt': spk.salt,
                        'signature': spk.signature, 'active': spk.active, 'timestamp': spk.timestamp}
                 signed_pre_keys.append(key)
             bundle['signed_pre_keys'] = signed_pre_keys
             pre_keys = []
-            for pre_key in pre_keysList:
+            for pre_key in pre_keys_list:
                 key = {'id': pre_key.key_id, 'public': pre_key.public, 'cipher': pre_key.cipher, 'salt': pre_key.salt,
                        'used': pre_key.used}
                 pre_keys.append(key)
             bundle['pre_keys'] = pre_keys
             sender_keys = []
-            for sender_key in sender_keysList:
+            for sender_key in sender_keys_list:
                 stick_id = sender_key.party_id + str(sender_key.chain_id)
                 key = {'id': sender_key.key_id, 'key': sender_key.key, 'stick_id': stick_id, 'step': sender_key.step,
                        'identity_key_id': sender_key.identity_key.key_id, 'pre_key_id': sender_key.pre_key.key_id}
