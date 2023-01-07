@@ -91,12 +91,12 @@ class StickProtocol():
             PKB['pre_key_id'] = pre_key.key_id
             if not is_sticky:
                 pre_key.delete()
-            elif pre_key:
+            else:
                 pre_key.used = True
                 pre_key.save()
         return PKB
 
-    def get_pre_key_bundles(self, currentUser, users_id):
+    def get_pre_key_bundles(self, current_user, users_id):
         """
         Similar to the above method, but fetches PreKeyBundles of several users at once. This method allows a user to
         communicate their SenderKey to multiple members of a party at once.
@@ -104,9 +104,9 @@ class StickProtocol():
         bundles = {}
         # Make sure the current user is the first in the list. When creating DecryptionSenderKeys client-side to share
         # with other members - there must already be a corresponding EncryptionSenderKey.
-        if currentUser.id in users_id:
-            users_id.remove(currentUser.id)
-            users_id.insert(0, currentUser.id)
+        if current_user.id in users_id:
+            users_id.remove(current_user.id)
+            users_id.insert(0, current_user.id)
 
         to_be_removed = []
         for id in users_id:
@@ -184,7 +184,7 @@ class StickProtocol():
                 if not party:
                     return {'party_exists': False}
                 # A user connected with another user should be authorized
-                if party.user and (user in party.user.connections.all() or user.phone in party.user.contacts):
+                if party.user and user in party.user.connections.all():
                     authorized = True
                 else:
                     if user in party.connections.all():  # A user in the connections list of a party should be authorized
@@ -236,7 +236,8 @@ class StickProtocol():
             key = None
             if sender_key:
                 key = sender_key.key
-                # sender_key.delete()
+                sender_key.key = ''
+                sender_key.save()
             sender_keys[id] = key
         return {'authorized': True, 'sender_keys': sender_keys}
 
@@ -282,7 +283,7 @@ class StickProtocol():
                 elif data['type'] != 'individual':
                     members_ids = self.__create_targets(user, groups_ids, connections_ids)
             party_id = data['party_id']
-        else:  # Sharing to the currentUser's party (currentUsers' profile)
+        else:  # Sharing to the current_user's party (current_users' profile)
             members_ids = connections_ids
             is_individual = data['type'] == 'individual'
             party_id = Party.objects.get(user=user, individual=is_individual).id
@@ -353,13 +354,13 @@ class StickProtocol():
             members_ids.append(user.id)
         return members_ids
 
-    def get_active_stick_id(self, data, currentUser):
+    def get_active_stick_id(self, data, current_user):
         """
         This method gets the active sticky session stick_id associated with a particular party_id that already exists, and
         its current step.
         """
         party_id = data['party_id']
-        sender_keys = EncryptionSenderKey.objects.filter(party_id=party_id, user=currentUser).order_by('-chain_id')
+        sender_keys = EncryptionSenderKey.objects.filter(party_id=party_id, user=current_user).order_by('-chain_id')
         active_sender_key = sender_keys[0]
         response_dict = {}
         if active_sender_key.step < self.session_life_cycle:
