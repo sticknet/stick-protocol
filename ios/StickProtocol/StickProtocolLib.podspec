@@ -1,8 +1,8 @@
 Pod::Spec.new do |spec|
 
 
-  spec.name         = "StickProtocol"
-  spec.version      = "1.2.3"
+  spec.name         = "StickProtocolLib"
+  spec.version      = "1.2.5"
   spec.summary      = "End-to-End Encryption Protocol Tailored For Social Network Platforms"
   spec.swift_version = "5.0"
 
@@ -16,7 +16,7 @@ Pod::Spec.new do |spec|
   spec.license      = { :type => "GPLv3", :text => "Copyright © 2018-2023 StickNet"}
  
 
-  spec.author             = { "Omar Basem" => "founder@stiiick.com" }
+  spec.author             = { "Omar Basem" => "founder@sticknet.org" }
  
 
   spec.ios.deployment_target = "12.0"
@@ -24,9 +24,6 @@ Pod::Spec.new do |spec|
 
 
   spec.source       = { :http => "https://dl.dropboxusercontent.com/s/c6xiws1ans9u8v7/StickProtocol.zip?dl=0" }
-
-
-  # spec.exclude_files = "Classes/Exclude"
 
   spec.pod_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
   spec.user_target_xcconfig = { 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'arm64' }
