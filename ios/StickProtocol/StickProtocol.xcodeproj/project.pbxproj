@@ -147,8 +147,8 @@
 		07DB3D5D261197A700237665 /* group_cipher.c in Sources */ = {isa = PBXBuildFile; fileRef = 07DB3D59261197A700237665 /* group_cipher.c */; };
 		07DB3D5E261197A700237665 /* group_cipher.h in Headers */ = {isa = PBXBuildFile; fileRef = 07DB3D5A261197A700237665 /* group_cipher.h */; };
 		07DB3DA42611A33300237665 /* README.txt in Resources */ = {isa = PBXBuildFile; fileRef = 07DB3DA32611A33300237665 /* README.txt */; };
-		2D83A34A2138A63D53634E4C /* libPods-StickProtocol-StickProtocolTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = A0FA4D9B910C349B6BB82BE5 /* libPods-StickProtocol-StickProtocolTests.a */; };
-		53ADF596B33CABEA0811CB57 /* libPods-StickProtocol.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 90A6DF9FEE0A5CA3DF96A99B /* libPods-StickProtocol.a */; };
+		D54E2E236DC584D5A27CEA31 /* libPods-StickProtocol-StickProtocolTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = C931D886F385077599540319 /* libPods-StickProtocol-StickProtocolTests.a */; };
+		EF63C10CA04C3F7A72B6BD64 /* libPods-StickProtocol.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E7FE48A9E9612CC98AA3708 /* libPods-StickProtocol.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -271,9 +271,9 @@
 		07DB3DA32611A33300237665 /* README.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = README.txt; sourceTree = "<group>"; };
 		480B013D7D38AF279D597F4E /* Pods-StickProtocol.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StickProtocol.debug.xcconfig"; path = "Target Support Files/Pods-StickProtocol/Pods-StickProtocol.debug.xcconfig"; sourceTree = "<group>"; };
 		52665AA51DCE22BE382488C8 /* Pods-StickProtocol-StickProtocolTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StickProtocol-StickProtocolTests.debug.xcconfig"; path = "Target Support Files/Pods-StickProtocol-StickProtocolTests/Pods-StickProtocol-StickProtocolTests.debug.xcconfig"; sourceTree = "<group>"; };
+		5E7FE48A9E9612CC98AA3708 /* libPods-StickProtocol.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-StickProtocol.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6B35F7AC4594F4E0AADA3578 /* Pods-StickProtocol.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StickProtocol.release.xcconfig"; path = "Target Support Files/Pods-StickProtocol/Pods-StickProtocol.release.xcconfig"; sourceTree = "<group>"; };
-		90A6DF9FEE0A5CA3DF96A99B /* libPods-StickProtocol.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-StickProtocol.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		A0FA4D9B910C349B6BB82BE5 /* libPods-StickProtocol-StickProtocolTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-StickProtocol-StickProtocolTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		C931D886F385077599540319 /* libPods-StickProtocol-StickProtocolTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-StickProtocol-StickProtocolTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F9F1F7861AC50EC78A7DF5B0 /* Pods-StickProtocol-StickProtocolTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StickProtocol-StickProtocolTests.release.xcconfig"; path = "Target Support Files/Pods-StickProtocol-StickProtocolTests/Pods-StickProtocol-StickProtocolTests.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -282,7 +282,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				53ADF596B33CABEA0811CB57 /* libPods-StickProtocol.a in Frameworks */,
+				EF63C10CA04C3F7A72B6BD64 /* libPods-StickProtocol.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -291,7 +291,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				07100FC92607262A00CD0E47 /* StickProtocol.framework in Frameworks */,
-				2D83A34A2138A63D53634E4C /* libPods-StickProtocol-StickProtocolTests.a in Frameworks */,
+				D54E2E236DC584D5A27CEA31 /* libPods-StickProtocol-StickProtocolTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -512,8 +512,8 @@
 			children = (
 				071026A32607BD2000CD0E47 /* CocoaLumberjack.framework */,
 				0710269C2607BCF800CD0E47 /* CocoaLumberjack.framework */,
-				90A6DF9FEE0A5CA3DF96A99B /* libPods-StickProtocol.a */,
-				A0FA4D9B910C349B6BB82BE5 /* libPods-StickProtocol-StickProtocolTests.a */,
+				5E7FE48A9E9612CC98AA3708 /* libPods-StickProtocol.a */,
+				C931D886F385077599540319 /* libPods-StickProtocol-StickProtocolTests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -1013,14 +1013,17 @@
 				"EXCLUDED_SOURCE_FILE_NAMES[arch=*]" = "StickProtocol/Internal/*";
 				INFOPLIST_FILE = StickProtocol/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
+				MACH_O_TYPE = mh_dylib;
 				MARKETING_VERSION = 1.2.1;
 				NEW_SETTING = "";
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_SWIFT_FLAGS = "$(inherited) -D COCOAPODS -Xcc -fmodule-map-file=\"${PODS_CONFIGURATION_BUILD_DIR}/CryptoSwift/CryptoSwift.modulemap\" -Xcc -fmodule-map-file=\"${PODS_CONFIGURATION_BUILD_DIR}/SignalArgon2/SignalArgon2.modulemap\" -Xcc -fmodule-map-file=\"${PODS_CONFIGURATION_BUILD_DIR}/SimpleKeychain/SimpleKeychain.modulemap\" -Xcc -fmodule-map-file=\"${PODS_ROOT}/Headers/Public/Mantle/Mantle.modulemap\" -Xcc -fmodule-map-file=\"${PODS_ROOT}/Headers/Public/SQLCipher/SQLCipher.modulemap\" -Xcc -fmodule-map-file=\"${PODS_ROOT}/Headers/Public/YapDatabase/YapDatabase.modulemap\" -Xfrontend -module-interface-preserve-types-as-written";
 				PRODUCT_BUNDLE_IDENTIFIER = com.stiiick.StickProtocol;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;
@@ -1049,14 +1052,17 @@
 				"EXCLUDED_SOURCE_FILE_NAMES[arch=*]" = "StickProtocol/Internal/*";
 				INFOPLIST_FILE = StickProtocol/Info.plist;
 				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
+				IPHONEOS_DEPLOYMENT_TARGET = 12.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 					"@loader_path/Frameworks",
 				);
+				MACH_O_TYPE = mh_dylib;
 				MARKETING_VERSION = 1.2.1;
 				NEW_SETTING = "";
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_SWIFT_FLAGS = "$(inherited) -D COCOAPODS -Xcc -fmodule-map-file=\"${PODS_CONFIGURATION_BUILD_DIR}/CryptoSwift/CryptoSwift.modulemap\" -Xcc -fmodule-map-file=\"${PODS_CONFIGURATION_BUILD_DIR}/SignalArgon2/SignalArgon2.modulemap\" -Xcc -fmodule-map-file=\"${PODS_CONFIGURATION_BUILD_DIR}/SimpleKeychain/SimpleKeychain.modulemap\" -Xcc -fmodule-map-file=\"${PODS_ROOT}/Headers/Public/Mantle/Mantle.modulemap\" -Xcc -fmodule-map-file=\"${PODS_ROOT}/Headers/Public/SQLCipher/SQLCipher.modulemap\" -Xcc -fmodule-map-file=\"${PODS_ROOT}/Headers/Public/YapDatabase/YapDatabase.modulemap\" -Xfrontend -module-interface-preserve-types-as-written";
 				PRODUCT_BUNDLE_IDENTIFIER = com.stiiick.StickProtocol;
 				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
 				SKIP_INSTALL = YES;

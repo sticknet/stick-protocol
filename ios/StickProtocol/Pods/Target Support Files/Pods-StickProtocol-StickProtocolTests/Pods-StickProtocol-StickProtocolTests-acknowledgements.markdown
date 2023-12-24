@@ -5,7 +5,7 @@ This application makes use of the following third party libraries:
 
 BSD 3-Clause License
 
-Copyright (c) 2010-2020, Deusty, LLC
+Copyright (c) 2010-2022, Deusty, LLC
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
@@ -61,7 +61,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 
 ## SQLCipher
 
-Copyright (c) 2008, ZETETIC LLC
+Copyright (c) 2008-2023, ZETETIC LLC
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -716,7 +716,7 @@ copy of the Program in return for a fee.
 
 The MIT License (MIT)
 
-Copyright (c) 2014 Auth0 LLC
+Copyright (c) 2022 Auth0, Inc. <support@auth0.com> (http://auth0.com)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -735,6 +735,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
 
 ## StickySignalProtocolC
 

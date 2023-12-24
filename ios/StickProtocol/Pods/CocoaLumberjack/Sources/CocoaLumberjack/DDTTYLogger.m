@@ -1,6 +1,6 @@
 // Software License Agreement (BSD License)
 //
-// Copyright (c) 2010-2020, Deusty, LLC
+// Copyright (c) 2010-2022, Deusty, LLC
 // All rights reserved.
 //
 // Redistribution and use of this software in source and binary forms,
@@ -713,15 +713,15 @@ static DDTTYLogger *sharedInstance;
         CGContextFillRect(context, CGRectMake(0, 0, 1, 1));
 
         if (rPtr) {
-            *rPtr = pixel[0] / 255.0f;
+            *rPtr = pixel[0] / 255.0;
         }
 
         if (gPtr) {
-            *gPtr = pixel[1] / 255.0f;
+            *gPtr = pixel[1] / 255.0;
         }
 
         if (bPtr) {
-            *bPtr = pixel[2] / 255.0f;
+            *bPtr = pixel[2] / 255.0;
         }
 
         CGContextRelease(context);
@@ -758,7 +758,7 @@ static DDTTYLogger *sharedInstance;
     [self getRed:&inR green:&inG blue:&inB fromColor:inColor];
 
     NSUInteger bestIndex = 0;
-    CGFloat lowestDistance = 100.0f;
+    CGFloat lowestDistance = 100.0;
 
     NSUInteger i = 0;
 
@@ -832,9 +832,11 @@ static DDTTYLogger *sharedInstance;
         return nil;
     }
 
+#if !defined(DD_CLI) || __has_include(<AppKit/NSColor.h>)
     if (@available(iOS 10.0, macOS 10.12, tvOS 10.0, watchOS 3.0, *)) {
         NSLogWarn(@"CocoaLumberjack: Warning: Usage of DDTTYLogger detected when DDOSLogger is available and can be used! Please consider migrating to DDOSLogger.");
     }
+#endif
 
     if ((self = [super init])) {
         // Initialize 'app' variable (char *)
@@ -1184,8 +1186,8 @@ static DDTTYLogger *sharedInstance;
         DDTTYLoggerColorProfile *colorProfile = nil;
 
         if (_colorsEnabled) {
-            if (logMessage->_tag) {
-                colorProfile = _colorProfilesDict[logMessage->_tag];
+            if (logMessage->_representedObject) {
+                colorProfile = _colorProfilesDict[logMessage->_representedObject];
             }
 
             if (colorProfile == nil) {
@@ -1218,20 +1220,21 @@ static DDTTYLogger *sharedInstance;
         NSUInteger msgLen = [logMsg lengthOfBytesUsingEncoding:NSUTF8StringEncoding];
         const BOOL useStack = msgLen < (1024 * 4);
 
-        char msgStack[useStack ? (msgLen + 1) : 1]; // Analyzer doesn't like zero-size array, hence the 1
-        char *msg = useStack ? msgStack : (char *)calloc(msgLen + 1, sizeof(char));
-
+        char *msg;
+        if (useStack) {
+            msg = (char *)alloca(msgLen + 1);
+        } else {
+            msg = (char *)calloc(msgLen + 1, sizeof(char));
+        }
         if (msg == NULL) {
             return;
         }
 
         BOOL logMsgEnc = [logMsg getCString:msg maxLength:(msgLen + 1) encoding:NSUTF8StringEncoding];
-
         if (!logMsgEnc) {
-            if (!useStack && msg != NULL) {
+            if (!useStack) {
                 free(msg);
             }
-
             return;
         }
 
@@ -1239,7 +1242,7 @@ static DDTTYLogger *sharedInstance;
 
         if (isFormatted) {
             // The log message has already been formatted.
-            int iovec_len = (_automaticallyAppendNewlineForCustomFormatters) ? 5 : 4;
+            const int iovec_len = (_automaticallyAppendNewlineForCustomFormatters) ? 5 : 4;
             struct iovec v[iovec_len];
 
             if (colorProfile) {
@@ -1262,7 +1265,7 @@ static DDTTYLogger *sharedInstance;
                 v[iovec_len - 1].iov_len = 0;
             }
 
-            v[2].iov_base = (char *)msg;
+            v[2].iov_base = msg;
             v[2].iov_len = msgLen;
 
             if (iovec_len == 5) {
@@ -1282,12 +1285,14 @@ static DDTTYLogger *sharedInstance;
             // The technique below is faster than using NSDateFormatter.
             if (logMessage->_timestamp) {
                 NSTimeInterval epoch = [logMessage->_timestamp timeIntervalSince1970];
+                double integral;
+                double fract = modf(epoch, &integral);
                 struct tm tm;
-                time_t time = (time_t)epoch;
+                time_t time = (time_t)integral;
                 (void)localtime_r(&time, &tm);
-                int milliseconds = (int)((epoch - floor(epoch)) * 1000.0);
+                long milliseconds = (long)(fract * 1000.0);
 
-                len = snprintf(ts, 24, "%04d-%02d-%02d %02d:%02d:%02d:%03d", // yyyy-MM-dd HH:mm:ss:SSS
+                len = snprintf(ts, 24, "%04d-%02d-%02d %02d:%02d:%02d:%03ld", // yyyy-MM-dd HH:mm:ss:SSS
                                tm.tm_year + 1900,
                                tm.tm_mon + 1,
                                tm.tm_mday,
@@ -1390,17 +1395,17 @@ static DDTTYLogger *sharedInstance;
         if (fgColor) {
             [DDTTYLogger getRed:&r green:&g blue:&b fromColor:fgColor];
 
-            fg_r = (uint8_t)(r * 255.0f);
-            fg_g = (uint8_t)(g * 255.0f);
-            fg_b = (uint8_t)(b * 255.0f);
+            fg_r = (uint8_t)(r * 255.0);
+            fg_g = (uint8_t)(g * 255.0);
+            fg_b = (uint8_t)(b * 255.0);
         }
 
         if (bgColor) {
             [DDTTYLogger getRed:&r green:&g blue:&b fromColor:bgColor];
 
-            bg_r = (uint8_t)(r * 255.0f);
-            bg_g = (uint8_t)(g * 255.0f);
-            bg_b = (uint8_t)(b * 255.0f);
+            bg_r = (uint8_t)(r * 255.0);
+            bg_g = (uint8_t)(g * 255.0);
+            bg_b = (uint8_t)(b * 255.0);
         }
 
         if (fgColor && isaColorTTY) {

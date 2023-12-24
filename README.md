@@ -15,8 +15,10 @@ the Stick protocol shows that it causes no noticeable compromise on usability or
 scientific foundation is 📄 <a href="https://www.sticknet.org/stick-protocol.pdf">published in IEEE</a> for those interested in the
 project’s technical and research motivations.
 
-Stick is the protocol used in <a href="https://www.sticknet.org">StickNet</a> - an end-to-end encrypted social network
-platform.
+Stick is the protocol used in <a href="https://www.sticknet.org">Sticknet</a> - an end-to-end encrypted social network
+platform 
+
+Note: Sticknet is now an end-to-end encrypted and decentralized cloud storage, with an intergrated social network.
 
 # Technical Documentation
 
@@ -95,6 +97,6 @@ npm install stick-protocol-handlers
 
 # License
 
-Copyright © 2018-2022 <a href="https://www.sticknet.org">StickNet</a>
+Copyright © 2018-2022 <a href="https://www.sticknet.org">Sticknet</a>
 
 Licensed under the GPLv3: http://www.gnu.org/licenses/gpl-3.0.html
