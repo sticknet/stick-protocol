@@ -710,3 +710,5 @@ Thumbs.db
 !/gradle/wrapper/gradle-wrapper.jar
 
 # End of https://www.toptal.com/developers/gitignore/api/macos,java,python,objective-c,swift,xcode,android,androidstudio,gradle,django,jetbrains
+
+/ios/StickProtocol/Pods/
