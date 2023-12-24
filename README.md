@@ -15,10 +15,8 @@ the Stick protocol shows that it causes no noticeable compromise on usability or
 scientific foundation is 📄 <a href="https://www.sticknet.org/stick-protocol.pdf">published in IEEE</a> for those interested in the
 project’s technical and research motivations.
 
-Stick is the protocol used in <a href="https://www.sticknet.org">Sticknet</a> - an end-to-end encrypted social network
-platform 
+Stick is the protocol used in <a href="https://www.sticknet.org">Sticknet</a> - an end-to-end encrypted and decentralized cloud storage, with an intergrated social network.
 
-Note: Sticknet is now an end-to-end encrypted and decentralized cloud storage, with an intergrated social network.
 
 # Technical Documentation
 
