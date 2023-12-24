@@ -1,1 +1,0 @@
-../../../YapDatabase/YapDatabase/Extensions/View/Internal/YapDatabaseViewChangePrivate.h

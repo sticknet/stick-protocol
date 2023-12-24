@@ -1,1 +1,0 @@
-../../../Target Support Files/YapDatabase/YapDatabase-umbrella.h

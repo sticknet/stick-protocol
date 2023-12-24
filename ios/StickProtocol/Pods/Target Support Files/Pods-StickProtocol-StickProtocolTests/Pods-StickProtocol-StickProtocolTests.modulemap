@@ -1,6 +1,0 @@
-module Pods_StickProtocol_StickProtocolTests {
-  umbrella header "Pods-StickProtocol-StickProtocolTests-umbrella.h"
-
-  export *
-  module * { export * }
-}
