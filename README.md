@@ -1,5 +1,5 @@
 <h1 align="center">Stick Protocol</h1>
-<p align="center">An End-to-End Encryption Protocol Tailored for Social Network Platforms</p>
+<p align="center">Re-Establishable Group End-to-End Encryption with Post-Compromise Security</p>
 
 [![GPLv3 license](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.html)
 
@@ -17,6 +17,7 @@ project’s technical and research motivations.
 
 Stick is the protocol used in <a href="https://www.sticknet.org">Sticknet</a> - an end-to-end encrypted and decentralized cloud storage, with an intergrated social network.
 
+<b>Note</b>: <i>Although the Stick Protocol was initially developed with a primary focus on social network platforms, it can be extended to other areas where end-to-end encrypted re-establishable sessions would be useful, such as cloud storages.</i>
 
 # Technical Documentation
 
