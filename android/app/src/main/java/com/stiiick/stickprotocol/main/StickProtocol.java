@@ -796,6 +796,7 @@ public class StickProtocol {
         SenderKeyRecord senderKeyRecord = senderKeyStore.loadSenderKey(senderKeyName);
 
         String key = decryptStickyKey(userId, senderKey.getString("key"), senderKey.getInt("identityKeyId"));
+        if (key == null) return;
         String chainKey = key.substring(0, 44);
         String signaturePrivateKey = key.substring(44, 88);
         String signaturePublicKey = key.substring(88, 132);
@@ -834,7 +835,8 @@ public class StickProtocol {
         int activeIdentityKeyId = Preferences.getActiveIdentityKeyId(context);
         // Swap identity key if needed
         if (activeIdentityKeyId != identityKeyId)
-            swapIdentityKey(identityKeyId);
+            Boolean success = swapIdentityKey(identityKeyId);
+        if (!success) return null;
         String key = decryptTextPairwise(senderId, true, cipher);
         // Reverse identity key back if was swapped
         if (activeIdentityKeyId != identityKeyId)
@@ -850,10 +852,14 @@ public class StickProtocol {
     public void swapIdentityKey(int keyId) {
         IdentityKeyDatabase identityKeyDatabase = DatabaseFactory.getIdentityKeyDatabase(context);
         IdentityKeyRecord identityKeyRecord = identityKeyDatabase.getIdentityKey(keyId);
+        if (identityKeyRecord == null) {
+            return false;
+        }
         String publicKey = Base64.encodeBytes(identityKeyRecord.getKeyPair().getPublicKey().serialize());
         String privateKey = Base64.encodeBytes(identityKeyRecord.getKeyPair().getPrivateKey().serialize());
         IdentityKeyUtil.setActive(context, "pref_identity_public", publicKey);
         IdentityKeyUtil.setActive(context, "pref_identity_private", privateKey);
+        return true;
     }
 
 
