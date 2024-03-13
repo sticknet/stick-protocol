@@ -834,8 +834,9 @@ public class StickProtocol {
     public String decryptStickyKey(String senderId, String cipher, int identityKeyId) {
         int activeIdentityKeyId = Preferences.getActiveIdentityKeyId(context);
         // Swap identity key if needed
+        boolean success = true;
         if (activeIdentityKeyId != identityKeyId)
-            Boolean success = swapIdentityKey(identityKeyId);
+            success = swapIdentityKey(identityKeyId);
         if (!success) return null;
         String key = decryptTextPairwise(senderId, true, cipher);
         // Reverse identity key back if was swapped
@@ -849,7 +850,7 @@ public class StickProtocol {
      *
      * @param keyId - int
      */
-    public void swapIdentityKey(int keyId) {
+    public boolean swapIdentityKey(int keyId) {
         IdentityKeyDatabase identityKeyDatabase = DatabaseFactory.getIdentityKeyDatabase(context);
         IdentityKeyRecord identityKeyRecord = identityKeyDatabase.getIdentityKey(keyId);
         if (identityKeyRecord == null) {
