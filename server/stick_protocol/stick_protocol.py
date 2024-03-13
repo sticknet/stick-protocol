@@ -422,9 +422,10 @@ class StickProtocol():
         """
         This method is used to update the active signed prekey for a user
         """
-        old_spk = SignedPreKey.objects.get(user=user, active=True)
-        old_spk.active = False
-        old_spk.save()
+        old_spk = SignedPreKey.objects.filter(user=user, active=True).first()
+        if old_spk:
+            old_spk.active = False
+            old_spk.save()
         SignedPreKey.objects.create(user=user, public=data['public'], signature=data['signature'],
                                     key_id=data['id'], cipher=data['cipher'], salt=data['salt'],
                                     timestamp=data['timestamp'], active=True)
@@ -433,9 +434,10 @@ class StickProtocol():
         """
         This method is used to update the active identity key for a user
         """
-        old_ik = IdentityKey.objects.get(user=user, active=True)
-        old_ik.active = False
-        old_ik.save()
+        old_ik = IdentityKey.objects.filter(user=user, active=True).first()
+        if old_ik:
+            old_ik.active = False
+            old_ik.save()
         IdentityKey.objects.create(user=user, public=data['public'],
                                    key_id=data['id'], cipher=data['cipher'], salt=data['salt'],
                                    timestamp=data['timestamp'], active=True)
