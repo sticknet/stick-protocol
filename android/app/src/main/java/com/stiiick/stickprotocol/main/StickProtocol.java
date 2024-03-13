@@ -527,8 +527,8 @@ public class StickProtocol {
             }
             return new String(bytes, StandardCharsets.UTF_8);
         } catch (InvalidMessageException | DuplicateMessageException | LegacyMessageException
-                | UntrustedIdentityException | InvalidVersionException | InvalidKeyIdException
-                | InvalidKeyException | NoSessionException | IOException e) {
+                 | UntrustedIdentityException | InvalidVersionException | InvalidKeyIdException
+                 | InvalidKeyException | NoSessionException | IOException e) {
             e.printStackTrace();
             SignalProtocolStore store = new MyProtocolStore(context);
             SignalProtocolAddress signalProtocolAddress = new SignalProtocolAddress(senderId, 0);
@@ -538,8 +538,8 @@ public class StickProtocol {
                 PreKeySignalMessage preKeySignalMessage = new PreKeySignalMessage(Base64.decode(cipher));
                 bytes = sessionCipher.decrypt(preKeySignalMessage);
             } catch (DuplicateMessageException | LegacyMessageException | InvalidMessageException
-                    | InvalidKeyIdException | InvalidKeyException | UntrustedIdentityException
-                    | InvalidVersionException | IOException ex) {
+                     | InvalidKeyIdException | InvalidKeyException | UntrustedIdentityException
+                     | InvalidVersionException | IOException ex) {
                 ex.printStackTrace();
             }
             if (bytes != null)
@@ -681,7 +681,7 @@ public class StickProtocol {
             decryptedCipher = groupCipher.decrypt(Base64.decode(cipher), isSticky, isSelf);
             return new String(decryptedCipher, StandardCharsets.UTF_8);
         } catch (LegacyMessageException | InvalidMessageException | DuplicateMessageException
-                | NoSessionException | IOException e) {
+                 | NoSessionException | IOException e) {
             e.printStackTrace();
         }
         return null;
@@ -834,8 +834,13 @@ public class StickProtocol {
     public String decryptStickyKey(String senderId, String cipher, int identityKeyId) {
         int activeIdentityKeyId = Preferences.getActiveIdentityKeyId(context);
         // Swap identity key if needed
+        boolean success = true;
         if (activeIdentityKeyId != identityKeyId)
+<<<<<<< HEAD
             Boolean success = swapIdentityKey(identityKeyId);
+=======
+            success = swapIdentityKey(identityKeyId);
+>>>>>>> 84b96c8 (handle non-existent IK)
         if (!success) return null;
         String key = decryptTextPairwise(senderId, true, cipher);
         // Reverse identity key back if was swapped
@@ -849,7 +854,7 @@ public class StickProtocol {
      *
      * @param keyId - int
      */
-    public void swapIdentityKey(int keyId) {
+    public boolean swapIdentityKey(int keyId) {
         IdentityKeyDatabase identityKeyDatabase = DatabaseFactory.getIdentityKeyDatabase(context);
         IdentityKeyRecord identityKeyRecord = identityKeyDatabase.getIdentityKey(keyId);
         if (identityKeyRecord == null) {
