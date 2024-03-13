@@ -114,7 +114,7 @@ public class Preferences {
     }
 
     public static long getActiveSignedPreKeyTimestamp(@NonNull Context context) {
-        return getLongPreference(context, ACTIVE_SIGNED_PRE_KEY_TIMESTAMP, 0);
+        return getLongPreference(context, ACTIVE_SIGNED_PRE_KEY_TIMESTAMP, 0L);
     }
 
     public static void setActiveSignedPreKeyTimestamp(@NonNull Context context, long value) {
@@ -130,7 +130,7 @@ public class Preferences {
     }
 
     public static long getActiveIdentityKeyTimestamp(@NonNull Context context) {
-        return getLongPreference(context, ACTIVE_IDENTITY_KEY_TIMESTAMP, 0);
+        return getLongPreference(context, ACTIVE_IDENTITY_KEY_TIMESTAMP, 0L);
     }
 
     public static void setActiveIdentityKeyTimestamp(@NonNull Context context, long value) {
