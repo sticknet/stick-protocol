@@ -836,11 +836,7 @@ public class StickProtocol {
         // Swap identity key if needed
         boolean success = true;
         if (activeIdentityKeyId != identityKeyId)
-<<<<<<< HEAD
-            Boolean success = swapIdentityKey(identityKeyId);
-=======
             success = swapIdentityKey(identityKeyId);
->>>>>>> 84b96c8 (handle non-existent IK)
         if (!success) return null;
         String key = decryptTextPairwise(senderId, true, cipher);
         // Reverse identity key back if was swapped
