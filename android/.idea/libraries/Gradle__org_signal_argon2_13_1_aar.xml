@@ -1,9 +1,8 @@
 <component name="libraryTable">
-  <library name="Gradle: org.signal:argon2:13.1@aar">
+  <library name="Gradle: org.signal:argon2:13.1@aar" external-system-id="GRADLE">
     <CLASSES>
-      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/a12cac63557aa8bb563d11e1716523bf/jetified-argon2-13.1/jars/classes.jar!/" />
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/a12cac63557aa8bb563d11e1716523bf/jetified-argon2-13.1/res" />
-      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/a12cac63557aa8bb563d11e1716523bf/jetified-argon2-13.1/AndroidManifest.xml" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-3/32891e148eb95404d112c8745337e4fe/transformed/jetified-argon2-13.1/AndroidManifest.xml" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-3/32891e148eb95404d112c8745337e4fe/transformed/jetified-argon2-13.1/jars/classes.jar!/" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />

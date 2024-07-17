@@ -3,7 +3,7 @@
 //  STiiiCK
 //
 //  Created by Omar Basem on 10/01/2021.
-//  Copyright © 2022 StickNet. All rights reserved.
+//  Copyright © 2022 Sticknet. All rights reserved.
 //
 
 import Foundation
@@ -48,7 +48,7 @@ public class SP {
 
         // Generate password salt
         let passwordSalt = generateRandomBytes(count: 32)
-        
+
         // Hashing password
         let (passwordHash, _) = try! Argon2.hash(iterations: 3, memoryInKiB: 4 * 1024, threads: 2, password: password.data(using: .utf8)!, salt: passwordSalt!, desiredLength: 32, variant: .id, version: .v13)
 
@@ -80,9 +80,9 @@ public class SP {
             counter += 1;
             if (progressEvent != nil) {
                 progressEvent!(["progress": counter, "total": preKeys!.count])
-            } 
+            }
         }
-        
+
         var signedMap = [String: Any]()
         signedMap["id"] = signedPreKey?.preKeyId
         signedMap["public"] = signedPreKey?.keyPair?.publicKey.base64EncodedString()
@@ -98,7 +98,7 @@ public class SP {
         identityMap["cipher"] = identityCipherMap["cipher"]!
         identityMap["salt"] = identityCipherMap["salt"]!
         identityMap["timestamp"] = UserDefaults(suiteName: self.accessGroup!)!.integer(forKey: "activeIdentityKeyTimestamp")
-        
+
         let oneTimeId = UUID().uuidString.lowercased()
         var map = [String: Any]()
         map["identityKey"] = identityMap
@@ -110,7 +110,7 @@ public class SP {
         map["passwordSalt"] = passwordSalt?.base64EncodedString()
         return map
     }
-    
+
 
     /***
      * The StickProtocol Re-Initialize method to decrypt the user's keys and re-establish the sticky
@@ -162,7 +162,7 @@ public class SP {
                 progressEvent!(["progress": count, "total": totalKeys])
             }
         }
-        
+
 
         for key in signedPreKeys {
             let SPKPub = Data(base64Encoded: key["public"] as! String)
@@ -276,7 +276,7 @@ public class SP {
      */
     public func initPairwiseSession(bundle: Dictionary<String, Any>) {
         do {
-            
+
             let databaseConnection = db!.newConnection()
             let encryptionManager = try? EncryptionManager(accessGroup: accessGroup!, databaseConnection: databaseConnection)
             let signalProtocolAddress = SignalAddress(name: bundle["userId"] as! String, deviceId: 0)
@@ -646,8 +646,12 @@ public class SP {
     public func decryptStickKey(senderId: String, cipher: String, identityKeyId: Int) -> String? {
         let activeIdentityKeyId = UserDefaults(suiteName: self.accessGroup!)!.integer(forKey: "activeIdentityKeyId")
         // Swap identity key if needed
+        var success = true
         if (activeIdentityKeyId != identityKeyId) {
-            swapIdentityKey(keyId: UInt32(identityKeyId))
+            success = swapIdentityKey(keyId: UInt32(identityKeyId))
+            if (!success) {
+                return nil
+            }
         }
         let key = decryptTextPairwise(senderId: senderId, isStickyKey: true, cipher: cipher)
         if (activeIdentityKeyId != identityKeyId) {
@@ -661,11 +665,15 @@ public class SP {
      *
      * @param keyId - int
      */
-    public func swapIdentityKey(keyId: UInt32) {
+    public func swapIdentityKey(keyId: UInt32) -> Bool {
         let databaseConnection = db!.newConnection()
         let encryptionManager = try? EncryptionManager(accessGroup: accessGroup!, databaseConnection: databaseConnection)
         let identityKeyPair = encryptionManager?.storage.loadIdentityKey(withId: keyId)
+        if (identityKeyPair == nil) {
+            return false
+        }
         encryptionManager?.storage.setActiveIdentityKeyPair(keyPair: identityKeyPair!)
+        return true
     }
 
     /****************************** END OF STICKY SESSION METHODS ******************************/
@@ -806,7 +814,7 @@ public class SP {
             map["cipher"] = cipherMap["cipher"]!
             map["salt"] = cipherMap["salt"]!
             preKeysArray.append(map)
-            
+
             // Progress
             progress += 1
             if (progressEvent != nil) {
@@ -821,7 +829,7 @@ public class SP {
             map["cipher"] = cipherMap["cipher"]!
             map["salt"] = cipherMap["salt"]!
             signedPreKeysArray.append(map)
-            
+
             // Progress
             progress += 1
             if (progressEvent != nil) {
@@ -836,7 +844,7 @@ public class SP {
             map["cipher"] = cipherMap["cipher"]!
             map["salt"] = cipherMap["salt"]!
             identityKeysArray.append(map)
-            
+
             // Progress
             progress += 1
             if (progressEvent != nil) {

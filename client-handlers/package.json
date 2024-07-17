@@ -1,6 +1,6 @@
 {
   "name": "stick-protocol-handlers",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "Client handlers for the Stick Protocol - an end-to-end encryption protocol tailored for social network platforms",
   "main": "StickProtocolHandlers.js",
   "scripts": {
@@ -15,5 +15,9 @@
   "bugs": {
     "url": "https://github.com/STiiiCK/stick-protocol/issues"
   },
-  "homepage": "https://github.com/STiiiCK/stick-protocol#readme"
+  "homepage": "https://github.com/STiiiCK/stick-protocol#readme",
+  "devDependencies": {
+    "@types/node": "^20.14.11",
+    "typescript": "^5.5.3"
+  }
 }

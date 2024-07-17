@@ -1,5 +1,5 @@
 <component name="libraryTable">
-  <library name="Gradle: org.greenrobot:eventbus:3.2.0">
+  <library name="Gradle: org.greenrobot:eventbus:3.2.0" external-system-id="GRADLE">
     <CLASSES>
       <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.greenrobot/eventbus/3.2.0/b2ef539ed06e49ffc54bf20d48acbc3176196b73/eventbus-3.2.0.jar!/" />
     </CLASSES>

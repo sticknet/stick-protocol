@@ -3,7 +3,7 @@
 //  STiiiCK
 //
 //  Created by Omar Basem on 20/03/2021.
-//  Copyright © 2022 StickNet. All rights reserved.
+//  Copyright © 2022 Sticknet. All rights reserved.
 //
 
 
@@ -151,7 +151,7 @@ static const NSUInteger kHMAC256_EnvelopeKeyLength = 20;
     [dataToAuth appendData:dataToDecrypt];
 
     NSData *_Nullable ourHmacData;
-  
+
     if (hmacType == TSHMACSHA256Truncated10Bytes) {
         // used to authenticate envelope from websocket
         SPAssert(hmacKey.length == kHMAC256_EnvelopeKeyLength);
@@ -165,7 +165,7 @@ static const NSUInteger kHMAC256_EnvelopeKeyLength = 20;
     } else {
         SPFail(@"unknown HMAC scheme: %ld", (long)hmacType);
     }
-  
+
     if (hmac == nil || ![ourHmacData constantTimeIsEqualToData:hmac]) {
         SPLogError(@"Bad HMAC on decrypting payload.");
         // Don't log HMAC in prod
@@ -234,7 +234,7 @@ static const NSUInteger kHMAC256_EnvelopeKeyLength = 20;
                                                                @"Error message when unable to receive an file because the sending client is too old."));
         return nil;
     }
-    
+
     return [self decryptData:dataToDecrypt
                      withKey:key
                       digest:digest

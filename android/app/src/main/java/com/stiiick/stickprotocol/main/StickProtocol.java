@@ -1,5 +1,5 @@
 /*
- *  Copyright © 2018-2022 StickNet.
+ *  Copyright © 2018-2022 Sticknet.
  *
  *  This source code is licensed under the GPLv3 license found in the
  *  LICENSE file in the root directory of this source tree.
@@ -114,6 +114,10 @@ public class StickProtocol {
         path = context.getFilesDir().getPath();
         keychain = new Keychain(context);
         this.passwordKey = service + ".password";
+    }
+
+    public static void setPathForTesting(String testPath) {
+        path = testPath;
     }
 
     /****************************** START OF INITIALIZATION METHODS ******************************/

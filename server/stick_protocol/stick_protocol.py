@@ -1,4 +1,4 @@
-#   Copyright © 2018-2022 StickNet.
+#   Copyright © 2018-2022 Sticknet.
 #
 #   This source code is licensed under the GPLv3 license found in the
 #   LICENSE file in the root directory of this source tree.
@@ -6,10 +6,6 @@
 import uuid, hashlib
 
 from .models import IdentityKey, SignedPreKey, PreKey, EncryptionSenderKey, DecryptionSenderKey, PendingKey, Party
-from django.db.models import Q, Count
-from firebase_admin import db
-from django.conf import settings
-from django.utils.dateformat import format
 
 
 #
@@ -422,25 +418,25 @@ class StickProtocol():
         """
         This method is used to update the active signed prekey for a user
         """
+        SignedPreKey.objects.create(user=user, public=data['public'], signature=data['signature'],
+                                    key_id=data['id'], cipher=data['cipher'], salt=data['salt'],
+                                    timestamp=data['timestamp'], active=True)
         old_spk = SignedPreKey.objects.filter(user=user, active=True).first()
         if old_spk:
             old_spk.active = False
             old_spk.save()
-        SignedPreKey.objects.create(user=user, public=data['public'], signature=data['signature'],
-                                    key_id=data['id'], cipher=data['cipher'], salt=data['salt'],
-                                    timestamp=data['timestamp'], active=True)
 
     def update_active_ik(self, data, user):
         """
         This method is used to update the active identity key for a user
         """
+        IdentityKey.objects.create(user=user, public=data['public'],
+                                   key_id=data['id'], cipher=data['cipher'], salt=data['salt'],
+                                   timestamp=data['timestamp'], active=True)
         old_ik = IdentityKey.objects.filter(user=user, active=True).first()
         if old_ik:
             old_ik.active = False
             old_ik.save()
-        IdentityKey.objects.create(user=user, public=data['public'],
-                                   key_id=data['id'], cipher=data['cipher'], salt=data['salt'],
-                                   timestamp=data['timestamp'], active=True)
 
     def verify_password_and_get_keys(self, data, user):
         """

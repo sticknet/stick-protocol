@@ -13,11 +13,11 @@ Pod::Spec.new do |spec|
   spec.homepage     = "https://github.com/sticknet/stick-protocol"
 
 
-  spec.license      = { :type => "GPLv3", :text => "Copyright © 2018-2023 StickNet"}
- 
+  spec.license      = { :type => "GPLv3", :text => "Copyright © 2018-2023 Sticknet"}
+
 
   spec.author             = { "Omar Basem" => "founder@sticknet.org" }
- 
+
 
   spec.ios.deployment_target = "12.0"
   spec.ios.vendored_frameworks = "StickProtocol.framework"
@@ -32,6 +32,6 @@ Pod::Spec.new do |spec|
   spec.dependency 'SignalArgon2'
   spec.dependency 'StickySignalProtocolC', '~> 1.0.0'
 
- 
+
 
 end

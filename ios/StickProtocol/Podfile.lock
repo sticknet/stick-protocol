@@ -1,17 +1,17 @@
 PODS:
-  - CocoaLumberjack (3.7.0):
-    - CocoaLumberjack/Core (= 3.7.0)
-  - CocoaLumberjack/Core (3.7.0)
-  - CryptoSwift (1.3.8)
-  - Mantle (2.1.6):
-    - Mantle/extobjc (= 2.1.6)
-  - Mantle/extobjc (2.1.6)
+  - CocoaLumberjack (3.8.5):
+    - CocoaLumberjack/Core (= 3.8.5)
+  - CocoaLumberjack/Core (3.8.5)
+  - CryptoSwift (1.8.2)
+  - Mantle (2.2.0):
+    - Mantle/extobjc (= 2.2.0)
+  - Mantle/extobjc (2.2.0)
   - SignalArgon2 (1.3.2)
-  - SimpleKeychain (0.12.2)
-  - SQLCipher (4.4.3):
-    - SQLCipher/standard (= 4.4.3)
-  - SQLCipher/common (4.4.3)
-  - SQLCipher/standard (4.4.3):
+  - SimpleKeychain (1.0.1)
+  - SQLCipher (4.6.0):
+    - SQLCipher/standard (= 4.6.0)
+  - SQLCipher/common (4.6.0)
+  - SQLCipher/standard (4.6.0):
     - SQLCipher/common
   - StickySignalProtocolC (1.0.2)
   - YapDatabase/SQLCipher (3.1.1):
@@ -107,15 +107,15 @@ CHECKOUT OPTIONS:
     :git: https://github.com/signalapp/YapDatabase.git
 
 SPEC CHECKSUMS:
-  CocoaLumberjack: e8955b9d337ac307103b0a34fd141c32f27e53c5
-  CryptoSwift: 01b0f0cba1d5c212e5a335ff6c054fb75a204f00
-  Mantle: 4c0ed6ce47c96eccc4dc3bb071deb3def0e2c3be
+  CocoaLumberjack: 6a459bc897d6d80bd1b8c78482ec7ad05dffc3f0
+  CryptoSwift: c63a805d8bb5e5538e88af4e44bb537776af11ea
+  Mantle: c5aa8794a29a022dfbbfc9799af95f477a69b62d
   SignalArgon2: 1c24183835ca861e6af06631c18b1671cdf35571
-  SimpleKeychain: d6a74781e20ebac8cd89deebf593587913aeed07
-  SQLCipher: 155ffeafc9ac102e5c9b68e3e9a1297a98a27096
+  SimpleKeychain: 130211269f88f038d7dc5254cf0b1b9ce978c398
+  SQLCipher: 30a8e81afa6128e600b17ffa77d0f92fa05ed208
   StickySignalProtocolC: 8d19963b60b8d099605421280d1068b2d92d49c8
   YapDatabase: b418a4baa6906e8028748938f9159807fd039af4
 
-PODFILE CHECKSUM: b13f30b4cf42b00f85ee74b12fb4002e03d593d5
+PODFILE CHECKSUM: e28a72443bd599866167adff076aa7fd0d3ba9cb
 
-COCOAPODS: 1.11.2
+COCOAPODS: 1.15.2

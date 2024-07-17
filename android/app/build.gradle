@@ -1,5 +1,5 @@
 /*
- *  Copyright © 2018-2022 StickNet.
+ *  Copyright © 2018-2022 Sticknet.
  *
  *  This source code is licensed under the GPLv3 license found in the
  *  LICENSE file in the root directory of this source tree.
@@ -10,12 +10,14 @@ plugins {
 }
 
 android {
-    compileSdkVersion 29
-    buildToolsVersion "29.0.3"
+    compileSdkVersion 33
+    buildToolsVersion "33.0.0"
+
+    namespace 'com.stiiick.stickprotocol'
 
     defaultConfig {
         minSdkVersion 19
-        targetSdkVersion 29
+        targetSdkVersion 33
         versionCode 4
         versionName "1.2.3"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -27,14 +29,19 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+    testOptions {
+        unitTests.all {
+            useJUnitPlatform()
+        }
+    }
+    sourceSets {
+        test {
+            java.srcDirs = ['src/test/java']
+        }
     }
 }
 
 dependencies {
-
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'com.google.android.material:material:1.2.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
@@ -49,7 +56,17 @@ dependencies {
     implementation 'com.fasterxml.jackson.core:jackson-annotations:2.10.3'
     implementation 'com.annimon:stream:1.2.1'
 
-    testImplementation 'junit:junit:4.+'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.2'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
+    testImplementation 'org.signal:argon2:13.1@aar'
+    testImplementation 'androidx.test:core:1.6.1'
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.robolectric:robolectric:4.7.3'
+    testImplementation 'org.mockito:mockito-core:3.11.2'
+    testImplementation 'androidx.test:core:1.6.1'
+    testImplementation 'androidx.test.ext:junit:1.2.1'
+    testImplementation 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher:1.7.0'
+    testImplementation 'org.powermock:powermock-module-junit4:2.0.9'
+    testImplementation 'org.powermock:powermock-api-mockito2:2.0.9'
+    testImplementation 'org.assertj:assertj-core:3.20.2'
+
 }
