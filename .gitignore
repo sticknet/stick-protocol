@@ -33,6 +33,9 @@ local.properties
 proguard/
 
 .idea/*
+android/.idea
+ios/.idea
+server/.idea
 # Log Files
 *.log
 
