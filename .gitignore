@@ -34,7 +34,7 @@ proguard/
 
 .idea/*
 android/.idea/*
-ios/.idea/*
+ios/StickProtocol/.idea/*
 server/.idea/*
 # Log Files
 *.log
