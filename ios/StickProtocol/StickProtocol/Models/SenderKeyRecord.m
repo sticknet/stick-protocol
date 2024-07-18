@@ -3,7 +3,7 @@
 //  STiiiCK
 //
 //  Created by Omar Basem on 12/08/2020.
-//  Copyright © 2018-2022 Sticknet. All rights reserved.
+//  Copyright © 2018-2022 StickNet. All rights reserved.
 //
 
 
@@ -37,7 +37,7 @@
 }
 
 - (BOOL) isEmpty {
-
+  
   bool result = sender_key_record_is_empty(_senderkeyRecord);
   if (result == true)
     return YES;
@@ -91,7 +91,7 @@
 - (SenderKeyState *)getSenderKeyState {
   sender_key_state *senderKeyState = NULL;
   sender_key_record_get_sender_key_state(_senderkeyRecord, &senderKeyState);
-
+  
   SenderKeyState *sks = [[SenderKeyState alloc] initWithSenderKeyState:senderKeyState];
   return sks;
 

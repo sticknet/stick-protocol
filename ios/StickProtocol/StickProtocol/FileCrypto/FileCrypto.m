@@ -3,7 +3,7 @@
 //  STiiiCK
 //
 //  Created by Omar Basem on 20/03/2021.
-//  Copyright © 2022 Sticknet. All rights reserved.
+//  Copyright © 2022 StickNet. All rights reserved.
 //
 
 
@@ -151,7 +151,7 @@ static const NSUInteger kHMAC256_EnvelopeKeyLength = 20;
     [dataToAuth appendData:dataToDecrypt];
 
     NSData *_Nullable ourHmacData;
-
+  
     if (hmacType == TSHMACSHA256Truncated10Bytes) {
         // used to authenticate envelope from websocket
         SPAssert(hmacKey.length == kHMAC256_EnvelopeKeyLength);
@@ -165,7 +165,7 @@ static const NSUInteger kHMAC256_EnvelopeKeyLength = 20;
     } else {
         SPFail(@"unknown HMAC scheme: %ld", (long)hmacType);
     }
-
+  
     if (hmac == nil || ![ourHmacData constantTimeIsEqualToData:hmac]) {
         SPLogError(@"Bad HMAC on decrypting payload.");
         // Don't log HMAC in prod
@@ -234,7 +234,7 @@ static const NSUInteger kHMAC256_EnvelopeKeyLength = 20;
                                                                @"Error message when unable to receive an file because the sending client is too old."));
         return nil;
     }
-
+    
     return [self decryptData:dataToDecrypt
                      withKey:key
                       digest:digest
@@ -272,68 +272,22 @@ static const NSUInteger kHMAC256_EnvelopeKeyLength = 20;
     ows_sub_overflow(dataToDecrypt.length, HMAC256_OUTPUT_LENGTH, &hmacOffset);
     NSData *hmac = [dataToDecrypt subdataWithRange:NSMakeRange(hmacOffset, HMAC256_OUTPUT_LENGTH)];
 
-    NSData *_Nullable paddedPlainText = [FileCrypto decryptCBCMode:encryptedFile
-                                                               key:encryptionKey
-                                                                IV:iv
-                                                           version:nil
-                                                           HMACKey:hmacKey
-                                                          HMACType:TSHMACSHA256AttachementType
-                                                      matchingHMAC:hmac
-                                                            digest:digest];
-    if (!paddedPlainText) {
+    NSData *_Nullable decryptedData = [self decryptCBCMode:encryptedFile
+                                                       key:encryptionKey
+                                                        IV:iv
+                                                   version:nil
+                                                   HMACKey:hmacKey
+                                                  HMACType:TSHMACSHA256AttachementType
+                                              matchingHMAC:hmac
+                                                    digest:digest];
+    if (!decryptedData) {
         SPFailDebug(@"couldn't decrypt file.");
         *error = CryptoErrorWithCodeDescription(CryptoErrorCode_FailedToDecryptMessage, NSLocalizedString(@"ERROR_MESSAGE_INVALID_MESSAGE", @""));
         return nil;
-    } else if (unpaddedSize == 0) {
-        // Legacy iOS clients didn't set the unpaddedSize on files.
-        // So an unpaddedSize of 0 could mean one of two things:
-        // [case 1] receiving a legacy file from before padding was introduced
-        // [case 2] receiving a modern file of length 0 that just has some null padding (e.g. an empty group sync)
-        __block BOOL foundNonNullByte = NO;
-        [paddedPlainText enumerateByteRangesUsingBlock:^(const void * _Nonnull bytes, NSRange byteRange, BOOL * _Nonnull stop) {
-            for (NSUInteger i = 0; i < byteRange.length; ++i) {
-                if (((uint8_t*)bytes)[i] != 0x00) {
-                    foundNonNullByte = YES;
-                    *stop = YES;
-                }
-            }
-        }];
-
-        if (foundNonNullByte) {
-            // [case 1] There was something besides 0 in our data, assume it wasn't padding.
-            return paddedPlainText;
-        } else {
-            // [case 2] The bytes were all 0's. We assume it was all padding and the actual
-            // file data was indeed empty. The downside here would be if a legacy client
-            // was intentionally sending an file consisting of just 0's. This seems unlikely,
-            // and would only affect iOS clients from before commit:
-            //
-            //      6eeb78157a044e632adc3daf6254aceacd53e335
-            //      Author: Michael Kirk <michael.code@endoftheworl.de>
-            //      Date:   Thu Oct 26 15:08:25 2017 -0700
-            //
-            //      Include size in file pointer
-            return [NSData new];
-        }
-    } else {
-        if (unpaddedSize > paddedPlainText.length) {
-            *error = CryptoErrorWithCodeDescription(CryptoErrorCode_FailedToDecryptMessage, NSLocalizedString(@"ERROR_MESSAGE_INVALID_MESSAGE", @""));
-            return nil;
-        }
-
-        if (unpaddedSize == paddedPlainText.length) {
-            SPLogInfo(@"decrypted unpadded file.");
-            return [paddedPlainText copy];
-        } else {
-            unsigned long paddingSize;
-            ows_sub_overflow(paddedPlainText.length, unpaddedSize, &paddingSize);
-
-            SPLogInfo(@"decrypted padded file with unpaddedSize: %lu, paddingSize: %lu",
-                (unsigned long)unpaddedSize,
-                paddingSize);
-            return [paddedPlainText subdataWithRange:NSMakeRange(0, unpaddedSize)];
-        }
     }
+
+    SPLogInfo(@"decrypted file.");
+    return decryptedData;
 }
 
 + (unsigned long)paddedSize:(unsigned long)unpaddedSize

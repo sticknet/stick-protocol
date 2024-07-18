@@ -33,6 +33,10 @@ local.properties
 proguard/
 
 .idea/*
+android/.idea/*
+ios/StickProtocol/.idea/*
+server/.idea/*
+client-handlers/node_modules
 # Log Files
 *.log
 

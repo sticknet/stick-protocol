@@ -3,7 +3,7 @@
 //  STiiiCK
 //
 //  Created by Omar Basem on 09/08/2020.
-//  Copyright © 2018-2022 Sticknet. All rights reserved.
+//  Copyright © 2018-2022 StickNet. All rights reserved.
 //
 
 #import "YapDatabaseObject.h"
@@ -66,11 +66,11 @@
     NSParameterAssert(collection);
     NSParameterAssert(uniqueID);
     NSParameterAssert(transaction);
-
+  
     if (!uniqueID || !transaction || !collection) {
         return nil;
     }
-
+  
     id object = [transaction objectForKey:uniqueID inCollection:collection];
     NSParameterAssert(!object || [object isKindOfClass:self.class]);
     return object;

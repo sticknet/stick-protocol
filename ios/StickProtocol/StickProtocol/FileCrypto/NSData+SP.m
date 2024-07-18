@@ -3,7 +3,7 @@
 //  STiiiCK
 //
 //  Created by Omar Basem on 20/08/2020.
-//  Copyright © 2018-2022 Sticknet. All rights reserved.
+//  Copyright © 2018-2022 StickNet. All rights reserved.
 //
 
 #import "NSData+SP.h"
@@ -32,11 +32,11 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)constantTimeIsEqualToData:(NSData *)other
 {
     volatile UInt8 isEqual = 0;
-
+    
     if (self.length != other.length) {
         return NO;
     }
-
+    
     UInt8 *leftBytes = (UInt8 *)self.bytes;
     UInt8 *rightBytes = (UInt8 *)other.bytes;
     for (int i = 0; i < self.length; i++) {
@@ -44,7 +44,7 @@ NS_ASSUME_NONNULL_BEGIN
         // the byte stream to maintain a constant time comparison
         isEqual |= leftBytes[i] ^ rightBytes[i];
     }
-
+    
     return isEqual == 0;
 }
 

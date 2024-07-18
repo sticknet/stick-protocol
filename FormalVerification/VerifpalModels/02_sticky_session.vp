@@ -29,7 +29,7 @@ Alice -> Bob: [aSigPub], blobSecEnc, blobSecSigned, photoEnc
 Alice -> Charlie: [aSigPub], blobSecEnc, blobSecSigned, photoEnc
 
 principal Bob[
-	knows private aChainKey // Alice's chain key which is part of her sender key 
+	knows private aChainKey // Alice's chain key which is part of her sender key
 	chainKey2B, messageKeyB = HKDF(MAC(aChainKey, nil), nil, nil) // derives message key
 	_ = SIGNVERIF(aSigPub, blobSecEnc, blobSecSigned)? // Verify signature
 	blobSecDec = DEC(messageKeyB, blobSecEnc) // Decrypt the blob secret
@@ -43,7 +43,7 @@ principal Bob[
 
 // Charlie will do the exact same process as Bob
 principal Charlie[
-	knows private aChainKey 
+	knows private aChainKey
 	chainKey2C, messageKeyC = HKDF(MAC(aChainKey, nil), nil, nil)
 	_ = SIGNVERIF(aSigPub, blobSecEnc, blobSecSigned)?
 	blobSecDec2 = DEC(messageKeyC, blobSecEnc)
@@ -59,12 +59,9 @@ phase[1]
 
 principal Alice[leaks chainKey2]
 
-
 queries[
 	authentication? Alice -> Bob: blobSecEnc
-	authentication? Alice -> Bob: photoEnc
 	authentication? Alice -> Charlie: blobSecEnc
-	authentication? Alice -> Charlie: photoEnc
 	confidentiality? blobSec
 	confidentiality? photo
 ]

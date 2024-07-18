@@ -3,7 +3,7 @@
 //  STiiiCK
 //
 //  Created by Omar Basem on 10/01/2021.
-//  Copyright © 2022 Sticknet. All rights reserved.
+//  Copyright © 2022 StickNet. All rights reserved.
 //
 
 import Foundation
@@ -43,8 +43,8 @@ public class SP {
      *                          * password salt
      */
     public func initialize(userId: String, password: String, progressEvent: (([String: Any]) -> Void)?) -> [String: Any] {
-        let keychain = A0SimpleKeychain(service: self.service!, accessGroup: self.accessGroup!)
-        keychain.setString(password, forKey: userId + "-password")
+        let keychain = SimpleKeychain(service: self.service!, accessGroup: self.accessGroup!, synchronizable: true)
+        try? keychain.set(password, forKey: userId + "-password")
 
         // Generate password salt
         let passwordSalt = generateRandomBytes(count: 32)
@@ -131,8 +131,8 @@ public class SP {
     public func reInitialize(bundle: Dictionary<String, Any>, password: String, userId: String,
                              progressEvent: (([String: Any]) -> Void)?) {
         UserDefaults(suiteName: self.accessGroup!)!.set(userId, forKey: "userId")
-        let keychain = A0SimpleKeychain(service: self.service!, accessGroup: self.accessGroup!)
-        keychain.setString(password, forKey: userId + "-password")
+        let keychain = SimpleKeychain(service: self.service!, accessGroup: self.accessGroup!, synchronizable: true)
+        try? keychain.set(password, forKey: userId + "-password")
         let databaseConnection = db!.newConnection()
         let encryptionManager = try? EncryptionManager(accessGroup: accessGroup!, databaseConnection: databaseConnection)
         encryptionManager?.storage.setLocalRegistrationId(localId: bundle["localId"] as! UInt32)
@@ -214,8 +214,8 @@ public class SP {
      */
     public func decryptPreKeys(preKeys: [Dictionary<String, Any>]) {
         let myId = UserDefaults(suiteName: self.accessGroup!)!.string(forKey: "userId")
-        let keychain = A0SimpleKeychain(service: self.service!, accessGroup: self.accessGroup!)
-        let password: String = keychain.string(forKey: myId! + "-password")!
+        let keychain = SimpleKeychain(service: self.service!, accessGroup: self.accessGroup!, synchronizable: true)
+        let password: String = try! keychain.string(forKey: myId! + "-password")
         let databaseConnection = self.db!.newConnection()
         let encryptionManager = try? EncryptionManager(accessGroup: accessGroup!, databaseConnection: databaseConnection)
         var count = 0
@@ -510,6 +510,15 @@ public class SP {
         map["cipher"] = cipherText
         return map
     }
+  
+  public func encryptFile(senderId: String, stickId: String, fileData: Data, isSticky: Bool) -> [String: String] {
+      let hashMap = encryptBlob(fileData: fileData)
+      let cipherText = encryptText(userId: senderId, stickId: stickId, text: hashMap!["secret"]!, isSticky: isSticky)
+      var map = [String: String]()
+      map["uri"] = hashMap!["uri"]
+      map["cipher"] = cipherText
+      return map
+  }
 
     /***
      * This method is used to decrypt files in a sticky session
@@ -646,12 +655,8 @@ public class SP {
     public func decryptStickKey(senderId: String, cipher: String, identityKeyId: Int) -> String? {
         let activeIdentityKeyId = UserDefaults(suiteName: self.accessGroup!)!.integer(forKey: "activeIdentityKeyId")
         // Swap identity key if needed
-        var success = true
         if (activeIdentityKeyId != identityKeyId) {
-            success = swapIdentityKey(keyId: UInt32(identityKeyId))
-            if (!success) {
-                return nil
-            }
+            swapIdentityKey(keyId: UInt32(identityKeyId))
         }
         let key = decryptTextPairwise(senderId: senderId, isStickyKey: true, cipher: cipher)
         if (activeIdentityKeyId != identityKeyId) {
@@ -665,15 +670,11 @@ public class SP {
      *
      * @param keyId - int
      */
-    public func swapIdentityKey(keyId: UInt32) -> Bool {
+    public func swapIdentityKey(keyId: UInt32) {
         let databaseConnection = db!.newConnection()
         let encryptionManager = try? EncryptionManager(accessGroup: accessGroup!, databaseConnection: databaseConnection)
         let identityKeyPair = encryptionManager?.storage.loadIdentityKey(withId: keyId)
-        if (identityKeyPair == nil) {
-            return false
-        }
         encryptionManager?.storage.setActiveIdentityKeyPair(keyPair: identityKeyPair!)
-        return true
     }
 
     /****************************** END OF STICKY SESSION METHODS ******************************/
@@ -703,8 +704,8 @@ public class SP {
             let encryptionManager = try? EncryptionManager(accessGroup: accessGroup!, databaseConnection: databaseConnection)
             let identityKey = encryptionManager?.storage.generateIdentityKeyPair().identityKeyPair
 
-            let keychain = A0SimpleKeychain(service: self.service!, accessGroup: self.accessGroup!)
-            let password: String = keychain.string(forKey: userId! + "-password")!
+            let keychain = SimpleKeychain(service: self.service!, accessGroup: self.accessGroup!, synchronizable: true)
+            let password: String = try! keychain.string(forKey: userId! + "-password")
 
             var identityMap = [String: Any]()
             identityMap["public"] = identityKey!.publicKey.base64EncodedString()
@@ -745,8 +746,8 @@ public class SP {
             encryptionManager!.storage.storeSignedPreKey((signedPreKey?.serializedData())!, signedPreKeyId: signedPreKey!.preKeyId)
             UserDefaults(suiteName: self.accessGroup!)!.set(signedPreKey?.preKeyId, forKey: "activeSignedPreKeyId")
             UserDefaults(suiteName: self.accessGroup!)!.set(UInt64(signedPreKey!.unixTimestamp), forKey: "activeSignedPreKeyTimestamp")
-            let keychain = A0SimpleKeychain(service: self.service!, accessGroup: self.accessGroup!)
-            let password: String = keychain.string(forKey: userId! + "-password")!
+            let keychain = SimpleKeychain(service: self.service!, accessGroup: self.accessGroup!, synchronizable: true)
+            let password: String = try! keychain.string(forKey: userId! + "-password")
             var signedMap = [String: Any]()
             signedMap["id"] = signedPreKey?.preKeyId
             signedMap["public"] = signedPreKey?.keyPair?.publicKey.base64EncodedString()
@@ -770,8 +771,8 @@ public class SP {
      */
     public func generatePreKeys(nextPreKeyId: UInt, count: UInt) -> [[String: Any]] {
         let myId = UserDefaults(suiteName: self.accessGroup!)!.string(forKey: "userId")
-        let keychain = A0SimpleKeychain(service: self.service!, accessGroup: self.accessGroup!)
-        let password: String = keychain.string(forKey: myId! + "-password")!
+        let keychain = SimpleKeychain(service: self.service!, accessGroup: self.accessGroup!, synchronizable: true)
+        let password: String = try! keychain.string(forKey: myId! + "-password")
         let databaseConnection = self.db!.newConnection()
         let encryptionManager = try? EncryptionManager(accessGroup: accessGroup!, databaseConnection: databaseConnection)
         let preKeys = encryptionManager?.generatePreKeys(nextPreKeyId, count: count)
@@ -1094,8 +1095,14 @@ public class SP {
      * @return password, String
      */
     public func recoverPassword(userId: String) -> String? {
-        let keychain = A0SimpleKeychain(service: self.service!, accessGroup: self.accessGroup!)
-        return keychain.string(forKey: userId + "-password")
+        let keychain = SimpleKeychain(service: self.service!, accessGroup: self.accessGroup!, synchronizable: true)
+      var password = try? keychain.string(forKey: userId + "-password")
+      if (password == nil) {
+        let nonSyncKeychain = SimpleKeychain(service: self.service!, accessGroup: self.accessGroup!, synchronizable: false)
+          password = try? nonSyncKeychain.string(forKey: userId + "-password")
+        try? keychain.set(password!, forKey: userId + "-password")
+      }
+        return password
     }
 
     /**

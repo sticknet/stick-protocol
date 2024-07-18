@@ -12,12 +12,11 @@ violations. The Stick protocol is an end-to-end encryption protocol, based on th
 for social networks. The Stick protocol supports re-establishable "many-to-many" encryption sessions in an asynchronous
 and multi-device setting while preserving forward secrecy and introducing backward secrecy. Performance evaluation of
 the Stick protocol shows that it causes no noticeable compromise on usability or performance. The Stick protocol's
-scientific foundation is 📄 <a href="https://www.sticknet.org/stick-protocol.pdf">published in IEEE</a> for those interested in the
+scientific foundation is 📄 <a href="https://www.sticknet.org/stick-protocol.pdf">published in IEEE</a> for those
+interested in the
 project’s technical and research motivations.
 
-Stick is the protocol used in <a href="https://www.sticknet.org">Sticknet</a> - an end-to-end encrypted and decentralized cloud storage, with an intergrated social network.
-
-<b>Note</b>: <i>Although the Stick Protocol was initially developed with a primary focus on social network platforms, it can be extended to other areas where end-to-end encrypted re-establishable sessions would be useful, such as cloud storages.</i>
+Stick is the protocol used in <a href="https://www.sticknet.org">Sticknet</a> - a secure social storage platform.
 
 # Technical Documentation
 
@@ -25,7 +24,8 @@ Stick is the protocol used in <a href="https://www.sticknet.org">Sticknet</a> - 
 
 # Usage Documentation
 
-<a href="https://www.sticknet.org/stick-protocol/usage-documentation">Click here<a/> for usage documentation of the Stick
+<a href="https://www.sticknet.org/stick-protocol/usage-documentation">Click here<a/> for usage documentation of the
+Stick
 protocol.
 
 # Installation
@@ -52,7 +52,7 @@ Gradle:
 
 ```gradle
 dependencies {
-  implementation 'com.github.sticknet:stick-protocol:1.2.2'
+   implementation 'com.github.sticknet:stick-protocol:+'
 }
 ```
 
@@ -93,6 +93,17 @@ javascript class</a> contains full usage documentation.
 ```
 npm install stick-protocol-handlers
 ```
+
+## Verification Tests
+
+The Stick protocol has a set of verification tests that can be run to verify the correctness of the protocol.
+These tests are written using <a href="https://verifpal.com/">Verifpal</a>, a formal verification tool for cryptographic
+protocols. The tests are located under `FormalVerification` directory. After installing the Verifpal tool, the tests 
+can be run as follows:
+```
+verifpal verify test_file.vp
+```
+Tests 01->04 are expected to pass, while test 05 is expected to fail.
 
 # License
 
