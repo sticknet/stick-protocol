@@ -1,4 +1,4 @@
-# iOS install guide
+# iOS installation guide
 
 Xcode version 14 and above have problems compiling some of the internal libraries of the Stick Protocol. Follow the
 below
@@ -38,7 +38,7 @@ pod 'YapDatabase/SQLCipher', :git => 'https://github.com/signalapp/YapDatabase.g
 pod 'Mantle', :modular_headers => true
 ```
 
-4. Copy the `DatabaseSetup` directory into your project.
+4. Copy the `stick-protocol/ios/StickProtocol/DatabaseSetup` directory into your project.
 
 5. Add the following to your bridging header:
 
