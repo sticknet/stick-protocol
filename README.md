@@ -61,14 +61,10 @@ main StickProtocol java class file</a> has usage documentation as well. It inclu
 
 ## iOS
 
-CocoaPods:
-
-```
-pod 'StickProtocolLib', '1.2.6'
-```
+Check iOS installation [guide](./ios_installation.md).
 
 The <a href="https://github.com/sticknet/stick-protocol/blob/main/ios/StickProtocol/StickProtocol/Main/StickProtocol.swift">
-main StickProtocol Swift class file</a> has usage documentation as well. It includes all the methods that you would
+main StickProtocol Swift class file</a> has usage documentation. It includes all the methods that you would
 need.
 
 ## Server
@@ -94,7 +90,7 @@ javascript class</a> contains full usage documentation.
 npm install stick-protocol-handlers
 ```
 
-## Verification Tests
+# Verification Tests
 
 The Stick protocol has a set of verification tests that can be run to verify the correctness of the protocol.
 These tests are written using <a href="https://verifpal.com/">Verifpal</a>, a formal verification tool for cryptographic
