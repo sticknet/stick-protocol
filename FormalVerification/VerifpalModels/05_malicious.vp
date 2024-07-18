@@ -25,7 +25,7 @@ principal Server[
 Server -> Bob: [aChainKey], [aSigPub], malpost, postSigned
 
 principal Bob[
-    _ = SIGNVERIF(aSigPub, malpost, postSigned)? // Verify signature
+    _ = SIGNVERIF(aSigPub, malpost, postSigned)? // Verify signature, test should fail here
 	chainKey2B, messageKeyB = HKDF(MAC(aChainKey, nil), nil, nil) // derives message key
 	postDec = DEC(messageKeyB, malpost) // Decrypt the blob secret
 ]
