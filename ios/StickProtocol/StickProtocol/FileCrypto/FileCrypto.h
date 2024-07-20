@@ -3,7 +3,7 @@
 //  STiiiCK
 //
 //  Created by Omar Basem on 20/03/2021.
-//  Copyright © 2022 StickNet. All rights reserved.
+//  Copyright © 2022 Sticknet. All rights reserved.
 //
 
 @import Foundation;

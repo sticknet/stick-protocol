@@ -3,7 +3,7 @@
 //  STiiiCK
 //
 //  Created by Omar Basem on 11/08/2020.
-//  Copyright © 2018-2022 StickNet. All rights reserved.
+//  Copyright © 2018-2022 Sticknet. All rights reserved.
 //
 
 #import "GroupCipher.h"
@@ -75,7 +75,7 @@
     if (!message) { return nil; }
     signal_buffer *buffer = NULL;
     int result = SG_ERR_UNKNOWN;
-    
+
     result = group_cipher_decrypt(_cipher, message.sender_key_message, NULL, &buffer, isSticky, isSelf);
 
     if (result < 0 || !buffer) {

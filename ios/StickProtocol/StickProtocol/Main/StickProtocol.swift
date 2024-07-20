@@ -3,7 +3,7 @@
 //  STiiiCK
 //
 //  Created by Omar Basem on 10/01/2021.
-//  Copyright © 2022 StickNet. All rights reserved.
+//  Copyright © 2022 Sticknet. All rights reserved.
 //
 
 import Foundation
@@ -510,7 +510,7 @@ public class SP {
         map["cipher"] = cipherText
         return map
     }
-  
+
   public func encryptFile(senderId: String, stickId: String, fileData: Data, isSticky: Bool) -> [String: String] {
       let hashMap = encryptBlob(fileData: fileData)
       let cipherText = encryptText(userId: senderId, stickId: stickId, text: hashMap!["secret"]!, isSticky: isSticky)
