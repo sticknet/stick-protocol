@@ -1,8 +1,7 @@
 # iOS installation guide
 
-Xcode version 14 and above have problems compiling some of the internal libraries of the Stick Protocol. Follow the
-below
-steps to add the Stick Protocol into your iOS project.
+Xcode version 14 and above have problems compiling some of the internal libraries of the Stick Protocol when installed
+as a pod framework. Instead, follow the below steps to add the Stick Protocol into your iOS project.
 
 1. Clone the Stick Protocol repository (outside of your project directory):
 
