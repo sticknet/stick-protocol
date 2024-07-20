@@ -3,7 +3,7 @@
 //  STiiiCK
 //
 //  Created by Omar Basem on 09/08/2020.
-//  Copyright © 2018-2022 StickNet. All rights reserved.
+//  Copyright © 2018-2022 Sticknet. All rights reserved.
 //
 
 import UIKit
@@ -43,7 +43,7 @@ open class EncryptionManager {
         self.userId = userId
         self.signalContext = context
         self.storage.delegate = self
-        
+
 
     }
 }
@@ -79,7 +79,7 @@ extension EncryptionManager {
 }
 
 extension EncryptionManager: StorageManagerDelegate {
-    
+
     public func generateIdentityKeyPair() -> SPIdentity {
         let keyHelper = self.keyHelper()!
         let keyPair = keyHelper.generateIdentityKeyPair()!
