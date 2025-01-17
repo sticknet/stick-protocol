@@ -18,7 +18,7 @@ Stick is the protocol used in <a href="https://www.sticknet.org">Sticknet</a> - 
 
 ## Security Features
 
-The Stick protocol benefits from the security features of the Signal protocol, and adds the following new features, or as summarized in <a target="_blank" href="https://omarbasem.com/PDFs/StickProtocolPoster.pdf">this diagram</a>:
+The Stick protocol benefits from the security features of the <a href="https://signal.org/docs/">Signal protocol<a/>, and adds the following new features, or as summarized in <a href="https://omarbasem.com/PDFs/StickProtocolPoster.pdf">this diagram</a>:
 
 1. <b>Re-establishable</b>: A user will be able to securely re-establish their encryption sessions when re-installing the application, or installing on a new device
 
