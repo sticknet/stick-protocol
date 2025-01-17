@@ -16,6 +16,22 @@ project’s technical and research motivations.
 
 Stick is the protocol used in <a href="https://www.sticknet.org">Sticknet</a> - a secure social storage platform.
 
+## Security Features
+
+The Stick protocol benefits from the security features of the Signal protocol, and adds the following new features, or as summarized in <a target="_blank" href="https://omarbasem.com/PDFs/StickProtocolPoster.pdf">this diagram</a>:
+
+1. <b>Re-establishable</b>: A user will be able to securely re-establish their encryption sessions when re-installing the application, or installing on a new device
+
+2. <b>Multi Device</b>: Stick protocol provides end-to-end encryption for all of a user's devices.
+
+3. <b>Perfect forward & backward secrecy for sharing sender keys</b>: provided by multiple pairwise sessions
+
+4. <b>Many-to-many backward secrecy</b>: sticky sessions provides backward secrecy for group communications every a maximum of N Encryptions.
+
+5. <b>Identity Keys self-healing</b>: A user's identity key refreshes every while to mitigate the effect of an identity key compromise
+
+6. <b>Double-Hashing</b>: for complete hiding of the user's password, even from the service provider at login
+
 ## Technical Documentation
 
 <a href="https://www.sticknet.org/stick-protocol">Click here<a/> for technical documentation of the Stick protocol.
