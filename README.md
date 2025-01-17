@@ -94,11 +94,11 @@ pip3 install stick-protocol-server
 
 ### Client Handlers
 
-The Stick protocol implementation features a client handlers library in JavaScript. It contains common handler methods
+The Stick protocol implementation features a client handlers library in TypeScript. It contains common handler methods
 needed for the Stick protocol client-side. These handlers may differ from one application to another. A developer is
 free to write their own handlers. They can be implemented in any programming language.
-The <a href="https://github.com/stickapp/stick-protocol/blob/main/client-handlers/StickProtocolHandlers.js">main
-javascript class</a> contains full usage documentation.
+The <a href="https://github.com/sticknet/stick-protocol/blob/main/client-handlers/src/StickProtocolHandlers.ts">main
+TypeScript class</a> contains full usage documentation.
 
 ```
 yarn add stick-protocol-handlers@1.2.2
